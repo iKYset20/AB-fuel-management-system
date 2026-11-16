@@ -46,6 +46,9 @@
         getLastOperatorByUnit:  { auth: true,  latest: false },
         getMasterQRFullList:    { auth: true,  latest: true }
     };
+    /* Selain fungsi baca, fungsi ini aman diulang sekali saat jaringan baru pulih:
+       handleIdempotentSync menolak transaction_id ganda di server; sisanya hanya memperbarui sesi/kehadiran. */
+    var RETRY_SAFE = { handleIdempotentSync: true, keepAliveSession: true, getOnlineUsers: true };
     var MAX_PER_FN = 12;
     var PREFETCH_EVERY_MS = 15 * 60 * 1000;
 
@@ -245,10 +248,10 @@
         // Logout: hapus data master yang butuh login dari perangkat ini
         if (fnName === 'logoutSession' || fnName === 'logoutAllSessions') purgeAuthCache();
 
-        // Fungsi BACA: bila jaringan gagal padahal browser "online" (mis. tepat setelah tersambung
-        // kembali / sinyal lemah), coba sekali lagi setelah 1,5 dtk. Fungsi tulis TIDAK diulang.
+        // Fungsi BACA & RETRY_SAFE: bila jaringan gagal padahal browser "online" (mis. tepat setelah
+        // tersambung kembali / sinyal lemah), coba sekali lagi setelah 1,5 dtk. Fungsi tulis lain TIDAK diulang.
         var attempt = postToServer(fnName, args);
-        if (CACHEABLE[fnName]) {
+        if (CACHEABLE[fnName] || RETRY_SAFE[fnName]) {
             attempt = attempt.catch(function (err) {
                 if (err.name !== 'NetworkError' || !(global.navigator && global.navigator.onLine)) throw err;
                 return new Promise(function (r) { setTimeout(r, 1500); }).then(function () { return postToServer(fnName, args); });

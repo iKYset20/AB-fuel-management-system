@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=2b73e90171"></script>
-    <script src="./pages-offline-ui.js?v=2b73e90171" defer></script>
+    <script src="./gas-adapter.js?v=43495ee68c"></script>
+    <script src="./pages-offline-ui.js?v=43495ee68c" defer></script>
+    <script src="./pages-install.js?v=43495ee68c" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
@@ -50,7 +51,17 @@
     </script>
 
     <!-- Favicon -->
-    <link href="https://cdn-icons-png.flaticon.com/512/2933/2933804.png" rel="icon">
+    <!-- [Fase 10] Aplikasi terpasang (PWA) — khusus versi GitHub Pages -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <meta name="theme-color" content="#0D2119">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="AB-Fuel">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="application-name" content="AB-Fuel">
 
     <!-- Google Web Fonts (Modern: Plus Jakarta Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
