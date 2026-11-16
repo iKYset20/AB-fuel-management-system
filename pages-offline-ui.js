@@ -115,16 +115,24 @@
         }
     }
 
+    var lastLiveAt = 0;
+    var LIVE_GRACE_MS = 15000;
+
     window.addEventListener('abfuel:cache-served', function (e) {
         var d = e.detail || {};
+        // Kegagalan "terlambat" (permintaan yang sudah berjalan saat koneksi berganti) tidak boleh
+        // memunculkan lagi status offline bila server baru saja terbukti terjangkau.
+        if (navigator.onLine && Date.now() - lastLiveAt < LIVE_GRACE_MS) return;
         servedFns[d.fn] = { savedAt: d.savedAt || Date.now() };
         showOffline();
     });
 
-    window.addEventListener('abfuel:live', function (e) {
-        var d = e.detail || {};
-        if (servedFns[d.fn]) delete servedFns[d.fn];
-        if (!Object.keys(servedFns).length && el && el.classList.contains('is-shown') && navigator.onLine) {
+    window.addEventListener('abfuel:live', function () {
+        lastLiveAt = Date.now();
+        // Server terjangkau → koneksi pulih. Semua penanda "data tersimpan" dilepas (Laporan/Lokasi
+        // tidak dimuat ulang otomatis; tanpa ini pemberitahuan bisa tertahan selamanya).
+        servedFns = {};
+        if (el && el.classList.contains('is-shown') && navigator.onLine) {
             show('Kembali online', 'Data terbaru sudah dimuat dari server.', true);
             hide(3500);
         }
