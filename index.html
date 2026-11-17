@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=d08df3ed29"></script>
-    <script src="./pages-offline-ui.js?v=d08df3ed29" defer></script>
-    <script src="./pages-install.js?v=d08df3ed29" defer></script>
+    <script src="./gas-adapter.js?v=d5eda05cc5"></script>
+    <script src="./pages-offline-ui.js?v=d5eda05cc5" defer></script>
+    <script src="./pages-install.js?v=d5eda05cc5" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3182,6 +3182,38 @@
         .net-status-pill:not(:has(.badge:not(.d-none))) { width: 36px; padding: 0; gap: 0; justify-content: center; }
     }
 
+    /* Kartu Audit Deviasi: ringkasan + daftar deviasi terbesar (gaya baris = tabel kartu tetangga) */
+    .dash-audit-body { align-items: stretch; justify-content: flex-start; gap: 12px; padding: 2px 0 0; }
+    .audit-summary { display: flex; align-items: baseline; gap: 8px; padding: 0 2px; }
+    .audit-summary-value { font-size: 1.9rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--text-primary); }
+    .audit-summary-value.is-alert { color: var(--status-error); }
+    .audit-summary-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); }
+    .audit-top-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .audit-top-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; border-radius: 12px;
+        background: var(--bg-inset); border: 1px solid var(--border-subtle);
+    }
+    .audit-top-rank { flex: 0 0 auto; width: 16px; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+    .audit-top-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+    .audit-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .audit-top-unit { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-top-chip { flex-shrink: 0; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 0.66rem; font-weight: 800; }
+    .audit-top-chip.is-danger { background: var(--status-error-bg); color: var(--status-error); }
+    .audit-top-chip.is-warn { background: var(--status-warning-bg); color: var(--status-warning); }
+    .audit-top-bar { display: block; height: 3px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--text-muted) 16%, transparent); overflow: hidden; }
+    .audit-top-bar > span { display: block; height: 100%; border-radius: inherit; transition: width var(--dur-gauge, 0.9s) var(--ease-gauge, ease); }
+    .audit-top-bar.is-danger > span { background: var(--status-error); }
+    .audit-top-bar.is-warn > span { background: var(--status-warning); }
+    .audit-top-empty { padding: 12px; border-radius: 12px; background: var(--bg-inset); font-size: 0.78rem; text-align: center; }
+    .audit-top-empty.is-ok { color: var(--status-success); font-weight: 600; }
+
+    /* Peta: tombol muat ulang / tampilkan semua lokasi (di bawah pilihan Satelit/Jalan) */
+    .dash-map-fit a { display: flex !important; align-items: center; justify-content: center; width: 34px !important; height: 34px !important; font-size: 0.82rem; color: var(--text-primary) !important; }
+    .dash-map-fit a:hover { color: var(--brand-text) !important; }
+    .dash-map-fit a.is-spinning i { animation: dashMapSpin 0.7s linear; }
+    @keyframes dashMapSpin { to { transform: rotate(360deg); } }
+
     /* Avatar ilustrasi: grid rapi */
     .preset-avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 10px; }
     .preset-avatar-grid .preset-avatar-item { width: 100%; height: auto; aspect-ratio: 1; }
@@ -3744,11 +3776,15 @@
                         Tampilkan Unit (<span id="countDeviasi">0</span>)
                     </button>
                 </div>
+                <!-- [Fase 13] Ringkasan + daftar deviasi terbesar (selaras dengan tabel kartu tetangga) -->
                 <div class="dash-audit-body">
-                    <div class="audit-kpi-well">
-                        <h1 class="text-danger fw-bold mb-0 pulse-alert-text tabular-nums" id="totalDeviasiAnomaliCount">0</h1>
+                    <div class="audit-summary">
+                        <span class="audit-summary-value tabular-nums" id="totalDeviasiAnomaliCount">0</span>
+                        <span class="audit-summary-label">unit di luar toleransi</span>
                     </div>
-                    <span class="dash-card-sub text-uppercase fw-bold">Unit Anomali / Boros</span>
+                    <ul class="audit-top-list" id="auditTopList" aria-label="Unit dengan deviasi terbesar">
+                        <li class="audit-top-empty text-muted">Loading data...</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -9493,6 +9529,7 @@ function renderTableAuditDeviasi(items) {
 
   if (countElem) {
     countElem.innerText = totalCount;
+    countElem.classList.toggle('is-alert', totalCount > 0);
   }
 
   if (btnViewAll && countSpan) {
@@ -9503,6 +9540,31 @@ function renderTableAuditDeviasi(items) {
       btnViewAll.classList.add('d-none');
     }
   }
+
+  // [Fase 13] Daftar 4 unit dengan deviasi terbesar: kode unit, chip %, bar sebanding besar deviasi
+  const list = document.getElementById('auditTopList');
+  if (!list) return;
+  if (!totalCount) {
+    list.innerHTML = '<li class="audit-top-empty is-ok"><i class="fa fa-check-circle me-2"></i>Semua unit dalam toleransi</li>';
+    return;
+  }
+  const devNum = (it) => { const n = parseFloat(String(it.deviasiText || '').replace(',', '.').replace(/[^0-9.+-]/g, '')); return isFinite(n) ? n : 0; };
+  const sorted = globalDeviasiData.slice().sort((a, b) => Math.abs(devNum(b)) - Math.abs(devNum(a))).slice(0, 4);
+  const maxAbs = Math.max(1, ...sorted.map(it => Math.abs(devNum(it))));
+  list.innerHTML = sorted.map((it, i) => {
+    const d = devNum(it);
+    const isBoros = String(it.statusText || '').toUpperCase() === 'BOROS' || String(it.badgeClass || '').indexOf('bg-danger') !== -1;
+    const tone = isBoros ? 'is-danger' : 'is-warn';
+    const w = Math.max(6, Math.round(Math.abs(d) / maxAbs * 100));
+    return `<li class="audit-top-item">
+        <span class="audit-top-rank tabular-nums">${i + 1}</span>
+        <span class="audit-top-main">
+          <span class="audit-top-row"><span class="audit-top-unit">${escapeHtml(it.unit || it.kodeUnit || '-')}</span>
+            <span class="audit-top-chip ${tone} tabular-nums" title="${escapeHtml(it.statusText || '')}">${escapeHtml(it.deviasiText || '-')}</span></span>
+          <span class="audit-top-bar ${tone}" aria-hidden="true"><span style="width:${w}%"></span></span>
+        </span>
+      </li>`;
+  }).join('');
 }
 
 function openModalDeviasi() {
@@ -10461,11 +10523,43 @@ function initDashMap() {
   satelit.addTo(DASH_MAP);
   // HP: pemilih peta dasar diciutkan jadi ikon agar tidak menutupi titik
   L.control.layers({ 'Satelit': satelit, 'Jalan': jalan }, null, { position: 'topright', collapsed: window.innerWidth < 768 }).addTo(DASH_MAP);
+  // [Fase 13] Tombol muat ulang (di bawah pilihan peta): ambil ulang titik & tampilkan semua lokasi aktif
+  const FitControl = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: function() {
+      const box = L.DomUtil.create('div', 'leaflet-bar leaflet-control dash-map-fit');
+      const a = L.DomUtil.create('a', '', box);
+      a.href = '#'; a.id = 'btnDashMapFit';
+      a.title = 'Muat ulang & tampilkan semua lokasi aktif';
+      a.setAttribute('role', 'button');
+      a.setAttribute('aria-label', 'Muat ulang dan tampilkan semua lokasi aktif');
+      a.innerHTML = '<i class="fa fa-sync-alt" aria-hidden="true"></i>';
+      L.DomEvent.disableClickPropagation(box);
+      L.DomEvent.on(a, 'click', function(e) {
+        L.DomEvent.preventDefault(e);
+        a.classList.add('is-spinning');
+        setTimeout(() => a.classList.remove('is-spinning'), 700);
+        fitDashMapToAll();
+        loadDashMapPoints(true); // titik terbaru dari server → peta disesuaikan lagi setelah data masuk
+      });
+      return box;
+    }
+  });
+  new FitControl().addTo(DASH_MAP);
   DASH_MAP.on('focus', () => DASH_MAP.scrollWheelZoom.enable());
   DASH_MAP.on('blur', () => DASH_MAP.scrollWheelZoom.disable());
   DASH_MAP_LAYER = L.layerGroup().addTo(DASH_MAP);
   if (window.ResizeObserver) new ResizeObserver(() => DASH_MAP && DASH_MAP.invalidateSize()).observe(el);
   return DASH_MAP;
+}
+
+// Sesuaikan tampilan peta agar semua titik lokasi aktif terlihat
+function fitDashMapToAll() {
+  if (!DASH_MAP) return;
+  const pts = DASH_MAP_POINTS.map(p => [p.lat, p.lng]);
+  if (!pts.length) { DASH_MAP.setView([-0.5, 117.15], 5); return; }
+  if (pts.length === 1) DASH_MAP.setView(pts[0], 14);
+  else DASH_MAP.fitBounds(pts, { padding: [36, 36], maxZoom: 15 });
 }
 
 function updateDashMapConsumption(data) {
@@ -10524,10 +10618,7 @@ function renderDashMapMarkers(fit) {
     m.addTo(DASH_MAP_LAYER);
     bounds.push([p.lat, p.lng]);
   });
-  if (fit && bounds.length) {
-    if (bounds.length === 1) DASH_MAP.setView(bounds[0], 14);
-    else DASH_MAP.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
-  }
+  if (fit && bounds.length) fitDashMapToAll();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
