@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=3a8ea7a664"></script>
-    <script src="./pages-offline-ui.js?v=3a8ea7a664" defer></script>
-    <script src="./pages-install.js?v=3a8ea7a664" defer></script>
+    <script src="./gas-adapter.js?v=d08df3ed29"></script>
+    <script src="./pages-offline-ui.js?v=d08df3ed29" defer></script>
+    <script src="./pages-install.js?v=d08df3ed29" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3143,6 +3143,49 @@
     .dash-map-tip { font-weight: 700; font-size: 0.7rem; border-radius: 8px; }
     @media print { .dash-map-card, .lokasi-picker-map { display: none !important; } }
 
+    /* =========================================================================
+       §F13 — CATATAN UJI LANJUTAN (Fase 13, 2026-11-17). Hanya CSS; ID/handler tetap.
+       ========================================================================= */
+
+    /* Tombol aksi hero Dashboard (desktop/tablet): lebih kecil, tinggi & jarak ikon seragam */
+    .dash-hero-actions { gap: 6px; }
+    .dash-hero-actions > .btn,
+    .dash-hero-actions > .btn-audio-mute {
+        height: 34px; padding: 0 14px !important;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        font-size: 0.74rem; font-weight: 600; line-height: 1; letter-spacing: 0;
+        border-radius: var(--radius-pill) !important;
+    }
+    .dash-hero-actions > .btn i,
+    .dash-hero-actions > .btn-audio-mute i { margin: 0 !important; font-size: 0.72rem; width: 0.9em; text-align: center; }
+
+    /* HP: chip Live/Anomali (ikon) sejajar ucapan di pojok kanan; 4 KPI Dashboard 2×2 ringkas */
+    @media (max-width: 767.98px) {
+        .dash-hero { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title status" "sub sub" "actions actions"; }
+        .dash-hero-status { justify-self: end; align-self: center; margin: 0; }
+        .dash-hero-actions > .btn,
+        .dash-hero-actions > .btn-audio-mute { height: 36px; }
+
+        .dash-v7 .row.g-3:has(> .col-6 > .kpi-stat) { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
+        .dash-v7 .kpi-stat { padding: 14px 12px 12px; }
+        .dash-v7 .kpi-stat .kpi-stat-head { margin-bottom: 10px; }
+        .dash-v7 .kpi-stat .kpi-stat-icon { width: 30px; height: 30px; font-size: 0.74rem; }
+        .dash-v7 .kpi-stat .kpi-stat-trend { display: none; }
+        .dash-v7 .kpi-stat .kpi-value-white,
+        .dash-v7 .kpi-stat .kpi-value-red { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dash-v7 .kpi-stat .kpi-label { font-size: 0.72rem; }
+        .dash-v7 .kpi-stat .kpi-stat-foot { font-size: 0.62rem; line-height: 1.35; }
+    }
+
+    /* HP: pil status jaringan (titik hijau) presisi di tengah saat label tersembunyi & antrean kosong */
+    @media (max-width: 576px) {
+        .net-status-pill:not(:has(.badge:not(.d-none))) { width: 36px; padding: 0; gap: 0; justify-content: center; }
+    }
+
+    /* Avatar ilustrasi: grid rapi */
+    .preset-avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 10px; }
+    .preset-avatar-grid .preset-avatar-item { width: 100%; height: auto; aspect-ratio: 1; }
+
     /* Toast panjang tidak lagi keluar layar di HP (sebelumnya white-space: nowrap) */
     @media (max-width: 767.98px) {
         #neumorphicToast { white-space: normal; width: max-content; max-width: calc(100vw - 32px); border-radius: 18px; text-align: left; line-height: 1.35; }
@@ -3600,7 +3643,7 @@
 
     <!-- ================= ROW 3 — 4 KPI GLASS STATCARD ================= -->
     <div class="row g-3">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 5;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-gas-pump"></i></span>
@@ -3611,7 +3654,7 @@
                 <div class="kpi-stat-foot">Pengeluaran unit hari ini (WITA)</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 6;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-chart-line"></i></span>
@@ -3622,7 +3665,7 @@
                 <div class="kpi-stat-foot" title="Total BBM masuk dari supplier pada periode yang sama (seluruh site)">Supplier masuk periode: <span class="fw-bold tabular-nums" id="kpiSupplier">0 L</span></div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 7;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-tachometer-alt"></i></span>
@@ -3633,7 +3676,7 @@
                 <div class="kpi-stat-foot">Unit KM: <span class="fw-bold tabular-nums" id="kpiEfisiensiKM">0 L/KM</span></div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div id="cardSisaStok" class="glass-card kpi-stat stagger-item" style="--stagger-idx: 8;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-oil-can"></i></span>
@@ -3643,26 +3686,6 @@
                 <div class="kpi-value-white" id="kpiSisaStok">0 Liter</div>
                 <div class="kpi-stat-foot"><span class="kpi-subtext-red" id="stokWarningText">MONITORING</span></div>
             </div>
-        </div>
-    </div>
-
-    <!-- ================= ROW 3b — PETA LOKASI SITE 2D (Fase 12, disetujui pengguna) =================
-         Titik dari MASTER_LOKASI (kolom Latitude/Longitude); ukuran titik = konsumsi lokasi pada periode filter. -->
-    <div class="row g-3">
-        <div class="col-12">
-            <section class="glass-card no-lift dash-map-card stagger-item" id="dashMapCard" style="--stagger-idx: 9;">
-                <div class="dash-card-head">
-                    <div>
-                        <h6 class="dash-card-title"><i class="fa fa-map-marked-alt me-2"></i>Peta Lokasi Site</h6>
-                        <span class="dash-card-sub">Titik dari Master Lokasi · ukuran titik = konsumsi BBM periode filter</span>
-                    </div>
-                    <span class="dash-map-count" id="dashMapCount">—</span>
-                </div>
-                <div class="dash-map-wrap">
-                    <div id="dashMap" class="dash-map" role="region" aria-label="Peta lokasi site"></div>
-                    <div id="dashMapNotice" class="dash-map-notice d-none"></div>
-                </div>
-            </section>
         </div>
     </div>
 
@@ -3785,6 +3808,25 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- ================= ROW 6 — PETA LOKASI SITE 2D (Fase 12; dipindah ke paling bawah atas permintaan pengguna) =================
+         Titik dari MASTER_LOKASI (kolom Latitude/Longitude); ukuran titik = konsumsi lokasi pada periode filter. -->
+    <div class="row g-3">
+        <div class="col-12">
+            <section class="glass-card no-lift dash-map-card stagger-item" id="dashMapCard" style="--stagger-idx: 9;">
+                <div class="dash-card-head">
+                    <div>
+                        <h6 class="dash-card-title"><i class="fa fa-map-marked-alt me-2"></i>Peta Lokasi Site</h6>
+                        <span class="dash-card-sub">Titik dari Master Lokasi · ukuran titik = konsumsi BBM periode filter</span>
+                    </div>
+                    <span class="dash-map-count" id="dashMapCount">—</span>
+                </div>
+                <div class="dash-map-wrap">
+                    <div id="dashMap" class="dash-map" role="region" aria-label="Peta lokasi site"></div>
+                    <div id="dashMapNotice" class="dash-map-notice d-none"></div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
@@ -4814,7 +4856,7 @@
         <span class="kpi-label">Terdeteksi Anomali</span>
         <h4 class="tier-value text-danger" id="kalAnomaliUnit">0</h4>
         <div class="tier-progress"><span id="kalAnomaliBar" style="--tier-pct: 0%;"></span></div>
-        <span class="tier-meta"><span id="kalAnomaliPct" class="fw-bold tabular-nums">0%</span> dari total unit · perlu audit flowmeter</span>
+        <span class="tier-meta"><span id="kalAnomaliPct" class="fw-bold tabular-nums">0%</span> dari total unit · deviasi di luar toleransi</span>
       </div>
     </div>
   </div>
@@ -6823,18 +6865,20 @@
                         <input type="file" id="inputUploadAvatar" accept="image/*" class="d-none" onchange="previewAvatarUpload(event)">
                     </label>
 
-                    <label class="field-label mb-2">ATAU PILIH AVATAR SITE / MINING</label>
+                    <label class="field-label mb-2">ATAU PILIH AVATAR</label>
                     <div class="preset-avatar-grid mb-3" id="presetAvatarGrid">
                         <!-- [Fase 12] Pilihan pertama: kembali ke monogram inisial (avatar kosong) -->
                         <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="preset-avatar-item preset-avatar-item--mono" id="presetAvatarMonogram" onclick="selectPresetAvatar('')" alt="Inisial nama (bawaan)" title="Inisial nama (bawaan)">
-                        <img src="https://i.pravatar.cc/150?img=12" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 1">
-                        <img src="https://i.pravatar.cc/150?img=33" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 2">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 3">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4333/4333609.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 4">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1995/1995515.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 5">
-                        <img src="https://cdn-icons-png.flaticon.com/512/6073/6073873.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 6">
-                        <img src="https://cdn-icons-png.flaticon.com/512/924/924915.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 7">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 8">
+                        <!-- [Fase 13] Avatar ilustrasi DiceBear 'Notionists' (CC0) — segar & profesional, tanpa kacamata hitam/gestur -->
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Bima&amp;backgroundColor=cfe6f2&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 1" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Rani&amp;backgroundColor=d1f4e6&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 2" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Arga&amp;backgroundColor=d8ecd2&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 3" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Laras&amp;backgroundColor=f6d9d2&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 4" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Raka&amp;backgroundColor=e4dcf4&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 5" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Citra&amp;backgroundColor=f6e7c9&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 6" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Galih&amp;backgroundColor=dfe7ee&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 7" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Maya&amp;backgroundColor=f2e2d4&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 8" loading="lazy">
+                        <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Yoga&amp;backgroundColor=d1f4e6&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 9" loading="lazy">
                     </div>
 
                     <!-- TOMBOL SIMPAN FOTO PROFIL -->
@@ -9187,7 +9231,10 @@ function renderDashboardUI(data) {
   const efisiensi = data.kpiEfisiensi || (data.kpi && data.kpi.efisiensi) || '16.2 L/Jam';
   const efisiensiKM = data.kpiEfisiensiKM || (data.kpi && data.kpi.efisiensiKM) || '358.4 L/KM';
   const sisaStok = data.kpiSisaStok || (data.kpi && data.kpi.sisaStok) || '8,227.1 Liter';
-  const supplier = data.kpiSupplier || (data.kpi && data.kpi.supplier) || '19,963 Liter';
+  // [Fase 13] Supplier masuk periode: cukup liter (tanpa jumlah kedatangan "· Nx")
+  const supplier = (typeof data.kpiSupplierLiter === 'number')
+    ? Math.round(data.kpiSupplierLiter).toLocaleString('id-ID') + ' L'
+    : (data.kpiSupplier || (data.kpi && data.kpi.supplier) || '0 L');
 
   // Count-up V7 (tabular-nums); teks akhir identik dengan nilai dari server
   setKpiValue('kpiTodayCons', todayCons);
