@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=a73eaa50e6"></script>
-    <script src="./pages-offline-ui.js?v=a73eaa50e6" defer></script>
-    <script src="./pages-install.js?v=a73eaa50e6" defer></script>
+    <script src="./gas-adapter.js?v=4e620f9b78"></script>
+    <script src="./pages-offline-ui.js?v=4e620f9b78" defer></script>
+    <script src="./pages-install.js?v=4e620f9b78" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3207,6 +3207,12 @@
     .audit-top-bar.is-warn > span { background: var(--status-warning); }
     .audit-top-empty { padding: 12px; border-radius: 12px; background: var(--bg-inset); font-size: 0.78rem; text-align: center; }
     .audit-top-empty.is-ok { color: var(--status-success); font-weight: 600; }
+    .audit-period {
+        align-self: flex-start; display: inline-flex; align-items: center;
+        padding: 3px 10px; border-radius: var(--radius-pill);
+        background: var(--bg-inset); color: var(--text-secondary);
+        font-size: 0.64rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    }
 
     /* Peta: tombol muat ulang / tampilkan semua lokasi (di bawah pilihan Satelit/Jalan) */
     .dash-map-fit a { display: flex !important; align-items: center; justify-content: center; width: 34px !important; height: 34px !important; font-size: 0.82rem; color: var(--text-primary) !important; }
@@ -3217,6 +3223,47 @@
     /* Avatar ilustrasi: grid rapi */
     .preset-avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 10px; }
     .preset-avatar-grid .preset-avatar-item { width: 100%; height: auto; aspect-ratio: 1; }
+
+    /* =========================================================================
+       §F14 — Data Master HP & Panel Kelola User (Fase 14, 2026-11-17). Hanya CSS.
+       ========================================================================= */
+
+    /* Kolom pencarian Data Master: SATU kapsul utuh (tanpa garis pembagi ikon|input), tinggi 36px
+       sama dengan tombol Reload di sampingnya. Berlaku untuk semua sub-tab. */
+    #masterDataContainer .v7-search {
+        height: 36px; flex-wrap: nowrap; align-items: center;
+        border: 1px solid var(--border-subtle) !important; border-radius: var(--radius-pill) !important;
+        background: var(--bg-inset) !important; overflow: hidden;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #masterDataContainer .v7-search:focus-within { border-color: var(--brand-primary) !important; box-shadow: 0 0 0 3px var(--brand-soft); }
+    #masterDataContainer .v7-search > .input-group-text,
+    #masterDataContainer .v7-search > .form-control {
+        height: 100%; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+        background: transparent !important;
+    }
+    #masterDataContainer .v7-search > .input-group-text { padding: 0 2px 0 14px; color: var(--text-muted) !important; font-size: 0.78rem; }
+    #masterDataContainer .v7-search > .form-control { padding: 0 14px 0 8px !important; font-size: 0.8rem; }
+    #masterDataContainer .v7-section-head .btn.btn-ghost { height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px !important; border-radius: var(--radius-pill) !important; white-space: nowrap; }
+    #masterDataContainer .v7-section-head .btn.btn-ghost i { margin: 0 !important; }
+
+    @media (max-width: 767.98px) {
+        /* Pencarian + Reload satu baris rata: pencarian mengisi sisa lebar */
+        #masterDataContainer .v7-section-head > .d-flex { flex-wrap: nowrap !important; width: 100%; }
+        #masterDataContainer .v7-section-head > .d-flex > .v7-search { flex: 1 1 auto; width: auto !important; min-width: 0; }
+        #masterDataContainer .v7-section-head > .v7-search { width: 100% !important; }
+
+        /* Form input 2 kolom: label ringkas satu baris, kontrol setinggi seragam */
+        #masterDataContainer .v7-form-grid { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
+        #masterDataContainer .v7-form-grid .field-label { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.6rem; letter-spacing: 0.04em; margin-bottom: 4px; }
+        #masterDataContainer .v7-form-grid .form-control,
+        #masterDataContainer .v7-form-grid .form-select { height: 36px; }
+        #masterDataContainer .v7-form-grid > .col-12.d-flex .btn { height: 38px; }
+    }
+
+    /* Panel Kelola User: garis warna tepi kartu statistik dihapus (permintaan pengguna) */
+    .user-stat::before { display: none !important; }
+    .user-stat { padding-left: 12px; }
 
     /* Toast panjang tidak lagi keluar layar di HP (sebelumnya white-space: nowrap) */
     @media (max-width: 767.98px) {
@@ -3778,6 +3825,7 @@
                 </div>
                 <!-- [Fase 13] Ringkasan + daftar deviasi terbesar (selaras dengan tabel kartu tetangga) -->
                 <div class="dash-audit-body">
+                    <span class="audit-period" id="auditPeriodText" title="Periode & lokasi yang dipakai perhitungan audit"><i class="fa fa-calendar-alt me-1" aria-hidden="true"></i>—</span>
                     <div class="audit-summary">
                         <span class="audit-summary-value tabular-nums" id="totalDeviasiAnomaliCount">0</span>
                         <span class="audit-summary-label">unit di luar toleransi</span>
@@ -5225,22 +5273,22 @@
       </div>
       <input type="hidden" id="unitRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
-        <div class="col-12 col-md-3">
+        <div class="col-6 col-md-3">
           <label class="field-label" for="unitKode">KODE UNIT</label>
           <input type="text" id="unitKode" class="form-control form-control-sm text-uppercase" placeholder="EX: EXCA-01">
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-6 col-md-3">
           <label class="field-label" for="unitKategori">KATEGORI</label>
           <input type="text" id="unitKategori" class="form-control form-control-sm" placeholder="Alat Berat / DT / LV">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="unitSatuan">SATUAN METER</label>
           <select id="unitSatuan" class="form-select form-select-sm">
             <option value="HM" selected>HM</option>
             <option value="KM">KM</option>
           </select>
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="unitStdKonsumsi">STD RATE (L/HM)</label>
           <input type="number" step="0.1" id="unitStdKonsumsi" class="form-control form-control-sm tabular-nums" placeholder="15.0">
         </div>
@@ -5296,15 +5344,15 @@
       </div>
       <input type="hidden" id="qrRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="qrCodeId">QR ID CODE</label>
           <input type="text" id="qrCodeId" class="form-control form-control-sm" placeholder="QR-EXCA-01">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="qrKodeUnit">KODE UNIT TARGET</label>
           <input type="text" id="qrKodeUnit" class="form-control form-control-sm text-uppercase" placeholder="EXCA-01">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="qrLokasi">LOKASI PIT</label>
           <select id="qrLokasi" class="form-select form-select-sm">
             <option value="Legislatif" selected>Legislatif</option>
@@ -5312,11 +5360,11 @@
             <option value="Workshop">Workshop</option>
           </select>
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="qrKapasitas">KAPASITAS TANGKI (L)</label>
           <input type="number" id="qrKapasitas" class="form-control form-control-sm tabular-nums" placeholder="400">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="qrStatus">STATUS QR</label>
           <select id="qrStatus" class="form-select form-select-sm">
             <option value="Aktif" selected>Aktif</option>
@@ -5376,23 +5424,23 @@
       </div>
       <input type="hidden" id="karyawanRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="karyawanNik">NIK / ID KARYAWAN</label>
           <input type="text" id="karyawanNik" class="form-control form-control-sm" placeholder="NIK-001">
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-6 col-md-3">
           <label class="field-label" for="karyawanNama">NAMA LENGKAP</label>
           <input type="text" id="karyawanNama" class="form-control form-control-sm" placeholder="Nama Operator / Driver">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="karyawanJabatan">JABATAN</label>
           <input type="text" id="karyawanJabatan" class="form-control form-control-sm" placeholder="Operator EXCA / Driver DT">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="karyawanDept">DEPARTEMEN</label>
           <input type="text" id="karyawanDept" class="form-control form-control-sm" placeholder="Produksi / Mining">
         </div>
-        <div class="col-12 col-md-1">
+        <div class="col-6 col-md-1">
           <label class="field-label" for="karyawanStatus">STATUS</label>
           <select id="karyawanStatus" class="form-select form-select-sm">
             <option value="Aktif" selected>Aktif</option>
@@ -5453,47 +5501,47 @@
       <input type="hidden" id="dealerRowIndex" value="0">
 
       <div class="row g-2 v7-form-grid">
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerKode">KODE / TIPE</label>
           <input type="text" id="dealerKode" class="form-control form-control-sm text-uppercase" placeholder="EXCA 320">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerMerek">MEREK / BRAND</label>
           <input type="text" id="dealerMerek" class="form-control form-control-sm text-uppercase" placeholder="CATERPILLAR">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerKategori">KATEGORI</label>
           <input type="text" id="dealerKategori" class="form-control form-control-sm text-capitalize" placeholder="Excavator / DT">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerSatuan">SATUAN STANDAR</label>
           <select id="dealerSatuan" class="form-select form-select-sm">
             <option value="Liter/HM" selected>Liter/HM</option>
             <option value="Liter/KM">Liter/KM</option>
           </select>
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerKapasitas">KAPASITAS TANGKI (L)</label>
           <input type="number" id="dealerKapasitas" class="form-control form-control-sm tabular-nums" placeholder="400">
         </div>
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label class="field-label" for="dealerToleransi">TOLERANSI (%)</label>
           <input type="number" step="0.1" id="dealerToleransi" class="form-control form-control-sm tabular-nums" placeholder="5.0">
         </div>
 
-        <div class="col-12 col-md-2 mt-2">
+        <div class="col-6 col-md-2 mt-2">
           <label class="field-label" for="dealerRingan">BEBAN RINGAN</label>
           <input type="number" step="0.1" id="dealerRingan" class="form-control form-control-sm tabular-nums" placeholder="15.0">
         </div>
-        <div class="col-12 col-md-2 mt-2">
+        <div class="col-6 col-md-2 mt-2">
           <label class="field-label" for="dealerSedang">BEBAN SEDANG</label>
           <input type="number" step="0.1" id="dealerSedang" class="form-control form-control-sm tabular-nums" placeholder="18.0">
         </div>
-        <div class="col-12 col-md-2 mt-2">
+        <div class="col-6 col-md-2 mt-2">
           <label class="field-label" for="dealerBerat">BEBAN BERAT</label>
           <input type="number" step="0.1" id="dealerBerat" class="form-control form-control-sm tabular-nums" placeholder="22.0">
         </div>
-        <div class="col-12 col-md-2 mt-2">
+        <div class="col-6 col-md-2 mt-2">
           <label class="field-label" for="dealerRata2">ACUAN RATA-RATA</label>
           <input type="number" step="0.1" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="18.5">
         </div>
@@ -5556,11 +5604,11 @@
       </div>
       <input type="hidden" id="lokasiRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
-        <div class="col-12 col-md-6">
+        <div class="col-6 col-md-6">
           <label class="field-label" for="lokasiNama">NAMA LOKASI</label>
           <input type="text" id="lokasiNama" class="form-control form-control-sm" maxlength="60" placeholder="EX: Akses PLTS">
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-6 col-md-3">
           <label class="field-label" for="lokasiStatus">STATUS</label>
           <select id="lokasiStatus" class="form-select form-select-sm">
             <option value="Aktif" selected>Aktif</option>
@@ -9260,6 +9308,8 @@ function renderDashboardUI(data) {
   if (!data) return;
   // [Fase 12] Peta lokasi: konsumsi per lokasi periode filter (data yang sama dengan donut lokasi)
   if (typeof updateDashMapConsumption === 'function') updateDashMapConsumption(data);
+  // [Fase 14] Keterangan periode & lokasi pada kartu Audit Deviasi
+  if (typeof updateAuditPeriodLabel === 'function') updateAuditPeriodLabel(data);
 
   // 1. KPI DATA
   const todayCons = data.kpiTodayCons || (data.kpi && data.kpi.todayCons) || '0 L';
@@ -9519,6 +9569,34 @@ function filterModalTopKonsumsi() {
 }
 
 // --- RENDER & MODAL HANDLER: STATUS AUDIT DEVIASI FLEET ---
+// [Fase 14] Angka deviasi dari teks "+23.4%" & urutan dari deviasi terbesar (kartu & pop-up sama)
+function devNum(it) {
+  const n = parseFloat(String((it && it.deviasiText) || '').replace(',', '.').replace(/[^0-9.+-]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+function sortDeviasiDesc(list) {
+  return (list || []).slice().sort((a, b) => Math.abs(devNum(b)) - Math.abs(devNum(a)));
+}
+
+// [Fase 14] "1 Okt – 17 Nov · Semua Lokasi" — periode sama dengan server (getDashboardNativeDataInternal_):
+// filter kustom → tanggal awal filter; bawaan → 1 Oktober terakhir (awal periode KPI). Akhir = tanggal akhir filter.
+function updateAuditPeriodLabel(data) {
+  const el = document.getElementById('auditPeriodText');
+  if (!el) return;
+  const BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const parse = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || '')); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+  const now = new Date();
+  const akhir = parse((data && data.defaultTglAkhir) || (document.getElementById('inputTglAkhir') || {}).value) || now;
+  let awal;
+  if (IS_CUSTOM_FILTER_ACTIVE) awal = parse((data && data.defaultTglAwal) || (document.getElementById('inputTglAwal') || {}).value);
+  if (!awal) awal = new Date(now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1, 9, 1);
+  const fmt = (d, withYear) => d.getDate() + ' ' + BLN[d.getMonth()] + (withYear ? ' ' + d.getFullYear() : '');
+  const showYear = awal.getFullYear() !== akhir.getFullYear() || akhir.getFullYear() !== now.getFullYear();
+  const lokasi = (document.getElementById('selectLokasiPit') || {}).value || 'Semua Lokasi';
+  el.innerHTML = '<i class="fa fa-calendar-alt me-1" aria-hidden="true"></i>' +
+    escapeHtml(fmt(awal, showYear) + ' – ' + fmt(akhir, showYear) + ' · ' + lokasi);
+}
+
 function renderTableAuditDeviasi(items) {
   globalDeviasiData = items || [];
   const countElem = document.getElementById('totalDeviasiAnomaliCount');
@@ -9548,8 +9626,7 @@ function renderTableAuditDeviasi(items) {
     list.innerHTML = '<li class="audit-top-empty is-ok"><i class="fa fa-check-circle me-2"></i>Semua unit dalam toleransi</li>';
     return;
   }
-  const devNum = (it) => { const n = parseFloat(String(it.deviasiText || '').replace(',', '.').replace(/[^0-9.+-]/g, '')); return isFinite(n) ? n : 0; };
-  const sorted = globalDeviasiData.slice().sort((a, b) => Math.abs(devNum(b)) - Math.abs(devNum(a))).slice(0, 4);
+  const sorted = sortDeviasiDesc(globalDeviasiData).slice(0, 4);
   const maxAbs = Math.max(1, ...sorted.map(it => Math.abs(devNum(it))));
   list.innerHTML = sorted.map((it, i) => {
     const d = devNum(it);
@@ -9568,7 +9645,7 @@ function renderTableAuditDeviasi(items) {
 }
 
 function openModalDeviasi() {
-  renderModalTableDeviasi(globalDeviasiData);
+  renderModalTableDeviasi(sortDeviasiDesc(globalDeviasiData)); // [Fase 14] deviasi terbesar di atas
   const searchInput = document.getElementById('searchDeviasi');
   if (searchInput) searchInput.value = '';
 
@@ -9607,7 +9684,7 @@ function filterModalDeviasi() {
     const unit = (item.unit || item.kodeUnit || '').toLowerCase();
     return unit.indexOf(keyword) !== -1;
   });
-  renderModalTableDeviasi(filtered);
+  renderModalTableDeviasi(sortDeviasiDesc(filtered));
 }
 
 // --- RENDER & MODAL HANDLER: METERAN RUSAK ---
