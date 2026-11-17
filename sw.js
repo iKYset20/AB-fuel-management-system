@@ -14,10 +14,10 @@
  */
 'use strict';
 
-var VERSION = '43495ee68c';
+var VERSION = '1bba5111e3';
 var SHELL_CACHE = 'abfuel-pages-shell-' + VERSION;
 var CDN_CACHE = 'abfuel-pages-cdn-v1'; // URL CDN berversi → aman dipakai lintas build
-var SHELL_FILES = ["./","./index.html","./gas-adapter.js?v=43495ee68c","./pages-offline-ui.js?v=43495ee68c","./pages-install.js?v=43495ee68c","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png","./icons/favicon-32.png"];   // ./, ./index.html, ./gas-adapter.js?v=…, ./pages-offline-ui.js?v=…
+var SHELL_FILES = ["./","./index.html","./gas-adapter.js?v=1bba5111e3","./pages-offline-ui.js?v=1bba5111e3","./pages-install.js?v=1bba5111e3","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png","./icons/favicon-32.png"];   // ./, ./index.html, ./gas-adapter.js?v=…, ./pages-offline-ui.js?v=…
 var PRECACHE_CDN = [
     "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css",

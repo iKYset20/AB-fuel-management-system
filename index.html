@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=43495ee68c"></script>
-    <script src="./pages-offline-ui.js?v=43495ee68c" defer></script>
-    <script src="./pages-install.js?v=43495ee68c" defer></script>
+    <script src="./gas-adapter.js?v=1bba5111e3"></script>
+    <script src="./pages-offline-ui.js?v=1bba5111e3" defer></script>
+    <script src="./pages-install.js?v=1bba5111e3" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
@@ -2689,6 +2689,271 @@
     .v7-menu-auth[onclick^="logout"] { background: var(--status-error-bg) !important; color: var(--status-error) !important; box-shadow: none; }
     .v7-menu-auth[onclick^="logout"]:hover { background: var(--status-error) !important; color: #FFFFFF !important; }
 
+    /* =========================================================================
+       §F11 — PERBAIKAN HASIL UJI HP (Fase 11, 2026-11-17). Hanya CSS; ID/handler tidak berubah.
+       ========================================================================= */
+
+    /* #1 Logo kartu login: .brand-mark bergaya sidebar gelap (putih transparan) → tak terlihat di
+          kartu terang. Kini chip brand mengikuti tema (mint lembut + ikon hijau). */
+    .login-mark {
+        background: var(--brand-soft);
+        border: 1px solid color-mix(in srgb, var(--brand-primary) 28%, transparent);
+        color: var(--brand-text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    /* #2 iOS Safari memperbesar halaman saat input < 16px disentuh (lalu tertinggal garis render
+          pada lapisan kaca). Khusus iOS: semua kolom isian 16px → tidak ada zoom otomatis. */
+    @supports (-webkit-touch-callout: none) {
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+        select, textarea, .form-control, .form-select, .float-input, .topbar-search-input {
+            font-size: 16px !important;
+        }
+    }
+
+    /* #3 Top bar bergetar saat scroll (iOS: sticky + backdrop-filter pada elemen yang sama).
+          Efek kaca & warna DIPERTAHANKAN — blur dipindah ke lapisan ::before yang punya layer GPU
+          sendiri (translateZ). Top bar tidak lagi ber-backdrop-filter → menu dropdown bisa
+          diposisikan terhadap layar (#5). */
+    .topbar {
+        background: transparent;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+    .topbar::before {
+        content: "";
+        position: absolute; inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: var(--shell-glass);
+        -webkit-backdrop-filter: blur(22px) saturate(1.15);
+        backdrop-filter: blur(22px) saturate(1.15);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* #5 HP/tablet: menu "Admin online" & profil dibuka selebar layar tepat di bawah top bar
+          (sebelumnya 300px rata-kanan pada tombol di sisi kiri → terpotong di tepi kiri). */
+    @media (max-width: 991.98px) {
+        .topbar .dropdown-menu.show {
+            position: fixed !important;
+            inset: calc(var(--shell-pad) + 64px + env(safe-area-inset-top)) 16px auto 16px !important;
+            transform: none !important;
+            width: auto !important; min-width: 0 !important; max-width: none !important;
+            max-height: calc(100dvh - var(--shell-pad) - 180px);
+            overflow-y: auto;
+            margin: 0 !important;
+        }
+    }
+
+    /* #4 Hero & panel filter Dashboard di HP — lebih lega, tidak menumpuk */
+    @media (max-width: 767.98px) {
+        .dash-hero { gap: 12px; }
+        .dash-hero-status { flex-wrap: nowrap; margin-bottom: 10px; min-width: 0; }
+        .dash-hero-status .live-chip { min-width: 0; flex: 0 1 auto; overflow: hidden; }
+        .dash-hero-status .dash-hero-eyebrow { display: none; }       /* titik hijau = live */
+        .dash-hero-status .dash-hero-sync { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; opacity: 0.85; }
+        .dash-hero-status .dash-hero-sync::before { content: none; }
+        .dash-hero-status #alertBadge { flex-shrink: 0; height: 26px; display: inline-flex; align-items: center; font-size: 0.6rem; padding: 0 10px; }
+        .dash-hero-status #alertBadge.d-none { display: none !important; }
+        .dash-hero-title { font-size: 1.55rem; margin-bottom: 4px; }
+        .dash-hero-sub { font-size: 0.78rem; }
+        /* Aksi: 2 kolom sama lebar. "Scan to Fill" hero disembunyikan di HP — tombol SCAN FILL besar
+           di bottom-nav menjalankan aksi yang sama (elemen & onclick tetap ada di DOM). */
+        .dash-hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .dash-hero-actions > * { width: 100%; justify-content: center; padding: 0 10px !important; font-size: 0.76rem; white-space: nowrap; }
+        .dash-hero-actions > .btn-brand { display: none !important; }
+
+        /* Panel filter: grid rapi — tanggal berdampingan, lokasi & granularitas penuh, aksi di bawah */
+        .dash-filter { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px 8px; align-items: center; padding: 14px; }
+        .dash-filter > .dash-filter-label { grid-column: 1 / -1; }
+        .dash-filter .dash-filter-input { width: 100% !important; min-width: 0 !important; }
+        .dash-filter > #selectLokasiPit, .dash-filter > #granularityGroup, .dash-filter > .dash-filter-actions { grid-column: 1 / -1; }
+        .dash-filter > #granularityGroup { display: flex; width: 100%; }
+        .dash-filter > #granularityGroup > .btn { flex: 1 1 0; padding-left: 4px !important; padding-right: 4px !important; }
+        .dash-filter > .dash-filter-actions { display: flex; gap: 8px; margin: 0; }
+        .dash-filter > .dash-filter-actions > .btn:first-child { flex: 1 1 auto; justify-content: center; }
+    }
+
+    /* #6 Sesi & Perangkat: daftar semua perangkat yang sedang masuk */
+    .profil-session-meta {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        margin: 2px 2px 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; color: var(--text-secondary);
+    }
+    .profil-session-refresh {
+        width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-subtle);
+        background: var(--bg-inset); color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center;
+        font-size: 0.72rem; transition: transform 0.35s var(--ease-spring), color 0.2s ease;
+    }
+    .profil-session-refresh:hover { color: var(--brand-text); transform: rotate(90deg); }
+    .profil-session-list { display: flex; flex-direction: column; gap: 8px; }
+    .profil-session.is-current { border-color: color-mix(in srgb, var(--brand-primary) 35%, transparent); }
+    .profil-session small { display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+    .profil-session-tag {
+        display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: var(--radius-pill);
+        font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; vertical-align: 2px;
+        background: var(--brand-soft); color: var(--brand-text);
+    }
+    .profil-session-out { flex-shrink: 0; height: 30px; padding: 0 12px !important; font-size: 0.72rem !important; border-radius: var(--radius-pill) !important; }
+
+    /* #9 Master Lokasi: catatan kecil di bawah form */
+    .v7-form-hint { margin-top: 10px; font-size: 0.72rem; color: var(--text-muted); }
+
+    /* =========================================================================
+       #7 #10 #11 DESAIN ULANG KARTU STATISTIK — gaya "laporan profesional":
+       label kecil kapital + ikon kecil sejajar, angka besar tabular, aksen tipis di tepi KIRI
+       (menggantikan garis tebal di atas), tanpa ikon panah dekoratif. ID & JS tidak berubah.
+       ========================================================================= */
+
+    /* --- #10 Kartu Stok (4 KPI) & #11 Kalibrasi (3 tier): kerangka kartu bersama --- */
+    #kartuStokContainer .kpi-stat,
+    #kalibrasiContainer .tier-card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "icon label tag" "value value value" "bar bar bar" "foot foot foot";
+        align-items: center; align-content: start;
+        column-gap: 10px; row-gap: 6px;
+        padding: 18px 18px 16px 20px;
+    }
+    #kartuStokContainer .kpi-stat .kpi-stat-head,
+    #kalibrasiContainer .tier-card .tier-card-head { display: contents; }
+    #kartuStokContainer .kpi-stat .kpi-stat-icon,
+    #kalibrasiContainer .tier-card .kpi-stat-icon {
+        grid-area: icon; width: 30px; height: 30px; border-radius: 9px; font-size: 0.78rem;
+        box-shadow: none;
+    }
+    #kartuStokContainer .kpi-stat .kpi-label,
+    #kalibrasiContainer .tier-card .kpi-label {
+        grid-area: label; margin: 0; order: 0;
+        font-size: 0.66rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+        color: var(--text-secondary); line-height: 1.25;
+    }
+    #kartuStokContainer .kpi-stat .kpi-value-white,
+    #kartuStokContainer .kpi-stat .kpi-value-red,
+    #kalibrasiContainer .tier-card .tier-value {
+        grid-area: value; order: 0; margin: 6px 0 0;
+        font-size: 1.85rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.035em;
+        font-variant-numeric: tabular-nums; color: var(--text-primary);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #kalibrasiContainer .tier-card .tier-value.text-success { color: var(--tone-green) !important; }
+    #kalibrasiContainer .tier-card .tier-value.text-danger { color: var(--tone-rose) !important; }
+    #kartuStokContainer .kpi-stat .kpi-stat-foot,
+    #kalibrasiContainer .tier-card .tier-meta {
+        grid-area: foot; order: 0; margin: 2px 0 0;
+        font-size: 0.7rem; line-height: 1.4; color: var(--text-muted);
+    }
+    #kalibrasiContainer .tier-card .tier-progress { grid-area: bar; height: 4px; margin-top: 4px; }
+
+    /* Aksen tipis di tepi kiri (menggantikan garis 3px di atas) */
+    #kartuStokContainer .kpi-stat::before,
+    #kalibrasiContainer .tier-card::before {
+        top: 18px; bottom: 18px; left: 0; right: auto;
+        width: 3px; height: auto; border-radius: 0 3px 3px 0; opacity: 1;
+    }
+
+    /* Kalibrasi: tag/badge jadi chip lembut; kartu "featured" tidak lagi melayang */
+    #kalibrasiContainer .tier-card .tier-tag,
+    #kalibrasiContainer .tier-card .tier-badge {
+        grid-area: tag; justify-self: end;
+        padding: 3px 9px; border: 0; box-shadow: none;
+        font-size: 0.56rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+        background: var(--bg-inset); color: var(--text-muted);
+    }
+    #kalibrasiContainer .tier-card .tier-badge { background: var(--tone-green-bg); color: var(--tone-green); }
+    #kalibrasiContainer .tier-card .tier-badge i { font-size: 0.85em; }
+    #kalibrasiContainer .tier-card .tier-tag--alert { background: var(--tone-rose-bg); color: var(--tone-rose); }
+    #kalibrasiContainer .tier-card--featured {
+        background: var(--bg-surface); border-color: var(--border-glass) !important; box-shadow: var(--shadow-card);
+    }
+    @media (min-width: 768px) {
+        #kalibrasiContainer .tier-card--featured { transform: none; }
+        #kalibrasiContainer .tier-card--featured.stagger-item { animation-name: v7CascadeIn; }
+    }
+    @media (min-width: 768px) and (hover: hover) {
+        #kalibrasiContainer .tier-card--featured:hover { transform: translateY(-5px); }
+    }
+
+    /* HP: kartu ringkas 2 kolom (Kartu Stok 2×2; Kalibrasi: Total penuh, Akurat | Anomali) */
+    @media (max-width: 767.98px) {
+        #kartuStokContainer .row.g-3:has(> [class*="col-"] > .kpi-stat) { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
+        #kalibrasiContainer .tier-row { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
+        #kartuStokContainer .kpi-stat,
+        #kalibrasiContainer .tier-card { padding: 14px 12px 12px 14px; row-gap: 4px; column-gap: 8px; }
+        #kartuStokContainer .kpi-stat::before,
+        #kalibrasiContainer .tier-card::before { top: 14px; bottom: 14px; }
+        #kartuStokContainer .kpi-stat .kpi-stat-icon,
+        #kalibrasiContainer .tier-card .kpi-stat-icon { width: 26px; height: 26px; border-radius: 8px; font-size: 0.7rem; }
+        #kartuStokContainer .kpi-stat .kpi-label,
+        #kalibrasiContainer .tier-card .kpi-label { font-size: 0.58rem; letter-spacing: 0.05em; }
+        #kartuStokContainer .kpi-stat .kpi-value-white,
+        #kartuStokContainer .kpi-stat .kpi-value-red,
+        #kalibrasiContainer .tier-card .tier-value { font-size: 1.3rem; margin-top: 4px; }
+        #kartuStokContainer .kpi-stat .kpi-stat-foot,
+        #kalibrasiContainer .tier-card .tier-meta {
+            font-size: 0.64rem;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        /* Kartu Kalibrasi sempit: label penuh di baris ikon, chip tag dipindah ke bawah angka */
+        #kalibrasiContainer .col-6 .tier-card {
+            grid-template-columns: auto minmax(0, 1fr);
+            grid-template-areas: "icon label" "value value" "tag tag" "bar bar" "foot foot";
+        }
+        #kalibrasiContainer .col-6 .tier-card .tier-tag,
+        #kalibrasiContainer .col-6 .tier-card .tier-badge { justify-self: start; }
+    }
+
+    /* --- #7 Panel Kelola User: 4 statistik bermakna & bisa diklik untuk menyaring --- */
+    .user-stats { gap: 10px; margin: 6px 0 14px; }
+    .user-stat {
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column; gap: 4px; text-align: left;
+        width: 100%; padding: 12px 12px 11px 15px;
+        border-radius: 14px; border: 1px solid var(--border-subtle); border-top-width: 1px;
+        background: var(--bg-inset); color: inherit; font: inherit; cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s var(--ease-out-soft);
+    }
+    .user-stat::before {
+        content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 0 3px 3px 0;
+        background: var(--text-muted); opacity: 0.55;
+    }
+    .user-stat--ok::before { background: var(--status-success); opacity: 1; }
+    .user-stat--warn::before { background: var(--status-warning); opacity: 1; }
+    .user-stat--info::before { background: var(--brand-text); opacity: 1; }
+    .user-stat:hover { border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent); }
+    .user-stat:active { transform: scale(0.98); }
+    .user-stat:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+    .user-stat.is-active { border-color: var(--brand-primary); background: color-mix(in srgb, var(--brand-soft) 60%, var(--bg-inset)); }
+    .user-stat-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .user-stat-head i { font-size: 0.72rem; color: var(--text-muted); }
+    .user-stat--ok .user-stat-head i { color: var(--status-success); }
+    .user-stat--warn.has-alert .user-stat-head i { color: var(--status-warning); }
+    .user-stat--info.has-alert .user-stat-head i { color: var(--brand-text); }
+    .user-stat .user-stat-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-stat .user-stat-value { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .user-stat--warn.has-alert .user-stat-value { color: var(--status-warning); }
+    .user-stat-foot { display: flex; align-items: center; gap: 8px; min-height: 16px; font-size: 0.66rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-stat-bar { flex: 1 1 auto; height: 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--text-muted) 18%, transparent); overflow: hidden; }
+    .user-stat-bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--status-success); transition: width var(--dur-gauge, 0.9s) var(--ease-gauge, ease); }
+    @media (max-width: 767.98px) {
+        .user-stat .user-stat-value { font-size: 1.3rem; }
+    }
+
+    /* #13 Filter Audit Kalibrasi (HP/tablet): Periode = 2 tanggal berdampingan, Lokasi penuh di bawah */
+    @media (max-width: 991.98px) {
+        #kalibrasiContainer .v7-filter-inline { display: grid; gap: 12px; width: 100%; }
+        #kalibrasiContainer .v7-filter-group {
+            display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center; gap: 6px 8px; width: 100%;
+        }
+        #kalibrasiContainer .v7-filter-group > .field-label { grid-column: 1 / -1; }
+        #kalibrasiContainer .v7-filter-group > .dash-filter-input { width: 100% !important; min-width: 0 !important; flex: none; }
+        #kalibrasiContainer .v7-filter-group > select.dash-filter-input { grid-column: 1 / -1; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
             animation-duration: 0.01ms !important;
@@ -3160,7 +3425,7 @@
                 </div>
                 <div class="kpi-label">Total Konsumsi Periode</div>
                 <div class="kpi-value-white" id="kpiTotalCons">0 L</div>
-                <div class="kpi-stat-foot"><i class="fa fa-truck-loading"></i> Supplier periodik: <span class="fw-bold tabular-nums" id="kpiSupplier">0 Liter</span></div>
+                <div class="kpi-stat-foot" title="Total BBM masuk dari supplier pada periode yang sama (seluruh site)">Supplier masuk periode: <span class="fw-bold tabular-nums" id="kpiSupplier">0 L</span></div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
@@ -3508,44 +3773,40 @@
 
     <!-- 2. GRID 4 KARTU KPI KARTU STOK (GLASS STATCARD) -->
     <div class="row g-3">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 1;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-gas-pump"></i></span>
-                    <span class="kpi-stat-trend" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                 </div>
                 <div class="kpi-label">Total Pengisian</div>
                 <div class="kpi-value-white" id="kpiKartuStokTotal">0 Liter</div>
                 <div class="kpi-stat-foot">Akumulasi liter pada periode filter</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 2;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-history"></i></span>
-                    <span class="kpi-stat-trend" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                 </div>
                 <div class="kpi-label">Frekuensi Pengisian</div>
                 <div class="kpi-value-white" id="kpiKartuStokFrekuensi">0 Kali</div>
                 <div class="kpi-stat-foot">Jumlah transaksi pengisian unit</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 3;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-tachometer-alt"></i></span>
-                    <span class="kpi-stat-trend" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                 </div>
                 <div class="kpi-label">Rata-Rata Efisiensi</div>
                 <div class="kpi-value-red" id="kpiKartuStokEfisiensi">-</div>
                 <div class="kpi-stat-foot">Aktual rate (L/HM atau L/KM)</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-6 col-xl-3">
             <div class="glass-card kpi-stat stagger-item" style="--stagger-idx: 4;">
                 <div class="kpi-stat-head">
                     <span class="kpi-stat-icon"><i class="fa fa-calculator"></i></span>
-                    <span class="kpi-stat-trend" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
                 </div>
                 <div class="kpi-label">Rata-Rata / Pengisian</div>
                 <div class="kpi-value-white" id="kpiKartuStokAvgIsi">0 Liter</div>
@@ -4315,8 +4576,8 @@
       </div>
     </div>
 
-    <!-- Tier 2 (Featured): Unit Akurat / Normal -->
-    <div class="col-12 col-md-4">
+    <!-- Tier 2 (Featured): Unit Akurat / Normal — HP: 2 kolom berdampingan dengan Tier 3 -->
+    <div class="col-6 col-md-4">
       <div class="glass-card tier-card tier-card--featured stagger-item" style="--stagger-idx: 2;">
         <div class="tier-card-head">
           <span class="kpi-stat-icon"><i class="fa fa-check-double"></i></span>
@@ -4330,7 +4591,7 @@
     </div>
 
     <!-- Tier 3 (Alert): Terdeteksi Anomali -->
-    <div class="col-12 col-md-4">
+    <div class="col-6 col-md-4">
       <div class="glass-card tier-card tier-card--alert stagger-item" style="--stagger-idx: 3;">
         <div class="tier-card-head">
           <span class="kpi-stat-icon"><i class="fa fa-exclamation-triangle"></i></span>
@@ -4536,6 +4797,9 @@
       </button>
       <button type="button" class="btn btn-outline-danger fw-bold btn-submaster" id="btnSubMasterDealer" onclick="switchMasterSubTab('MASTER_DEALER', this)">
         <i class="fa fa-cogs me-1"></i> Standar Dealer
+      </button>
+      <button type="button" class="btn btn-outline-danger fw-bold btn-submaster" id="btnSubMasterLokasi" onclick="switchMasterSubTab('MASTER_LOKASI', this)">
+        <i class="fa fa-map-marker-alt me-1"></i> Master Lokasi
       </button>
     </div>
   </section>
@@ -4989,6 +5253,62 @@
     </section>
   </div>
 
+  <!-- =========================================================================
+       SUB-TAB 6: MASTER LOKASI (sheet MASTER_LOKASI) — Fase 11 #9
+       Sumber semua dropdown lokasi (Dashboard, Laporan, Kalibrasi, Scan-to-Fill, Master QR).
+       ========================================================================= -->
+  <div id="subViewMasterLokasi" class="submaster-view v7-stack d-none">
+    <section class="glass-card no-lift v7-form-card" id="formLokasiWrapper">
+      <div class="v7-form-head">
+        <h6 class="dash-card-title mb-0" id="titleFormLokasi"><i class="fa fa-plus-circle text-brand me-2"></i>INPUT LOKASI BARU</h6>
+      </div>
+      <input type="hidden" id="lokasiRowIndex" value="0">
+      <div class="row g-2 v7-form-grid">
+        <div class="col-12 col-md-6">
+          <label class="field-label" for="lokasiNama">NAMA LOKASI</label>
+          <input type="text" id="lokasiNama" class="form-control form-control-sm" maxlength="60" placeholder="EX: Akses PLTS">
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="field-label" for="lokasiStatus">STATUS</label>
+          <select id="lokasiStatus" class="form-select form-select-sm">
+            <option value="Aktif" selected>Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-flex align-items-end gap-2">
+          <button onclick="resetLokasiForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
+          <button onclick="saveLokasiForm()" id="btnSaveLokasi" class="btn btn-sm btn-brand flex-grow-1 fw-bold">Simpan Lokasi</button>
+        </div>
+      </div>
+      <p class="v7-form-hint mb-0"><i class="fa fa-info-circle me-1"></i>Lokasi <strong>Nonaktif</strong> tidak muncul di pilihan lokasi baru, tetapi riwayat transaksinya tetap tersimpan.</p>
+    </section>
+
+    <section class="glass-card no-lift v7-table-card">
+      <div class="v7-section-head align-items-center">
+        <h6 class="dash-card-title mb-0"><i class="fa fa-map-marker-alt me-2"></i>Daftar Lokasi Kerja Site</h6>
+        <div class="input-group input-group-sm modal-search v7-search">
+          <span class="input-group-text"><i class="fa fa-search"></i></span>
+          <input type="text" id="searchLokasi" class="form-control" placeholder="Cari Lokasi..." onkeyup="filterMasterLokasiTable()">
+        </div>
+      </div>
+
+      <div class="table-responsive v7-table-scroll v7-table-scroll--sm">
+        <table class="table table-clean table-hover align-middle mb-0">
+          <thead>
+            <tr class="text-center">
+              <th>Nama Lokasi</th>
+              <th>Status</th>
+              <th class="v7-col-action">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMasterLokasi" class="text-center align-middle">
+            <tr><td colspan="3" class="py-4 text-muted">Memuat…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
 </div>
 
 <!-- SCRIPT FILTERING & LOGIKA MASTER DATA -->
@@ -4998,6 +5318,7 @@
   let MASTER_QR_CACHE = [];
   let MASTER_KARYAWAN_CACHE = [];
   let MASTER_DEALER_CACHE = [];
+  let MASTER_LOKASI_CACHE = [];
 
   document.addEventListener('DOMContentLoaded', function() {
     initAdminDefaultDate();
@@ -5031,13 +5352,16 @@
     } else if (subKey === 'MASTER_DEALER') {
       document.getElementById('subViewMasterDealer').classList.remove('d-none');
       if(MASTER_DEALER_CACHE.length === 0) loadMasterDealerTable();
+    } else if (subKey === 'MASTER_LOKASI') {
+      document.getElementById('subViewMasterLokasi').classList.remove('d-none');
+      loadMasterLokasiTable();
     }
     syncMasterDataRBACUI();
   }
 
   // Kunci baris (rowKey dari server) yang sedang diedit per form — dikirim saat simpan agar server
   // menolak/menemukan ulang baris bila posisi baris sudah bergeser (diubah user lain).
-  const EDIT_ROW_KEYS = { admin: '', unit: '', qr: '', karyawan: '', dealer: '' };
+  const EDIT_ROW_KEYS = { admin: '', unit: '', qr: '', karyawan: '', dealer: '', lokasi: '' };
 
   // Respons server standar: tangani sesi kedaluwarsa (kembali ke Guest) — true bila sudah ditangani
   function masterSessionGuard(res) {
@@ -5068,7 +5392,7 @@
       }
     }
 
-    const formsToToggle = ['formMasterDbWrapper', 'formUnitWrapper', 'formQRWrapper', 'formKaryawanWrapper', 'formDealerWrapper'];
+    const formsToToggle = ['formMasterDbWrapper', 'formUnitWrapper', 'formQRWrapper', 'formKaryawanWrapper', 'formDealerWrapper', 'formLokasiWrapper'];
     formsToToggle.forEach(id => {
       const formEl = document.getElementById(id);
       if (formEl) {
@@ -5454,6 +5778,130 @@
           })
           .deleteMasterUnit(rowIdx, clientToken, rowKey);
       }
+    });
+  }
+
+  /* --- 6. SUB TAB: MASTER LOKASI (Fase 11 #9) --- */
+  function loadMasterLokasiTable() {
+    showSkeleton('tbodyMasterLokasi', 3);
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (masterSessionGuard(res)) return;
+          if (res && res.success) {
+            MASTER_LOKASI_CACHE = res.data || [];
+            document.getElementById('searchLokasi').value = '';
+            renderMasterLokasiTable(MASTER_LOKASI_CACHE);
+          } else {
+            const tb = document.getElementById('tbodyMasterLokasi');
+            if (tb) tb.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-4">${escapeHtml((res && res.message) || 'Login diperlukan untuk melihat Master Lokasi.')}</td></tr>`;
+          }
+        })
+        .withFailureHandler(function() {
+          const tb = document.getElementById('tbodyMasterLokasi');
+          if (tb) tb.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Tidak dapat terhubung ke server.</td></tr>';
+        })
+        .getMasterLokasiFullList(getAuthToken());
+    }
+  }
+
+  function filterMasterLokasiTable() {
+    const keyword = (document.getElementById('searchLokasi').value || '').toLowerCase();
+    renderMasterLokasiTable(MASTER_LOKASI_CACHE.filter(l => (l.nama || '').toLowerCase().includes(keyword)));
+  }
+
+  function renderMasterLokasiTable(dataToRender) {
+    const tbody = document.getElementById('tbodyMasterLokasi');
+    if (!tbody) return;
+    const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
+    const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
+    if (!dataToRender || dataToRender.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Data Lokasi Kosong / Tidak Ditemukan</td></tr>';
+      return;
+    }
+    tbody.innerHTML = dataToRender.map(l => {
+      const idx = Number(l.rowIndex) || 0;
+      const statusPill = l.status === 'Aktif'
+        ? '<span class="status-pill status-pill--ok"><span class="status-dot"></span>Aktif</span>'
+        : '<span class="status-pill status-pill--off"><span class="status-dot"></span>Nonaktif</span>';
+      const actions = isMasterAdmin
+        ? `<button onclick="editLokasiRow(${idx})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+           <button onclick="deleteLokasiRow(${idx})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
+        : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Terkunci</button>`;
+      return `<tr>
+          <td class="fw-bold text-white text-start ps-3">${escapeHtml(l.nama)}</td>
+          <td>${statusPill}</td>
+          <td>${actions}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function editLokasiRow(rowIndex) {
+    const item = MASTER_LOKASI_CACHE.find(l => l.rowIndex == rowIndex);
+    if (!item) return;
+    document.getElementById('lokasiRowIndex').value = item.rowIndex;
+    EDIT_ROW_KEYS.lokasi = item.rowKey || '';
+    document.getElementById('lokasiNama').value = item.nama;
+    document.getElementById('lokasiStatus').value = item.status === 'Aktif' ? 'Aktif' : 'Nonaktif';
+    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT LOKASI (${escapeHtml(item.nama)})`;
+    const f = document.getElementById('formLokasiWrapper');
+    if (f && f.scrollIntoView) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function resetLokasiForm() {
+    document.getElementById('lokasiRowIndex').value = 0;
+    EDIT_ROW_KEYS.lokasi = '';
+    document.getElementById('lokasiNama').value = '';
+    document.getElementById('lokasiStatus').value = 'Aktif';
+    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT LOKASI BARU`;
+  }
+
+  function saveLokasiForm() {
+    const dataObj = {
+      rowIndex: document.getElementById('lokasiRowIndex').value,
+      rowKey: EDIT_ROW_KEYS.lokasi,
+      nama: document.getElementById('lokasiNama').value.trim(),
+      status: document.getElementById('lokasiStatus').value
+    };
+    if (!dataObj.nama) { showToast("Nama lokasi wajib diisi!", "warning"); return; }
+    if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
+    const btn = document.getElementById('btnSaveLokasi');
+    btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i>`;
+    btn.disabled = true;
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.innerHTML = `Simpan Lokasi`;
+        btn.disabled = false;
+        if (masterSessionGuard(res)) return;
+        showToast(res.message, res.success ? "success" : "error");
+        if (res.success) {
+          resetLokasiForm();
+          loadMasterLokasiTable();
+          if (typeof loadMasterLokasiDinamis === 'function') loadMasterLokasiDinamis(); // semua dropdown ikut segar
+        }
+      })
+      .withFailureHandler(function() {
+        btn.innerHTML = `Simpan Lokasi`;
+        btn.disabled = false;
+        showToast('Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+      })
+      .saveMasterLokasi(dataObj, getAuthToken());
+  }
+
+  function deleteLokasiRow(rowIdx) {
+    const target = MASTER_LOKASI_CACHE.find(l => l.rowIndex == rowIdx);
+    const rowKey = target ? (target.rowKey || '') : '';
+    const nama = target ? target.nama : '';
+    showConfirmModal(`Hapus lokasi "${nama}"? Bila lokasi masih dipakai di riwayat transaksi, pertimbangkan menjadikannya Nonaktif saja.`, function() {
+      if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (masterSessionGuard(res)) return;
+          showToast(res.message, res.success ? "success" : "error");
+          loadMasterLokasiTable();
+          if (typeof loadMasterLokasiDinamis === 'function') loadMasterLokasiDinamis();
+        })
+        .deleteMasterLokasi(rowIdx, getAuthToken(), rowKey);
     });
   }
 
@@ -6085,13 +6533,20 @@
                             <span class="dash-card-sub">Kendalikan di mana akun Anda sedang masuk</span>
                         </div>
                     </div>
-                    <div class="profil-session">
-                        <span class="profil-session-icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
-                        <div class="min-w-0 flex-grow-1">
-                            <strong>Perangkat ini</strong>
-                            <small>Berakhir otomatis setelah 15 menit tanpa aktivitas</small>
+                    <!-- [Fase 11 #6] Daftar sesi aktif dari server (renderMySessions); isi awal = perangkat ini -->
+                    <div class="profil-session-meta">
+                        <span id="profilSessionCount">Memuat perangkat…</span>
+                        <button type="button" class="profil-session-refresh" id="btnRefreshSessions" title="Muat ulang daftar perangkat" aria-label="Muat ulang daftar perangkat"><i class="fa fa-sync-alt" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="profil-session-list" id="profilSessionList" aria-live="polite">
+                        <div class="profil-session">
+                            <span class="profil-session-icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
+                            <div class="min-w-0 flex-grow-1">
+                                <strong>Perangkat ini</strong>
+                                <small>Berakhir otomatis setelah 15 menit tanpa aktivitas</small>
+                            </div>
+                            <span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>
                         </div>
-                        <span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>
                     </div>
                     <p class="profil-note">Curiga akun dipakai orang lain? Gunakan <strong>Keluar dari semua perangkat</strong>, lalu ganti kata sandi Anda.</p>
                     <div class="d-grid gap-2">
@@ -6178,11 +6633,28 @@
                         </button>
                     </div>
 
-                    <div class="user-stats">
-                        <div class="user-stat"><span class="user-stat-value tabular-nums" id="userStatTotal">0</span><span class="user-stat-label">Total user</span></div>
-                        <div class="user-stat user-stat--ok"><span class="user-stat-value tabular-nums" id="userStatActive">0</span><span class="user-stat-label">Aktif</span></div>
-                        <div class="user-stat user-stat--warn"><span class="user-stat-value tabular-nums" id="userStatLocked">0</span><span class="user-stat-label">Dijeda / nonaktif</span></div>
-                        <div class="user-stat user-stat--info"><span class="user-stat-value tabular-nums" id="userStatReset">0</span><span class="user-stat-label">Minta reset</span></div>
+                    <!-- [Fase 11 #7] Ringkasan user: tiap kartu bisa diklik untuk menyaring tabel (klik lagi = semua) -->
+                    <div class="user-stats" role="group" aria-label="Ringkasan & saring user">
+                        <button type="button" class="user-stat is-active" data-user-filter="all" aria-pressed="true">
+                            <span class="user-stat-head"><span class="user-stat-label">Total user</span><i class="fa fa-users" aria-hidden="true"></i></span>
+                            <span class="user-stat-value tabular-nums" id="userStatTotal">0</span>
+                            <span class="user-stat-foot" id="userStatTotalHint">Semua akun terdaftar</span>
+                        </button>
+                        <button type="button" class="user-stat user-stat--ok" data-user-filter="active" aria-pressed="false">
+                            <span class="user-stat-head"><span class="user-stat-label">Aktif</span><i class="fa fa-check-circle" aria-hidden="true"></i></span>
+                            <span class="user-stat-value tabular-nums" id="userStatActive">0</span>
+                            <span class="user-stat-foot"><span class="user-stat-bar" aria-hidden="true"><span id="userStatActiveBar"></span></span><span id="userStatActivePct" class="tabular-nums">0%</span></span>
+                        </button>
+                        <button type="button" class="user-stat user-stat--warn" data-user-filter="locked" aria-pressed="false">
+                            <span class="user-stat-head"><span class="user-stat-label">Dijeda / nonaktif</span><i class="fa fa-pause-circle" aria-hidden="true"></i></span>
+                            <span class="user-stat-value tabular-nums" id="userStatLocked">0</span>
+                            <span class="user-stat-foot" id="userStatLockedHint">Tidak ada</span>
+                        </button>
+                        <button type="button" class="user-stat user-stat--info" data-user-filter="reset" aria-pressed="false">
+                            <span class="user-stat-head"><span class="user-stat-label">Minta reset</span><i class="fa fa-key" aria-hidden="true"></i></span>
+                            <span class="user-stat-value tabular-nums" id="userStatReset">0</span>
+                            <span class="user-stat-foot" id="userStatResetHint">Tidak ada permintaan</span>
+                        </button>
                     </div>
 
                     <div class="profil-search mb-2">
@@ -6412,6 +6884,8 @@
             if (expEl) expEl.textContent = (tokPayload && tokPayload.exp) ? formatWaktuSingkat(tokPayload.exp) : '-';
             showMustChangeBanner(!!activeSession.mustChange);
 
+            loadMySessions(); // [Fase 11 #6] daftar perangkat yang sedang masuk
+
             const panelMgmt = document.getElementById('panelUserManagement');
             if (panelMgmt) {
                 if (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin') {
@@ -6584,7 +7058,7 @@
                     setLoginBusy(false);
                     setLoginAlert('info', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda, lalu coba lagi.');
                 })
-                .checkProfilUserLogin(userVal, passVal);
+                .checkProfilUserLogin(userVal, passVal, getDeviceLabel());
         } else {
             // Pratinjau lokal (tanpa server GAS): login tidak tersedia.
             setLoginBusy(false);
@@ -7029,6 +7503,21 @@
     }
 
     let USER_MGMT_CACHE = [];
+    // [Fase 11 #7] Saringan dari kartu ringkasan: all | active | locked | reset (tampilan saja)
+    let USER_STAT_FILTER = 'all';
+    function setUserStatFilter(key) {
+        USER_STAT_FILTER = (USER_STAT_FILTER === key && key !== 'all') ? 'all' : key;
+        document.querySelectorAll('.user-stat[data-user-filter]').forEach(function(el) {
+            const on = el.getAttribute('data-user-filter') === USER_STAT_FILTER;
+            el.classList.toggle('is-active', on);
+            el.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        renderUserManagementTable();
+    }
+    document.addEventListener('click', function(e) {
+        const card = e.target.closest && e.target.closest('.user-stat[data-user-filter]');
+        if (card) setUserStatFilter(card.getAttribute('data-user-filter'));
+    });
 
     function userInitials(name) {
         const parts = String(name || '?').trim().split(/\s+/).filter(Boolean);
@@ -7042,15 +7531,35 @@
 
         // Ringkasan
         const setNum = function(id, n) { const el = document.getElementById(id); if (el) el.textContent = n; };
-        setNum('userStatTotal', list.length);
-        setNum('userStatActive', list.filter(u => u.status === 'ACTIVE').length);
-        setNum('userStatLocked', list.filter(u => u.status !== 'ACTIVE').length);
-        setNum('userStatReset', list.filter(u => u.resetRequested).length);
+        const nTotal = list.length;
+        const nActive = list.filter(u => u.status === 'ACTIVE').length;
+        const nLocked = list.filter(u => u.status !== 'ACTIVE').length;
+        const nReset = list.filter(u => u.resetRequested).length;
+        setNum('userStatTotal', nTotal);
+        setNum('userStatActive', nActive);
+        setNum('userStatLocked', nLocked);
+        setNum('userStatReset', nReset);
+        // [Fase 11 #7] Info pendukung tiap kartu
+        const pct = nTotal ? Math.round(nActive / nTotal * 100) : 0;
+        setNum('userStatTotalHint', nTotal === 1 ? '1 akun terdaftar' : nTotal + ' akun terdaftar');
+        setNum('userStatActivePct', pct + '%');
+        const bar = document.getElementById('userStatActiveBar');
+        if (bar) bar.style.width = pct + '%';
+        setNum('userStatLockedHint', nLocked ? 'Perlu ditinjau' : 'Tidak ada');
+        setNum('userStatResetHint', nReset ? 'Ketuk untuk melihat' : 'Tidak ada permintaan');
+        document.querySelectorAll('.user-stat[data-user-filter="locked"]').forEach(el => el.classList.toggle('has-alert', nLocked > 0));
+        document.querySelectorAll('.user-stat[data-user-filter="reset"]').forEach(el => el.classList.toggle('has-alert', nReset > 0));
 
         const keyword = ((document.getElementById('searchMasterUser') || {}).value || '').trim().toLowerCase();
-        const rows = list.filter(u => !keyword || String(u.username).toLowerCase().includes(keyword) || String(u.fullName).toLowerCase().includes(keyword));
+        const byStat = function(u) {
+            if (USER_STAT_FILTER === 'active') return u.status === 'ACTIVE';
+            if (USER_STAT_FILTER === 'locked') return u.status !== 'ACTIVE';
+            if (USER_STAT_FILTER === 'reset') return !!u.resetRequested;
+            return true;
+        };
+        const rows = list.filter(u => byStat(u) && (!keyword || String(u.username).toLowerCase().includes(keyword) || String(u.fullName).toLowerCase().includes(keyword)));
         if (!rows.length) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">${list.length ? 'Tidak ada user yang cocok dengan pencarian.' : 'Belum ada user.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">${list.length ? (USER_STAT_FILTER !== 'all' ? 'Tidak ada user pada kategori ini.' : 'Tidak ada user yang cocok dengan pencarian.') : 'Belum ada user.'}</td></tr>`;
             return;
         }
 
@@ -7117,6 +7626,96 @@
                 .getAllUsersMasterUser(getAuthToken());
         }
     }
+
+    /* ---------- [Fase 11 #6] SESI & PERANGKAT ---------- */
+    // Label perangkat ringkas untuk daftar sesi (Apps Script tidak bisa membaca User-Agent sendiri)
+    function getDeviceLabel() {
+        const ua = navigator.userAgent || '';
+        let b = 'Browser', o = 'Perangkat';
+        if (/Edg\//.test(ua)) b = 'Edge';
+        else if (/OPR\//.test(ua)) b = 'Opera';
+        else if (/SamsungBrowser/.test(ua)) b = 'Samsung Internet';
+        else if (/CriOS|Chrome\//.test(ua)) b = 'Chrome';
+        else if (/FxiOS|Firefox\//.test(ua)) b = 'Firefox';
+        else if (/Safari\//.test(ua)) b = 'Safari';
+        if (/iPhone/.test(ua)) o = 'iPhone';
+        else if (/iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) o = 'iPad';
+        else if (/Android/.test(ua)) o = 'Android';
+        else if (/Windows/.test(ua)) o = 'Windows';
+        else if (/Mac OS X/.test(ua)) o = 'macOS';
+        else if (/Linux/.test(ua)) o = 'Linux';
+        const isApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+        return b + ' · ' + o + (isApp ? ' (Aplikasi)' : '');
+    }
+
+    function sessionDeviceIcon(label) {
+        if (/iPad|Tablet/i.test(label)) return 'fa-tablet-alt';
+        if (/iPhone|Android/i.test(label)) return 'fa-mobile-alt';
+        return 'fa-desktop';
+    }
+
+    function sessionAgo(ts) {
+        const m = Math.floor((Date.now() - Number(ts || 0)) / 60000);
+        if (m <= 0) return 'aktif sekarang';
+        if (m < 60) return 'aktif ' + m + ' mnt lalu';
+        return 'aktif ' + Math.floor(m / 60) + ' jam lalu';
+    }
+
+    function renderMySessions(list) {
+        const box = document.getElementById('profilSessionList');
+        const countEl = document.getElementById('profilSessionCount');
+        if (!box) return;
+        list = Array.isArray(list) ? list : [];
+        if (countEl) countEl.textContent = list.length + ' perangkat sedang masuk';
+        box.innerHTML = list.map(function(s) {
+            const dev = s.device || 'Perangkat';
+            const masuk = s.createdAt ? 'Masuk ' + formatWaktuSingkat(s.createdAt) + ' · ' : '';
+            const action = s.isCurrent
+                ? '<span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>'
+                : `<button type="button" class="btn btn-sm btn-ghost-danger profil-session-out" onclick="logoutOtherDevice(${jsArg(s.sid)}, ${jsArg(dev)})"><i class="fa fa-sign-out-alt me-1" aria-hidden="true"></i>Keluar</button>`;
+            return `<div class="profil-session${s.isCurrent ? ' is-current' : ''}">
+                <span class="profil-session-icon"><i class="fa ${sessionDeviceIcon(dev)}" aria-hidden="true"></i></span>
+                <div class="min-w-0 flex-grow-1">
+                    <strong>${escapeHtml(dev)}${s.isCurrent ? ' <span class="profil-session-tag">Perangkat ini</span>' : ''}</strong>
+                    <small>${escapeHtml(masuk + sessionAgo(s.lastSeen))}</small>
+                </div>
+                ${action}
+            </div>`;
+        }).join('');
+    }
+
+    function loadMySessions() {
+        if (!getAuthToken() || !(typeof google !== 'undefined' && google.script && google.script.run)) return;
+        const countEl = document.getElementById('profilSessionCount');
+        if (countEl) countEl.textContent = 'Memuat perangkat…';
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (res && res.success) { renderMySessions(res.sessions); return; }
+                if (handleSessionExpired(res)) return;
+                if (countEl) countEl.textContent = 'Daftar perangkat tidak tersedia';
+            })
+            .withFailureHandler(function() { if (countEl) countEl.textContent = 'Daftar perangkat tidak tersedia (offline)'; })
+            .getMySessions(getAuthToken());
+    }
+
+    function logoutOtherDevice(sid, deviceLabel) {
+        showConfirmModal(`Keluarkan akun Anda dari "${deviceLabel}"? Perangkat itu harus login ulang.`, function() {
+            if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (handleSessionExpired(res)) return;
+                    showToast((res && res.message) || 'Selesai.', res && res.success ? 'success' : 'error');
+                    loadMySessions();
+                })
+                .withFailureHandler(function() { showToast('Tidak dapat terhubung ke server. Silakan coba lagi.', 'error'); })
+                .logoutOtherSession(getAuthToken(), sid);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btnRefreshSessions');
+        if (btn) btn.addEventListener('click', loadMySessions);
+    });
 
     // L1: keluar dari semua perangkat
     function logoutAllDevices() {
@@ -7629,6 +8228,10 @@
         currentUnitMasterMeta = { lastHmKm: 0, kapasitasTangki: 9999 };
 
         $('#modalScanToFill').modal('show');
+        // [Fase 11 #8] Daftar operator (Master_Karyawan, wajib login) & lokasi (MASTER_LOKASI) dimuat
+        // ulang setiap modal dibuka — sebelumnya hanya sekali saat halaman dibuka (sering masih Guest)
+        loadMasterKaryawanDropdown();
+        if (typeof loadMasterLokasiDinamis === 'function') loadMasterLokasiDinamis();
         $('#scanUnitCode').val('');
         $('#scanHmKm').val('');
         $('#scanLiter').val('');
@@ -7644,14 +8247,30 @@
                 .withSuccessHandler(function(res) {
                     if (res && res.success && res.data) {
                         const select = $('#scanOperator');
+                        const cur = select.val(); // pertahankan pilihan (mis. operator terakhir unit)
                         select.html('<option value="" disabled selected>-- Pilih Operator --</option>');
                         res.data.forEach(function(nama) {
                             select.append($('<option></option>').val(nama).text(nama));
                         });
+                        if (cur) ensureSelectOption('scanOperator', cur);
                     }
                 })
                 .getMasterKaryawanList(getAuthToken());
         }
+    }
+
+    /* [Fase 11 #8] Pilih nilai di <select>; bila belum ada di daftar master (mis. lokasi dari stiker QR
+       yang belum terdaftar di MASTER_LOKASI / operator lama), tambahkan sebagai pilihan agar tidak kosong. */
+    function ensureSelectOption(selectId, value) {
+        const el = document.getElementById(selectId);
+        if (!el || value === undefined || value === null || String(value).trim() === '') return;
+        const v = String(value).trim();
+        let opt = Array.from(el.options).find(o => o.value.toLowerCase() === v.toLowerCase());
+        if (!opt) {
+            opt = new Option(v, v);
+            el.add(opt);
+        }
+        el.value = opt.value;
     }
 
     function fetchLastOperator(kodeUnit) {
@@ -7659,7 +8278,7 @@
             google.script.run
                 .withSuccessHandler(function(res) {
                     if (res && res.success && res.lastOperator) {
-                        $('#scanOperator').val(res.lastOperator);
+                        ensureSelectOption('scanOperator', res.lastOperator);
                     }
                     // HM/KM terakhir unit → aktifkan cek "HM/KM mundur" di runAnomalyCheck()
                     currentUnitMasterMeta.lastHmKm = (res && parseFloat(res.lastHmKm)) || 0;
@@ -7786,7 +8405,7 @@
                 .withSuccessHandler(function(res) {
                     if (res && res.success && res.data) {
                         $('#scanUnitCode').val(res.data.kodeUnit);
-                        $('#scanLokasi').val(res.data.lokasi || 'Legislatif');
+                        if (res.data.lokasi) ensureSelectOption('scanLokasi', res.data.lokasi);
                         currentUnitMasterMeta.kapasitasTangki = parseFloat(res.data.kapasitas) || 9999;
                         fetchLastOperator(res.data.kodeUnit);
                     } else {
@@ -8055,7 +8674,10 @@ function loadMasterLokasiDinamis() {
                   { id: 'filterLokasiLaporan', defaultOpt: '<option value="Semua Lokasi">Semua Lokasi</option>' },
                   { id: 'filterKalLokasi', defaultOpt: '<option value="Semua Lokasi">Semua Lokasi</option>' },
                   { id: 'adminLokasi', defaultOpt: '<option value="" disabled selected>-- Pilih Lokasi --</option>' },
-                  { id: 'qrLokasi', defaultOpt: '<option value="" disabled selected>-- Pilih Lokasi --</option>' }
+                  { id: 'qrLokasi', defaultOpt: '<option value="" disabled selected>-- Pilih Lokasi --</option>' },
+                  // [Fase 11 #8] Lokasi Scan-to-Fill kini dari MASTER_LOKASI (sebelumnya 3 pilihan tetap)
+                  // (Master Lokasi sendiri dikelola di tab Master Data → Master Lokasi, Fase 11 #9)
+                  { id: 'scanLokasi', defaultOpt: '<option value="" disabled selected>-- Pilih Lokasi --</option>' }
               ];
 
               dropdowns.forEach(item => {
