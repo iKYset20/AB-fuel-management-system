@@ -14,20 +14,22 @@
  */
 'use strict';
 
-var VERSION = '1bba5111e3';
+var VERSION = '3a8ea7a664';
 var SHELL_CACHE = 'abfuel-pages-shell-' + VERSION;
 var CDN_CACHE = 'abfuel-pages-cdn-v1'; // URL CDN berversi → aman dipakai lintas build
-var SHELL_FILES = ["./","./index.html","./gas-adapter.js?v=1bba5111e3","./pages-offline-ui.js?v=1bba5111e3","./pages-install.js?v=1bba5111e3","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png","./icons/favicon-32.png"];   // ./, ./index.html, ./gas-adapter.js?v=…, ./pages-offline-ui.js?v=…
+var SHELL_FILES = ["./","./index.html","./gas-adapter.js?v=3a8ea7a664","./pages-offline-ui.js?v=3a8ea7a664","./pages-install.js?v=3a8ea7a664","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png","./icons/favicon-32.png"];   // ./, ./index.html, ./gas-adapter.js?v=…, ./pages-offline-ui.js?v=…
 var PRECACHE_CDN = [
     "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css",
     "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
     "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",
     "https://code.jquery.com/jquery-3.7.1.min.js",
     "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"
+    "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
 ];
 var NAV_TIMEOUT_MS = 6000;
 
@@ -60,6 +62,11 @@ self.addEventListener('activate', function (event) {
 
 function isApi(url) {
     return url.hostname === 'script.google.com' || /\.googleusercontent\.com$/.test(url.hostname);
+}
+
+// [Fase 12] Ubin peta (ribuan gambar kecil) TIDAK disimpan SW agar cache tidak membengkak
+function isMapTile(url) {
+    return url.hostname === 'server.arcgisonline.com' || /(^|\.)tile\.openstreetmap\.org$/.test(url.hostname);
 }
 
 function networkFirstPage(request) {
@@ -122,7 +129,7 @@ self.addEventListener('fetch', function (event) {
     var req = event.request;
     if (req.method !== 'GET') return;
     var url = new URL(req.url);
-    if (isApi(url)) return;
+    if (isApi(url) || isMapTile(url)) return;
     if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
 
     if (req.mode === 'navigate') { event.respondWith(networkFirstPage(req)); return; }

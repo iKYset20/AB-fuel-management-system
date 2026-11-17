@@ -44,7 +44,8 @@
         getMasterKaryawanList:  { auth: true,  latest: true },
         getMasterQRData:        { auth: true,  latest: false },
         getLastOperatorByUnit:  { auth: true,  latest: false },
-        getMasterQRFullList:    { auth: true,  latest: true }
+        getMasterQRFullList:    { auth: true,  latest: true },
+        getMasterLokasiMap:     { auth: true,  latest: true }   // Fase 12: titik peta Dashboard
     };
     /* Selain fungsi baca, fungsi ini aman diulang sekali saat jaringan baru pulih:
        handleIdempotentSync menolak transaction_id ganda di server; sisanya hanya memperbarui sesi/kehadiran. */

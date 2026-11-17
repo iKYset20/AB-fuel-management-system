@@ -4,16 +4,52 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=1bba5111e3"></script>
-    <script src="./pages-offline-ui.js?v=1bba5111e3" defer></script>
-    <script src="./pages-install.js?v=1bba5111e3" defer></script>
+    <script src="./gas-adapter.js?v=3a8ea7a664"></script>
+    <script src="./pages-offline-ui.js?v=3a8ea7a664" defer></script>
+    <script src="./pages-install.js?v=3a8ea7a664" defer></script>
     <title>AB - Fuel Management System</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
     <!-- Theme Initialization (Mencegah layar berkedip putih saat Dark Mode) -->
     <script>
         const savedTheme = localStorage.getItem('ab_fuel_theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
+
+        /* [Fase 12] HP: layar dikunci tanpa zoom (permintaan pengguna). Android mengikuti meta viewport
+           (user-scalable=no); Safari iOS mengabaikannya untuk pinch → gesture dicegah di sini.
+           Peta (Leaflet) tetap bisa di-pinch karena memakai event sentuh sendiri. */
+        (function () {
+            var ua = navigator.userAgent || '';
+            var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+            if (isIOS) document.documentElement.classList.add('is-ios');
+            var inMap = function (t) { return t && t.closest && t.closest('.leaflet-container'); };
+            ['gesturestart', 'gesturechange'].forEach(function (ev) {
+                document.addEventListener(ev, function (e) { if (!inMap(e.target)) e.preventDefault(); }, { passive: false });
+            });
+            document.addEventListener('touchmove', function (e) {
+                if (e.scale !== undefined && e.scale !== 1 && !inMap(e.target)) e.preventDefault();
+            }, { passive: false });
+            // Tinggi top bar → variabel CSS (dipakai top bar "fixed" khusus iOS di HP)
+            var syncTopbarH = function () {
+                var tb = document.querySelector('.topbar');
+                if (tb) document.documentElement.style.setProperty('--topbar-h', tb.offsetHeight + 'px');
+            };
+            document.addEventListener('DOMContentLoaded', function () {
+                syncTopbarH();
+                window.addEventListener('resize', syncTopbarH);
+                if (window.ResizeObserver) { var tb = document.querySelector('.topbar'); if (tb) new ResizeObserver(syncTopbarH).observe(tb); }
+                // Chip status hero ikon-saja di HP: teks lengkap tetap tersedia sebagai tooltip/label
+                var mirror = function (srcId, targetSel) {
+                    var src = document.getElementById(srcId), tgt = document.querySelector(targetSel);
+                    if (!src || !tgt) return;
+                    var copy = function () { var t = (src.textContent || '').trim(); tgt.setAttribute('title', t); tgt.setAttribute('aria-label', t); };
+                    copy();
+                    new MutationObserver(copy).observe(src, { childList: true, characterData: true, subtree: true });
+                };
+                mirror('syncTimeText', '.dash-hero-status .live-chip');
+                mirror('alertBadge', '#alertBadge');
+            });
+        })();
 
         /* SECURITY HELPERS (global): escape data sebelum disisipkan ke HTML (anti-XSS) */
         function escapeHtml(value) {
@@ -26,6 +62,42 @@
         function jsArg(value) {
             return escapeHtml(JSON.stringify(String(value === null || value === undefined ? '' : value)));
         }
+        /* [Fase 12] AVATAR MONOGRAM: bila user belum memilih foto/ilustrasi (avatarUrl kosong), tampilkan
+           inisial nama di lingkaran gradasi (warna tetap per nama). SVG dibuat lokal → tampil juga offline. */
+        const AVATAR_TONES = [
+            ['#0E634B', '#23946C'], ['#0F5F73', '#2E9AB0'], ['#7A4A0C', '#C98A22'], ['#33456E', '#5E79B8'],
+            ['#5A3E7A', '#8E6CC0'], ['#7A3434', '#C2605A'], ['#264D40', '#4F8F74'], ['#4B5320', '#86913A']
+        ];
+        function avatarInitials(name) {
+            const p = String(name || '').replace(/\([^)]*\)/g, ' ').trim().split(/\s+/).filter(Boolean);
+            if (!p.length) return '?';
+            return ((p[0][0] || '') + (p.length > 1 ? (p[p.length - 1][0] || '') : (p[0][1] || ''))).toUpperCase();
+        }
+        function monogramAvatarUrl(name) {
+            const key = String(name || '?');
+            let h = 0;
+            for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+            const t = AVATAR_TONES[h % AVATAR_TONES.length];
+            const ini = avatarInitials(key).replace(/[<>&"']/g, '');
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">' +
+                '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + t[0] + '"/><stop offset="1" stop-color="' + t[1] + '"/></linearGradient></defs>' +
+                '<rect width="96" height="96" fill="url(#g)"/>' +
+                '<circle cx="78" cy="14" r="34" fill="#fff" opacity=".07"/>' +
+                '<text x="48" y="50" text-anchor="middle" dominant-baseline="central" font-family="Plus Jakarta Sans,Segoe UI,Arial,sans-serif" font-size="' + (ini.length > 1 ? 36 : 42) + '" font-weight="700" letter-spacing="-1" fill="#F4FBF8">' + ini + '</text></svg>';
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+        /* Tamu: siluet netral (lokal, bukan gambar pihak ketiga) */
+        function guestAvatarUrl() {
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#3A4A43"/>' +
+                '<circle cx="48" cy="38" r="16" fill="#C9D6CF"/><path d="M18 86c3-17 15-26 30-26s27 9 30 26z" fill="#C9D6CF"/></svg>';
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+        function resolveAvatarUrl(session) {
+            const s = session || {};
+            const url = String(s.avatarUrl || s.avatar || '').trim();
+            return url || monogramAvatarUrl(s.fullName || s.nama || s.username || '?');
+        }
+
         /* Token JWT sesi aktif — wajib dikirim ke setiap fungsi server yang mengubah data */
         function getAuthToken() {
             try { return localStorage.getItem('darkpan_jwt_token') || ''; } catch (e) { return ''; }
@@ -76,6 +148,9 @@
 
     <!-- Customized Bootstrap Stylesheet CDN (5.0.2 — patch aman, tampilan V7 tidak berubah) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- [Fase 12] Leaflet 1.9.4 (peta lokasi site 2D) — SRI sha384 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" rel="stylesheet" integrity="sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb" crossorigin="anonymous">
 
     <!-- HTML5-QRCode Library CDN -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+" crossorigin="anonymous"></script>
@@ -2954,6 +3029,125 @@
         #kalibrasiContainer .v7-filter-group > select.dash-filter-input { grid-column: 1 / -1; }
     }
 
+    /* =========================================================================
+       §F12 — UJI HP LANJUTAN + CATATAN DESKTOP (Fase 12, 2026-11-17). Hanya CSS; ID/handler tetap.
+       ========================================================================= */
+
+    /* Zoom dikunci (meta viewport + gesture iOS di Index.html); ketuk-ganda tidak memperbesar */
+    @media (pointer: coarse) { html { touch-action: manipulation; } }
+
+    /* Garis render saat keyboard iOS muncul: lapisan latar tetap dilebihkan & punya layer GPU sendiri
+       (pseudo-elemen — BUKAN .app-shell itu sendiri, lihat jebakan modal di TODO.md) */
+    .app-shell::before { inset: -2px; -webkit-transform: translateZ(0); transform: translateZ(0); }
+
+    /* Top bar bergetar di iOS: bug Safari pada position:sticky + overflow-x:hidden di <html>.
+       (1) overflow-x: clip tidak memicu bug tsb; (2) khusus iOS di HP top bar dibuat fixed + ruang
+       pengganti setinggi top bar (--topbar-h diukur JS). Efek kaca & warna tidak berubah. */
+    @supports (overflow-x: clip) { html { overflow-x: clip; } }
+    @media (max-width: 991.98px) {
+        html.is-ios .topbar {
+            position: fixed;
+            top: var(--shell-pad); left: var(--shell-pad); right: var(--shell-pad);
+            margin: 0;
+        }
+        html.is-ios .content { padding-top: calc(var(--topbar-h, 56px) + var(--shell-gap)) !important; }
+    }
+
+    /* Desktop: daftar pilihan <select> tak terbaca di tema gelap (latar select transparan → Chrome
+       Windows menggambar daftar putih + teks terang). Opsi diberi latar pekat sesuai tema. */
+    select option, select optgroup { background-color: var(--modal-solid); color: var(--text-primary); }
+    select option:checked { background-color: color-mix(in srgb, var(--brand-primary) 24%, var(--modal-solid)); }
+
+    /* Kartu Stok & Kalibrasi: garis warna tipis di tepi kiri dihapus (permintaan pengguna) */
+    #kartuStokContainer .kpi-stat::before,
+    #kalibrasiContainer .tier-card::before { display: none !important; }
+    #kartuStokContainer .kpi-stat, #kalibrasiContainer .tier-card { padding-left: 18px; }
+    @media (max-width: 767.98px) {
+        #kartuStokContainer .kpi-stat, #kalibrasiContainer .tier-card { padding-left: 12px; }
+    }
+
+    /* Hero Dashboard — DESKTOP: ucapan berdiri sendiri di kiri; chip Live/Anomali kecil di kanan atas,
+       tombol aksi di bawahnya. */
+    .dash-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "title status" "sub actions";
+        align-items: end; column-gap: 20px; row-gap: 8px;
+    }
+    .dash-hero-main { display: contents; }
+    .dash-hero-title { grid-area: title; margin: 0; align-self: end; }
+    .dash-hero-sub { grid-area: sub; align-self: center; }
+    .dash-hero-status { grid-area: status; justify-self: end; align-self: end; margin: 0; flex-wrap: nowrap; }
+    .dash-hero-actions { grid-area: actions; justify-self: end; }
+    .dash-hero-status .live-chip { height: 22px; padding: 0 10px 0 8px; gap: 6px; }
+    .dash-hero-status .dash-hero-eyebrow, .dash-hero-status .dash-hero-sync { font-size: 0.6rem; }
+    .dash-hero-status #alertBadge { height: 22px; display: inline-flex; align-items: center; padding: 0 9px; font-size: 0.55rem; letter-spacing: 0.04em; }
+
+    /* Hero Dashboard — HP: ucapan paling atas, chip IKON SAJA di bawahnya (teks lengkap = tooltip),
+       tombol Audio Siren disembunyikan (sudah ada lonceng di top bar) → tersisa tombol Filter. */
+    @media (max-width: 767.98px) {
+        .dash-hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "sub" "status" "actions"; row-gap: 8px; }
+        .dash-hero-status { justify-self: start; margin: 2px 0 0; gap: 6px; }
+        .dash-hero-status .live-chip { width: 24px; height: 24px; padding: 0; justify-content: center; border-radius: 50%; }
+        .dash-hero-status .live-chip .dash-hero-eyebrow,
+        .dash-hero-status .live-chip .dash-hero-sync { display: none; }
+        .dash-hero-status #alertBadge {
+            width: 24px; height: 24px; padding: 0; border-radius: 50%;
+            justify-content: center; font-size: 0 !important; letter-spacing: 0;
+        }
+        .dash-hero-status #alertBadge::before {
+            font-family: "Font Awesome 5 Free"; font-weight: 900; font-size: 0.62rem; line-height: 1;
+            content: "\f00c"; /* centang = normal */
+        }
+        .dash-hero-status #alertBadge.bg-danger::before { content: "\f071"; } /* segitiga = anomali */
+        .dash-hero-actions { grid-template-columns: minmax(0, 1fr); }
+        .dash-hero-actions > #btnMuteSound { display: none !important; }
+    }
+
+    /* ---------- [Fase 12] PETA LOKASI SITE (Leaflet 2D) ---------- */
+    .dash-map-card { padding: 20px 20px 18px; }
+    .dash-map-count {
+        flex-shrink: 0; align-self: flex-start;
+        padding: 4px 10px; border-radius: var(--radius-pill);
+        background: var(--bg-inset); color: var(--text-secondary);
+        font-size: 0.66rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    }
+    .dash-map-wrap { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); }
+    .dash-map { height: 380px; width: 100%; background: var(--bg-inset); }
+    .dash-map-notice {
+        position: absolute; left: 12px; bottom: 12px; z-index: 500; max-width: calc(100% - 24px);
+        padding: 8px 12px; border-radius: 12px;
+        background: var(--modal-solid); color: var(--text-primary);
+        font-size: 0.74rem; font-weight: 600; box-shadow: 0 8px 22px rgba(5, 46, 34, 0.25);
+    }
+    .lokasi-picker-map { height: 240px; width: 100%; margin-top: 4px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-inset); cursor: crosshair; }
+    @media (max-width: 767.98px) {
+        .dash-map { height: 280px; }
+        .dash-map-card { padding: 14px; }
+        .lokasi-picker-map { height: 200px; }
+    }
+    /* Kontrol & popup Leaflet mengikuti tema */
+    .leaflet-container { font-family: inherit; }
+    .leaflet-control-layers, .leaflet-bar a, .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: var(--modal-solid) !important; color: var(--text-primary) !important;
+    }
+    .leaflet-control-layers { border-radius: 12px !important; border: 1px solid var(--border-subtle) !important; box-shadow: 0 6px 18px rgba(5, 46, 34, 0.22) !important; font-size: 0.72rem; font-weight: 600; }
+    .leaflet-control-layers-base label { margin: 2px 0; }
+    .leaflet-bar { border: 1px solid var(--border-subtle) !important; border-radius: 12px !important; overflow: hidden; }
+    .leaflet-bar a { border-bottom-color: var(--border-subtle) !important; }
+    .leaflet-popup-content-wrapper { border-radius: 14px !important; }
+    .leaflet-control-attribution { font-size: 0.6rem !important; background: rgba(255, 255, 255, 0.72) !important; }
+    .dash-map-pop strong { display: block; font-size: 0.86rem; margin-bottom: 2px; }
+    .dash-map-pop span { display: block; font-size: 0.74rem; color: var(--text-secondary); }
+    .dash-map-pop small { display: block; font-size: 0.66rem; color: var(--text-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .dash-map-tip { font-weight: 700; font-size: 0.7rem; border-radius: 8px; }
+    @media print { .dash-map-card, .lokasi-picker-map { display: none !important; } }
+
+    /* Toast panjang tidak lagi keluar layar di HP (sebelumnya white-space: nowrap) */
+    @media (max-width: 767.98px) {
+        #neumorphicToast { white-space: normal; width: max-content; max-width: calc(100vw - 32px); border-radius: 18px; text-align: left; line-height: 1.35; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
             animation-duration: 0.01ms !important;
@@ -3103,7 +3297,7 @@
 
                     <div class="sidebar-user-profile">
                         <div class="sidebar-user-avatar">
-                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Avatar" id="sidebarUserAvatar">
+                            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="User Avatar" id="sidebarUserAvatar">
                             <span class="online-status" id="sidebarOnlineStatus"></span>
                         </div>
                         <div class="ms-3 text-truncate">
@@ -3187,7 +3381,7 @@
                         <!-- AVATAR PROFIL -->
                         <div class="nav-item dropdown profile-dropdown" id="profileDropdown">
                             <a href="#" class="nav-link dropdown-toggle topbar-avatar" data-bs-toggle="dropdown" aria-expanded="false" title="Menu profil">
-                                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" id="headerUserAvatar">
+                                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" id="headerUserAvatar">
                                 <span class="topbar-avatar-text d-none d-lg-flex">
                                     <span class="topbar-avatar-name" id="headerUserName">Guest Mode</span>
                                     <span class="topbar-avatar-role" id="headerUserRole">Pengawas Site</span>
@@ -3196,7 +3390,7 @@
                             <!-- Kartu profil kaca (data disalin dari updateAuthUI oleh syncProfileDropdown) -->
                             <div class="dropdown-menu dropdown-menu-end profile-menu m-0">
                                 <div class="profile-menu-head">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" class="profile-menu-avatar" id="dropdownUserAvatar">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" class="profile-menu-avatar" id="dropdownUserAvatar">
                                     <div class="profile-menu-id">
                                         <span class="profile-menu-name" id="dropdownUserName">Guest Mode</span>
                                         <span class="profile-menu-role" id="dropdownUserRole">Pengawas Site</span>
@@ -3449,6 +3643,26 @@
                 <div class="kpi-value-white" id="kpiSisaStok">0 Liter</div>
                 <div class="kpi-stat-foot"><span class="kpi-subtext-red" id="stokWarningText">MONITORING</span></div>
             </div>
+        </div>
+    </div>
+
+    <!-- ================= ROW 3b — PETA LOKASI SITE 2D (Fase 12, disetujui pengguna) =================
+         Titik dari MASTER_LOKASI (kolom Latitude/Longitude); ukuran titik = konsumsi lokasi pada periode filter. -->
+    <div class="row g-3">
+        <div class="col-12">
+            <section class="glass-card no-lift dash-map-card stagger-item" id="dashMapCard" style="--stagger-idx: 9;">
+                <div class="dash-card-head">
+                    <div>
+                        <h6 class="dash-card-title"><i class="fa fa-map-marked-alt me-2"></i>Peta Lokasi Site</h6>
+                        <span class="dash-card-sub">Titik dari Master Lokasi · ukuran titik = konsumsi BBM periode filter</span>
+                    </div>
+                    <span class="dash-map-count" id="dashMapCount">—</span>
+                </div>
+                <div class="dash-map-wrap">
+                    <div id="dashMap" class="dash-map" role="region" aria-label="Peta lokasi site"></div>
+                    <div id="dashMapNotice" class="dash-map-notice d-none"></div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -5279,8 +5493,24 @@
           <button onclick="resetLokasiForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
           <button onclick="saveLokasiForm()" id="btnSaveLokasi" class="btn btn-sm btn-brand flex-grow-1 fw-bold">Simpan Lokasi</button>
         </div>
+        <!-- [Fase 12] Koordinat peta Dashboard (opsional) -->
+        <div class="col-6 col-md-3">
+          <label class="field-label" for="lokasiLat">LATITUDE</label>
+          <input type="text" inputmode="decimal" id="lokasiLat" class="form-control form-control-sm tabular-nums" placeholder="-0.502106" oninput="handleLokasiCoordPaste(this)">
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="field-label" for="lokasiLng">LONGITUDE</label>
+          <input type="text" inputmode="decimal" id="lokasiLng" class="form-control form-control-sm tabular-nums" placeholder="117.153709" oninput="syncLokasiPickerMarker()">
+        </div>
+        <div class="col-12 col-md-6 d-flex align-items-end gap-2">
+          <button type="button" class="btn btn-sm btn-ghost fw-bold flex-grow-1" id="btnLokasiGps" onclick="useMyLocationForLokasi()"><i class="fa fa-crosshairs me-1"></i>Pakai lokasi saya</button>
+          <button type="button" class="btn btn-sm btn-ghost px-3" onclick="clearLokasiCoords()" title="Kosongkan koordinat"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="col-12">
+          <div id="lokasiPickerMap" class="lokasi-picker-map" aria-label="Klik peta untuk menentukan titik lokasi"></div>
+        </div>
       </div>
-      <p class="v7-form-hint mb-0"><i class="fa fa-info-circle me-1"></i>Lokasi <strong>Nonaktif</strong> tidak muncul di pilihan lokasi baru, tetapi riwayat transaksinya tetap tersimpan.</p>
+      <p class="v7-form-hint mb-0"><i class="fa fa-info-circle me-1"></i>Klik peta untuk menentukan titik, atau tempel koordinat dari Google Maps (contoh <em>-0.5021, 117.1537</em>) ke kolom Latitude. Lokasi <strong>Nonaktif</strong> tidak muncul di pilihan lokasi baru maupun di peta, tetapi riwayat transaksinya tetap tersimpan.</p>
     </section>
 
     <section class="glass-card no-lift v7-table-card">
@@ -5298,11 +5528,12 @@
             <tr class="text-center">
               <th>Nama Lokasi</th>
               <th>Status</th>
+              <th>Koordinat</th>
               <th class="v7-col-action">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyMasterLokasi" class="text-center align-middle">
-            <tr><td colspan="3" class="py-4 text-muted">Memuat…</td></tr>
+            <tr><td colspan="4" class="py-4 text-muted">Memuat…</td></tr>
           </tbody>
         </table>
       </div>
@@ -5783,7 +6014,8 @@
 
   /* --- 6. SUB TAB: MASTER LOKASI (Fase 11 #9) --- */
   function loadMasterLokasiTable() {
-    showSkeleton('tbodyMasterLokasi', 3);
+    showSkeleton('tbodyMasterLokasi', 4);
+    setTimeout(initLokasiPickerMap, 50); // peta pemilih titik (Fase 12)
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(res) {
@@ -5794,12 +6026,12 @@
             renderMasterLokasiTable(MASTER_LOKASI_CACHE);
           } else {
             const tb = document.getElementById('tbodyMasterLokasi');
-            if (tb) tb.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-4">${escapeHtml((res && res.message) || 'Login diperlukan untuk melihat Master Lokasi.')}</td></tr>`;
+            if (tb) tb.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">${escapeHtml((res && res.message) || 'Login diperlukan untuk melihat Master Lokasi.')}</td></tr>`;
           }
         })
         .withFailureHandler(function() {
           const tb = document.getElementById('tbodyMasterLokasi');
-          if (tb) tb.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Tidak dapat terhubung ke server.</td></tr>';
+          if (tb) tb.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Tidak dapat terhubung ke server.</td></tr>';
         })
         .getMasterLokasiFullList(getAuthToken());
     }
@@ -5816,7 +6048,7 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Data Lokasi Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Data Lokasi Kosong / Tidak Ditemukan</td></tr>';
       return;
     }
     tbody.innerHTML = dataToRender.map(l => {
@@ -5828,9 +6060,13 @@
         ? `<button onclick="editLokasiRow(${idx})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
            <button onclick="deleteLokasiRow(${idx})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Terkunci</button>`;
+      const coord = (typeof l.lat === 'number' && typeof l.lng === 'number')
+        ? `<span class="tabular-nums small">${l.lat.toFixed(5)}, ${l.lng.toFixed(5)}</span>`
+        : '<span class="text-muted small">—</span>';
       return `<tr>
           <td class="fw-bold text-white text-start ps-3">${escapeHtml(l.nama)}</td>
           <td>${statusPill}</td>
+          <td>${coord}</td>
           <td>${actions}</td>
         </tr>`;
     }).join('');
@@ -5843,6 +6079,9 @@
     EDIT_ROW_KEYS.lokasi = item.rowKey || '';
     document.getElementById('lokasiNama').value = item.nama;
     document.getElementById('lokasiStatus').value = item.status === 'Aktif' ? 'Aktif' : 'Nonaktif';
+    document.getElementById('lokasiLat').value = typeof item.lat === 'number' ? item.lat : '';
+    document.getElementById('lokasiLng').value = typeof item.lng === 'number' ? item.lng : '';
+    syncLokasiPickerMarker(true);
     document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT LOKASI (${escapeHtml(item.nama)})`;
     const f = document.getElementById('formLokasiWrapper');
     if (f && f.scrollIntoView) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -5853,7 +6092,81 @@
     EDIT_ROW_KEYS.lokasi = '';
     document.getElementById('lokasiNama').value = '';
     document.getElementById('lokasiStatus').value = 'Aktif';
+    clearLokasiCoords();
     document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT LOKASI BARU`;
+  }
+
+  /* ---------- [Fase 12] Koordinat lokasi: tempel "lat, lng", GPS, peta pemilih ---------- */
+  let LOKASI_PICKER = null, LOKASI_PICKER_MARKER = null;
+
+  function initLokasiPickerMap() {
+    const el = document.getElementById('lokasiPickerMap');
+    if (!el || LOKASI_PICKER || typeof L === 'undefined' || el.offsetParent === null) {
+      if (LOKASI_PICKER) LOKASI_PICKER.invalidateSize();
+      return;
+    }
+    LOKASI_PICKER = L.map(el, { scrollWheelZoom: false }).setView([-0.5, 117.15], 5);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Citra &copy; Esri' }).addTo(LOKASI_PICKER);
+    LOKASI_PICKER.on('click', function(e) {
+      document.getElementById('lokasiLat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('lokasiLng').value = e.latlng.lng.toFixed(6);
+      syncLokasiPickerMarker();
+    });
+    if (window.ResizeObserver) new ResizeObserver(() => LOKASI_PICKER && LOKASI_PICKER.invalidateSize()).observe(el);
+    syncLokasiPickerMarker(true);
+  }
+
+  function readLokasiCoords() {
+    const lat = parseFloat(String(document.getElementById('lokasiLat').value).replace(',', '.'));
+    const lng = parseFloat(String(document.getElementById('lokasiLng').value).replace(',', '.'));
+    return (isFinite(lat) && isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) ? [lat, lng] : null;
+  }
+
+  function syncLokasiPickerMarker(center) {
+    if (!LOKASI_PICKER) return;
+    const c = readLokasiCoords();
+    if (!c) { if (LOKASI_PICKER_MARKER) { LOKASI_PICKER.removeLayer(LOKASI_PICKER_MARKER); LOKASI_PICKER_MARKER = null; } return; }
+    if (!LOKASI_PICKER_MARKER) {
+      LOKASI_PICKER_MARKER = L.circleMarker(c, { radius: 9, color: '#FFFFFF', weight: 2, fillColor: '#1FC796', fillOpacity: 0.95 }).addTo(LOKASI_PICKER);
+    } else LOKASI_PICKER_MARKER.setLatLng(c);
+    if (center) LOKASI_PICKER.setView(c, Math.max(LOKASI_PICKER.getZoom(), 14));
+  }
+
+  // Tempel "lat, lng" (format Google Maps) ke kolom Latitude → dipecah otomatis
+  function handleLokasiCoordPaste(input) {
+    const m = /^\s*(-?\d+(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d+(?:[.,]\d+)?)\s*$/.exec(input.value || '');
+    if (m && /[,;\s]/.test(input.value.trim()) && (input.value.match(/[.]/g) || []).length >= 1) {
+      input.value = m[1].replace(',', '.');
+      document.getElementById('lokasiLng').value = m[2].replace(',', '.');
+      syncLokasiPickerMarker(true);
+      return;
+    }
+    syncLokasiPickerMarker();
+  }
+
+  function clearLokasiCoords() {
+    const a = document.getElementById('lokasiLat'), b = document.getElementById('lokasiLng');
+    if (a) a.value = '';
+    if (b) b.value = '';
+    syncLokasiPickerMarker();
+  }
+
+  function useMyLocationForLokasi() {
+    if (!navigator.geolocation) { showToast('Perangkat ini tidak mendukung GPS/lokasi.', 'warning'); return; }
+    const btn = document.getElementById('btnLokasiGps');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Mencari lokasi…'; }
+    const done = () => { if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa fa-crosshairs me-1"></i>Pakai lokasi saya'; } };
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      document.getElementById('lokasiLat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('lokasiLng').value = pos.coords.longitude.toFixed(6);
+      initLokasiPickerMap();
+      syncLokasiPickerMarker(true);
+      showToast('Lokasi terkini terisi (akurasi ±' + Math.round(pos.coords.accuracy) + ' m).', 'success');
+      done();
+    }, function(err) {
+      showToast(err && err.code === 1 ? 'Izin lokasi ditolak. Aktifkan izin lokasi browser, atau klik titik di peta.' : 'Lokasi tidak bisa didapat. Klik titik di peta sebagai gantinya.', 'warning');
+      done();
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
   }
 
   function saveLokasiForm() {
@@ -5861,9 +6174,12 @@
       rowIndex: document.getElementById('lokasiRowIndex').value,
       rowKey: EDIT_ROW_KEYS.lokasi,
       nama: document.getElementById('lokasiNama').value.trim(),
-      status: document.getElementById('lokasiStatus').value
+      status: document.getElementById('lokasiStatus').value,
+      lat: document.getElementById('lokasiLat').value.trim(),
+      lng: document.getElementById('lokasiLng').value.trim()
     };
     if (!dataObj.nama) { showToast("Nama lokasi wajib diisi!", "warning"); return; }
+    if ((dataObj.lat === '') !== (dataObj.lng === '')) { showToast("Isi Latitude & Longitude, atau kosongkan keduanya.", "warning"); return; }
     if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
     const btn = document.getElementById('btnSaveLokasi');
     btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i>`;
@@ -5878,6 +6194,7 @@
           resetLokasiForm();
           loadMasterLokasiTable();
           if (typeof loadMasterLokasiDinamis === 'function') loadMasterLokasiDinamis(); // semua dropdown ikut segar
+          if (typeof loadDashMapPoints === 'function') loadDashMapPoints(true);         // titik peta Dashboard
         }
       })
       .withFailureHandler(function() {
@@ -6432,7 +6749,7 @@
         <div class="glass-card no-lift profil-hero mb-3 stagger-item" style="--stagger-idx: 0;">
             <div class="profil-hero-main">
                 <div class="profil-avatar profil-avatar--xl">
-                    <img id="profilAvatarImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Foto profil">
+                    <img id="profilAvatarImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Foto profil">
                     <span class="profil-avatar-dot" title="Sesi aktif"></span>
                 </div>
                 <div class="min-w-0 flex-grow-1">
@@ -6508,6 +6825,8 @@
 
                     <label class="field-label mb-2">ATAU PILIH AVATAR SITE / MINING</label>
                     <div class="preset-avatar-grid mb-3" id="presetAvatarGrid">
+                        <!-- [Fase 12] Pilihan pertama: kembali ke monogram inisial (avatar kosong) -->
+                        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="preset-avatar-item preset-avatar-item--mono" id="presetAvatarMonogram" onclick="selectPresetAvatar('')" alt="Inisial nama (bawaan)" title="Inisial nama (bawaan)">
                         <img src="https://i.pravatar.cc/150?img=12" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 1">
                         <img src="https://i.pravatar.cc/150?img=33" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 2">
                         <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Preset avatar 3">
@@ -6850,8 +7169,16 @@
     }
     function markSelectedPreset(src) {
         document.querySelectorAll('#presetAvatarGrid .preset-avatar-item').forEach(function(img) {
-            img.classList.toggle('is-selected', img.src === src);
+            const isMono = img.id === 'presetAvatarMonogram';
+            img.classList.toggle('is-selected', isMono ? !src : img.src === src);
         });
+    }
+
+    // [Fase 12] Monogram inisial untuk user yang belum memilih foto/ilustrasi
+    let AVATAR_USE_MONOGRAM = false;
+    function currentMonogramUrl() {
+        const s = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
+        return monogramAvatarUrl(s.fullName || s.nama || s.username || '?');
     }
 
     function initProfilTab() {
@@ -6869,10 +7196,13 @@
             document.getElementById('profilDisplayName').innerText = activeSession.fullName || activeSession.nama || activeSession.username;
             document.getElementById('profilRoleBadge').innerText = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin') ? 'Master Admin' : 'Sub Admin';
             
-            const avatarSrc = activeSession.avatarUrl || activeSession.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            document.getElementById('profilAvatarImg').src = avatarSrc;
-            selectedTempAvatarUrl = avatarSrc;
-            markSelectedPreset(avatarSrc);
+            const storedAvatar = String(activeSession.avatarUrl || activeSession.avatar || '').trim();
+            const monoEl = document.getElementById('presetAvatarMonogram');
+            if (monoEl) monoEl.src = currentMonogramUrl();
+            document.getElementById('profilAvatarImg').src = resolveAvatarUrl(activeSession);
+            selectedTempAvatarUrl = storedAvatar;
+            AVATAR_USE_MONOGRAM = !storedAvatar;
+            markSelectedPreset(storedAvatar);
 
             // Hero: username, login sebelumnya, batas sesi, status keamanan
             const unameEl = document.getElementById('profilUsername');
@@ -7264,9 +7594,11 @@
     }
 
     function selectPresetAvatar(srcUrl) {
-        selectedTempAvatarUrl = srcUrl;
-        document.getElementById('profilAvatarImg').src = srcUrl;
-        markSelectedPreset(srcUrl);
+        // '' = monogram inisial (disimpan sebagai avatar kosong)
+        AVATAR_USE_MONOGRAM = !srcUrl;
+        selectedTempAvatarUrl = srcUrl || '';
+        document.getElementById('profilAvatarImg').src = srcUrl || currentMonogramUrl();
+        markSelectedPreset(srcUrl || '');
     }
 
     function previewAvatarUpload(event) {
@@ -7309,7 +7641,9 @@
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
                 selectedTempAvatarUrl = compressedBase64;
+                AVATAR_USE_MONOGRAM = false;
                 document.getElementById('profilAvatarImg').src = selectedTempAvatarUrl;
+                markSelectedPreset(selectedTempAvatarUrl);
             };
             img.src = e.target.result;
         };
@@ -7323,10 +7657,11 @@
             return;
         }
 
-        if (!selectedTempAvatarUrl) {
+        if (!selectedTempAvatarUrl && !AVATAR_USE_MONOGRAM) {
             showToast("Pilih foto atau preset avatar terlebih dahulu!", "warning");
             return;
         }
+        if (AVATAR_USE_MONOGRAM) selectedTempAvatarUrl = ''; // kosong = monogram inisial
 
         const btnSave = document.getElementById('btnSaveAvatar');
         btnSave.disabled = true;
@@ -8061,6 +8396,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha384-9MhbyIRcBVQiiC7FSd7T38oJNj2Zh+EfxS7/vjhBi4OOT78NlHSnzM31EZRWR1LZ" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha384-leGYpHE9Tc4N9OwRd98xg6YFpB9shlc/RkilpFi0ljr3QD4tFoFptZvgnnzzwG4Q" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha384-VCGDSwGwLWkVOK5vAWSaY38KZ4oKJ0whHjpJQhjqrMlWadpf2dUVKLgOLBdEaLvZ" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous"></script>
 
     <!-- Template Javascript -->
     <script>
@@ -8842,6 +9178,8 @@ function loadLiveDashboardData() {
 // 4. MAIN DASHBOARD RENDERER & CHART.JS
 function renderDashboardUI(data) {
   if (!data) return;
+  // [Fase 12] Peta lokasi: konsumsi per lokasi periode filter (data yang sama dengan donut lokasi)
+  if (typeof updateDashMapConsumption === 'function') updateDashMapConsumption(data);
 
   // 1. KPI DATA
   const todayCons = data.kpiTodayCons || (data.kpi && data.kpi.todayCons) || '0 L';
@@ -10045,6 +10383,111 @@ $(document).ready(function () {
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => moveSidebarPill(), 120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveSidebarPill());
 });
+
+/* =========================================================================
+   [Fase 12] PETA LOKASI SITE 2D (Leaflet) — Dashboard
+   Titik: MASTER_LOKASI (getMasterLokasiMap, wajib login). Ukuran & isi popup: konsumsi per lokasi
+   periode filter (chartPieLabels/chartPieData dari getDashboardNativeData). Peta dasar Satelit
+   (Esri World Imagery) / Jalan (OpenStreetMap), tanpa kunci API.
+   ========================================================================= */
+let DASH_MAP = null, DASH_MAP_LAYER = null, DASH_MAP_POINTS = [], DASH_MAP_CONS = {}, DASH_MAP_LOADED_FOR = null;
+
+function dashMapNotice(text) {
+  const n = document.getElementById('dashMapNotice');
+  if (!n) return;
+  n.classList.toggle('d-none', !text);
+  n.innerHTML = text || '';
+}
+
+function initDashMap() {
+  if (DASH_MAP || typeof L === 'undefined') return DASH_MAP;
+  const el = document.getElementById('dashMap');
+  if (!el) return null;
+  DASH_MAP = L.map(el, { zoomControl: true, attributionControl: true, scrollWheelZoom: false, worldCopyJump: true })
+    .setView([-0.5, 117.15], 5); // tampilan awal Indonesia tengah; disesuaikan ke titik setelah data masuk
+  const satelit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, attribution: 'Citra &copy; Esri'
+  });
+  const jalan = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  });
+  satelit.addTo(DASH_MAP);
+  // HP: pemilih peta dasar diciutkan jadi ikon agar tidak menutupi titik
+  L.control.layers({ 'Satelit': satelit, 'Jalan': jalan }, null, { position: 'topright', collapsed: window.innerWidth < 768 }).addTo(DASH_MAP);
+  DASH_MAP.on('focus', () => DASH_MAP.scrollWheelZoom.enable());
+  DASH_MAP.on('blur', () => DASH_MAP.scrollWheelZoom.disable());
+  DASH_MAP_LAYER = L.layerGroup().addTo(DASH_MAP);
+  if (window.ResizeObserver) new ResizeObserver(() => DASH_MAP && DASH_MAP.invalidateSize()).observe(el);
+  return DASH_MAP;
+}
+
+function updateDashMapConsumption(data) {
+  const labels = (data && data.chartPieLabels) || [], vals = (data && data.chartPieData) || [];
+  DASH_MAP_CONS = {};
+  labels.forEach((lbl, i) => { DASH_MAP_CONS[String(lbl).trim().toLowerCase()] = Number(vals[i]) || 0; });
+  renderDashMapMarkers();
+  loadDashMapPoints(); // sekali per sesi login (atau saat login berganti)
+}
+
+function loadDashMapPoints(force) {
+  const tok = (typeof getAuthToken === 'function') ? getAuthToken() : '';
+  const countEl = document.getElementById('dashMapCount');
+  if (!tok) {
+    DASH_MAP_POINTS = []; DASH_MAP_LOADED_FOR = null;
+    initDashMap(); renderDashMapMarkers();
+    if (countEl) countEl.textContent = 'Terkunci';
+    dashMapNotice('<i class="fa fa-lock me-1"></i> Login untuk melihat titik lokasi site.');
+    return;
+  }
+  if (!force && DASH_MAP_LOADED_FOR === tok) return;
+  if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
+  DASH_MAP_LOADED_FOR = tok;
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res || !res.success) { DASH_MAP_LOADED_FOR = null; if (res && res.sessionExpired) return; dashMapNotice('Titik lokasi tidak tersedia.'); return; }
+      DASH_MAP_POINTS = res.data || [];
+      initDashMap();
+      renderDashMapMarkers(true);
+      if (countEl) countEl.textContent = DASH_MAP_POINTS.length + ' / ' + (res.totalLokasi || DASH_MAP_POINTS.length) + ' lokasi';
+      dashMapNotice(DASH_MAP_POINTS.length ? '' :
+        '<i class="fa fa-map-pin me-1"></i> Belum ada koordinat. Isi Latitude/Longitude di <strong>Master Data → Master Lokasi</strong>.');
+    })
+    .withFailureHandler(function() { DASH_MAP_LOADED_FOR = null; dashMapNotice('<i class="fa fa-wifi me-1"></i> Peta belum bisa dimuat (offline).'); })
+    .getMasterLokasiMap(tok);
+}
+
+function renderDashMapMarkers(fit) {
+  if (!initDashMap() || !DASH_MAP_LAYER) return;
+  DASH_MAP_LAYER.clearLayers();
+  if (!DASH_MAP_POINTS.length) return;
+  const total = Object.values(DASH_MAP_CONS).reduce((a, b) => a + b, 0);
+  const maxV = Math.max(1, ...DASH_MAP_POINTS.map(p => DASH_MAP_CONS[p.nama.toLowerCase()] || 0));
+  const css = getComputedStyle(document.documentElement);
+  const brand = (css.getPropertyValue('--brand-500') || '#1FC796').trim();
+  const bounds = [];
+  DASH_MAP_POINTS.forEach(p => {
+    const liter = DASH_MAP_CONS[p.nama.toLowerCase()] || 0;
+    const r = 8 + Math.round(16 * Math.sqrt(liter / maxV)); // luas ∝ liter
+    const pct = total > 0 ? (liter / total * 100) : 0;
+    const m = L.circleMarker([p.lat, p.lng], { radius: r, color: '#FFFFFF', weight: 2, fillColor: liter > 0 ? brand : '#9DB3A8', fillOpacity: 0.85 })
+      .bindPopup(`<div class="dash-map-pop"><strong>${escapeHtml(p.nama)}</strong>
+        <span>${Math.round(liter).toLocaleString('id-ID')} L · ${pct.toFixed(1)}% konsumsi periode</span>
+        <small>${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}</small></div>`)
+      .bindTooltip(escapeHtml(p.nama), { direction: 'top', offset: [0, -r], className: 'dash-map-tip' });
+    m.addTo(DASH_MAP_LAYER);
+    bounds.push([p.lat, p.lng]);
+  });
+  if (fit && bounds.length) {
+    if (bounds.length === 1) DASH_MAP.setView(bounds[0], 14);
+    else DASH_MAP.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Peta ikut muat ulang setelah login/logout (token berubah) — dicek saat Dashboard dibuka
+  initDashMap();
+  loadDashMapPoints();
+});
 </script>
 
     <!-- AUTHENTICATION, UI LOGIC & THEME TOGGLE CONTROLLER -->
@@ -10329,15 +10772,15 @@ $(document).ready(function () {
             const mobileMasterBadge = document.getElementById('mobileMasterLockBadge');
             const dropdownAuthBtn = document.getElementById('dropdownAuthBtn');
 
-            const guestAvatarUrl = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            const adminAvatarUrl = 'https://i.pravatar.cc/150?img=12';
+            // [Fase 12] Tamu = siluet netral lokal; user tanpa foto/ilustrasi = monogram inisial
+            const guestAvatarSrc = guestAvatarUrl();
 
             const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
 
             if (mode === 'ADMIN' || activeSession.username) {
                 const displayName = activeSession.fullName || activeSession.username || 'Admin';
                 const displayRole = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin') ? 'Master Admin Site' : 'Sub Admin Site BBM';
-                const avatar = activeSession.avatarUrl || adminAvatarUrl;
+                const avatar = resolveAvatarUrl(activeSession);
 
                 if (sidebarName) sidebarName.innerText = displayName;
                 if (sidebarRole) sidebarRole.innerText = displayRole;
@@ -10363,8 +10806,8 @@ $(document).ready(function () {
                 if (sidebarRole) sidebarRole.innerText = 'Pengawas Site';
                 if (headerName) headerName.innerText = 'Guest Mode';
 
-                if (sidebarAvatar) sidebarAvatar.src = guestAvatarUrl;
-                if (headerAvatar) headerAvatar.src = guestAvatarUrl;
+                if (sidebarAvatar) sidebarAvatar.src = guestAvatarSrc;
+                if (headerAvatar) headerAvatar.src = guestAvatarSrc;
 
                 if (headerBadge) headerBadge.style.display = 'none';
                 if (masterIcon) masterIcon.className = 'fa fa-lock';
