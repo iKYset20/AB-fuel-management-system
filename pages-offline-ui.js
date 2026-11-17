@@ -4,23 +4,13 @@
  * ----------------------------------------------------------------------------
  * Elemen BARU khusus Pages (#pagesOfflineNotice) — tidak mengubah ID/markup lama.
  * Mendengar event dari gas-adapter.js:
- *   abfuel:cache-served {fn, savedAt} → "Menampilkan data tersimpan · <waktu>"
+ *   abfuel:cache-served {fn, savedAt} → "Mode offline aktif" + "data terakhir yang tersimpan (<waktu>)"
  *   abfuel:live         {fn}          → data segar diterima → pemberitahuan ditutup
  * serta online/offline browser. Warna memakai token tema (palet.md); tidak ikut cetak.
  * ============================================================================
  */
 (function () {
     'use strict';
-
-    var LABELS = {
-        getDashboardNativeData: 'Dashboard',
-        getLaporanHarianData: 'Laporan Harian',
-        getMasterLokasiList: 'Master Lokasi',
-        getMasterKaryawanList: 'Master Karyawan',
-        getMasterQRData: 'Master QR',
-        getLastOperatorByUnit: 'Riwayat Unit',
-        getMasterQRFullList: 'Master QR'
-    };
 
     var CSS = '' +
         '#pagesOfflineNotice{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));z-index:1039;' +
@@ -51,13 +41,17 @@
 
     var el, textEl, subEl, dotEl, hideTimer = null, dismissedUntilChange = false, servedFns = {};
 
+    // "hari ini, pukul 11.02" · "kemarin, pukul 09.15" · "16 Nov 2026, pukul 14.05"
     function fmtTime(ts) {
         var d = new Date(ts);
         var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+        var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         var today = new Date();
-        var sameDay = d.toDateString() === today.toDateString();
-        return (sameDay ? 'hari ini' : pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear()) +
-            ' ' + pad(d.getHours()) + '.' + pad(d.getMinutes());
+        var yest = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        var hari = d.toDateString() === today.toDateString() ? 'hari ini'
+            : d.toDateString() === yest.toDateString() ? 'kemarin'
+            : d.getDate() + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear();
+        return hari + ', pukul ' + pad(d.getHours()) + '.' + pad(d.getMinutes());
     }
 
     function build() {
@@ -102,16 +96,21 @@
 
     function showOffline() {
         if (dismissedUntilChange) return;
+        // [Fase 15] Bahasa lembut & profesional — tanpa istilah teknis (daftar data, "antrean", "server")
         var names = Object.keys(servedFns);
         if (names.length) {
             var newest = 0;
             names.forEach(function (k) { if (servedFns[k].savedAt > newest) newest = servedFns[k].savedAt; });
-            var labels = names.map(function (k) { return LABELS[k] || k; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
-            show((navigator.onLine ? 'Server belum terjangkau' : 'Offline') + ' — menampilkan data tersimpan (' + fmtTime(newest) + ')',
-                labels.join(', ') + '. Scan-to-Fill tetap bisa dipakai; transaksi masuk antrean.');
+            if (navigator.onLine) {
+                show('Menunggu koneksi ke sistem',
+                    'Sementara ini ditampilkan data terakhir yang tersimpan (' + fmtTime(newest) + '). Pembaruan akan berjalan otomatis.');
+            } else {
+                show('Mode offline aktif',
+                    'Ditampilkan data terakhir yang tersimpan (' + fmtTime(newest) + '). Pengisian BBM tetap dapat dicatat dan akan terkirim otomatis saat koneksi kembali.');
+            }
         } else {
-            show('Anda sedang offline',
-                'Scan-to-Fill tetap bisa dipakai; transaksi disimpan di antrean dan dikirim otomatis saat online.');
+            show('Koneksi internet terputus',
+                'Tidak perlu khawatir — pengisian BBM tetap dapat dicatat dan akan terkirim otomatis saat koneksi kembali.');
         }
     }
 
@@ -133,7 +132,7 @@
         // tidak dimuat ulang otomatis; tanpa ini pemberitahuan bisa tertahan selamanya).
         servedFns = {};
         if (el && el.classList.contains('is-shown') && navigator.onLine) {
-            show('Kembali online', 'Data terbaru sudah dimuat dari server.', true);
+            show('Data sudah diperbarui', 'Seluruh informasi kini sesuai dengan data terbaru.', true);
             hide(3500);
         }
     });
@@ -145,7 +144,7 @@
 
     window.addEventListener('online', function () {
         dismissedUntilChange = false;
-        show('Kembali online', 'Menyinkronkan antrean & memuat data terbaru…', true);
+        show('Koneksi kembali tersambung', 'Sedang menyinkronkan data dan memuat informasi terbaru…', true);
         servedFns = {};
         hide(4000);
         // Muat ulang data tampilan dari server (fungsi lama, tidak diubah)
