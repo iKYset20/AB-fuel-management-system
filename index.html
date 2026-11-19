@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=e7a2e70558"></script>
-    <script src="./pages-offline-ui.js?v=e7a2e70558" defer></script>
-    <script src="./pages-install.js?v=e7a2e70558" defer></script>
+    <script src="./gas-adapter.js?v=f122f4785c"></script>
+    <script src="./pages-offline-ui.js?v=f122f4785c" defer></script>
+    <script src="./pages-install.js?v=f122f4785c" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -79,7 +79,7 @@
             for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
             const t = AVATAR_TONES[h % AVATAR_TONES.length];
             const ini = avatarInitials(key).replace(/[<>&"']/g, '');
-            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">' +
+            const svg = '<svg xmlns="http:\/\/www.w3.org/2000/svg" viewBox="0 0 96 96">' +
                 '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + t[0] + '"/><stop offset="1" stop-color="' + t[1] + '"/></linearGradient></defs>' +
                 '<rect width="96" height="96" fill="url(#g)"/>' +
                 '<circle cx="78" cy="14" r="34" fill="#fff" opacity=".07"/>' +
@@ -88,7 +88,7 @@
         }
         /* Tamu: siluet netral (lokal, bukan gambar pihak ketiga) */
         function guestAvatarUrl() {
-            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#3A4A43"/>' +
+            const svg = '<svg xmlns="http:\/\/www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#3A4A43"/>' +
                 '<circle cx="48" cy="38" r="16" fill="#C9D6CF"/><path d="M18 86c3-17 15-26 30-26s27 9 30 26z" fill="#C9D6CF"/></svg>';
             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
@@ -3207,6 +3207,73 @@
     .audit-top-bar.is-warn > span { background: var(--status-warning); }
     .audit-top-empty { padding: 12px; border-radius: 12px; background: var(--bg-inset); font-size: 0.78rem; text-align: center; }
     .audit-top-empty.is-ok { color: var(--status-success); font-weight: 600; }
+
+    /* [Fase 16] Keterangan kecil di tabel kartu Dashboard (porsi site, keterangan cek meteran, sub-baris pop-up) */
+    .dash-cell-pct { margin-left: 6px; font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); }
+    .dash-table-card thead th,
+    .dash-table-card tbody td.text-end,
+    #tbodyMeteranRusak td:first-child { white-space: nowrap; }
+    /* Kartu 4 kolom di desktop (≥1200px) sempit: porsi site turun ke baris kecil di bawah liter */
+    @media (min-width: 1200px) and (max-width: 1599.98px) {
+        #tbodyTopKonsumsi .dash-cell-pct { display: block; margin: 1px 0 0; }
+        #tbodyMeteranRusak .dash-cell-note { max-width: 112px; padding-left: 4px; font-size: 0.68rem; }
+    }
+    .dash-cell-note { max-width: 130px; font-size: 0.72rem; font-weight: 600; color: var(--status-warning); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dash-cell-sub { display: block; margin-top: 2px; font-size: 0.7rem; font-weight: 500; color: var(--text-secondary); white-space: normal; }
+    /* [Fase 17] Data Master → Unit: pemetaan otomatis Jenis & Kategori */
+    .unit-map-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+    .unit-map-hint { font-size: 0.7rem; color: var(--text-muted); }
+    .unit-map-panel { margin-top: 10px; padding: 10px; border-radius: 14px; background: var(--bg-inset); }
+    .unit-map-summary { font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.5; }
+    #tbodyUnitMap td { font-size: 0.72rem; white-space: nowrap; }
+    /* [Fase 19] Data Master: transisi sub-tab — kartu masuk bergantian (geser naik + pudar + sedikit
+       membesar), lalu isi tabel menyusul. Tanpa blur agar tetap ringan di tabel besar. Sama untuk semua sub-tab. */
+    .submaster-view.submaster-enter > * { animation: v7SubIn 0.42s var(--ease-out-soft) backwards; }
+    .submaster-view.submaster-enter > *:nth-child(2) { animation-delay: 80ms; }
+    .submaster-view.submaster-enter > *:nth-child(3) { animation-delay: 160ms; }
+    .submaster-view.submaster-enter .v7-table-card tbody { animation: v7FadeIn 0.34s ease 0.2s backwards; }
+    @keyframes v7SubIn {
+        from { opacity: 0; transform: translateY(18px) scale(0.985); }
+        to   { opacity: 1; transform: none; }
+    }
+    @keyframes v7FadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* Pindah halaman tabel: isi tabel bergeser masuk sedikit */
+    tbody.v7-page-in { animation: v7PageIn 0.26s var(--ease-out-soft); }
+    @keyframes v7PageIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: none; }
+    }
+    /* Nomor halaman tabel (Database Master) */
+    .v7-pager { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .v7-pager:empty { display: none; }
+    .v7-pager-btn {
+        min-width: 30px; height: 30px; padding: 0 8px; border-radius: var(--radius-pill);
+        border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary);
+        font-size: 0.74rem; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .v7-pager-btn:hover:not(:disabled) { background: var(--bg-inset); color: var(--text-primary); }
+    .v7-pager-btn.is-active { background: var(--brand-primary); border-color: var(--brand-primary); color: var(--on-brand-primary); }
+    .v7-pager-btn:disabled { opacity: 0.4; cursor: default; }
+    .v7-pager-gap { color: var(--text-muted); font-size: 0.74rem; padding: 0 2px; }
+    /* Master Unit: teks standar di bawah Kode Tipe & chip status */
+    .unit-std-hint { display: block; margin-top: 4px; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); line-height: 1.3; }
+    .unit-std-hint.is-warn { color: var(--status-warning); }
+    .unit-status { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 0.66rem; font-weight: 700; background: var(--bg-inset); color: var(--text-secondary); }
+    .unit-status--active { background: var(--status-success-bg); color: var(--status-success); }
+    .unit-status--breakdown { background: var(--status-error-bg); color: var(--status-error); }
+    /* [Fase 21] Titik warna seri di tombol grafik tren (sama dengan warna area/garis) */
+    #trendSeriesGroup > .btn { display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0; }
+    @media (max-width: 575.98px) { #trendSeriesGroup > .btn { padding: 5px 10px; } }
+    .series-dot { flex-shrink: 0; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+    .series-dot--site { background: var(--tone-green); }
+    .series-dot--ab { background: var(--tone-amber); }
+    .series-dot--dt { background: var(--tone-blue); }
+    .series-dot--lv { background: var(--tone-rose); }
+    /* [Fase 20b] Ringkasan Supplier vs Site: perubahan stok di bawah Stok Akhir — naik hijau / turun kuning */
+    .chart-mini-delta { display: block; margin-top: 1px; font-size: 0.66rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: normal; line-height: 1.3; }
+    .chart-mini-delta.is-up { color: var(--status-success); }
+    .chart-mini-delta.is-down { color: var(--status-warning); }
     .audit-period {
         align-self: flex-start; display: inline-flex; align-items: center;
         padding: 3px 10px; border-radius: var(--radius-pill);
@@ -3615,15 +3682,16 @@
                 <div class="dash-card-head">
                     <div>
                         <h6 class="dash-card-title">Tren Konsumsi BBM Site</h6>
-                        <span class="dash-card-sub">Liter per granularitas filter · garis putus-putus = pembanding unit</span>
+                        <span class="dash-card-sub">Liter per periode filter · area hijau = total site, garis = tiap kelompok unit</span>
                     </div>
                     <div class="dash-card-tools">
-                        <!-- Toggle seri grafik (presentasi saja; v7FocusTrendSeries) -->
+                        <!-- Toggle seri grafik (presentasi saja; v7FocusTrendSeries). [Fase 21] titik warna = warna seri; + LV/Support -->
                         <div class="segmented-pill" role="group" id="trendSeriesGroup" aria-label="Pilih seri grafik">
                             <button type="button" class="btn active" onclick="v7FocusTrendSeries('all', this)">Semua</button>
-                            <button type="button" class="btn" onclick="v7FocusTrendSeries(2, this)">Site</button>
-                            <button type="button" class="btn" onclick="v7FocusTrendSeries(1, this)">Alat Berat</button>
-                            <button type="button" class="btn" onclick="v7FocusTrendSeries(0, this)">Dumptruck</button>
+                            <button type="button" class="btn" onclick="v7FocusTrendSeries(2, this)"><span class="series-dot series-dot--site" aria-hidden="true"></span>Site</button>
+                            <button type="button" class="btn" onclick="v7FocusTrendSeries(1, this)"><span class="series-dot series-dot--ab" aria-hidden="true"></span>Alat Berat</button>
+                            <button type="button" class="btn" onclick="v7FocusTrendSeries(0, this)"><span class="series-dot series-dot--dt" aria-hidden="true"></span>Dumptruck</button>
+                            <button type="button" class="btn" onclick="v7FocusTrendSeries(3, this)"><span class="series-dot series-dot--lv" aria-hidden="true"></span>LV/Support</button>
                         </div>
                     </div>
                 </div>
@@ -3633,9 +3701,9 @@
                 <!-- Mini-stat dihitung dari seri "Konsumsi BBM Site" (v7UpdateTrendMiniStats) -->
                 <div class="chart-mini-stats">
                     <div class="chart-mini-stat"><span class="chart-mini-label">Total periode</span><span class="chart-mini-value" id="trendStatTotal">0 L</span></div>
-                    <div class="chart-mini-stat"><span class="chart-mini-label">Rata-rata / titik</span><span class="chart-mini-value" id="trendStatAvg">0 L</span></div>
-                    <div class="chart-mini-stat"><span class="chart-mini-label">Puncak</span><span class="chart-mini-value" id="trendStatPeak">0 L</span></div>
-                    <div class="chart-mini-stat"><span class="chart-mini-label">Terendah</span><span class="chart-mini-value" id="trendStatLow">0 L</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label" id="trendStatAvgLabel">Rata-rata / hari</span><span class="chart-mini-value" id="trendStatAvg">0 L</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">Puncak</span><span class="chart-mini-value" id="trendStatPeak">0 L</span><span class="chart-mini-delta" id="trendStatPeakDate"></span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">Terendah</span><span class="chart-mini-value" id="trendStatLow">0 L</span><span class="chart-mini-delta" id="trendStatLowDate"></span></div>
                 </div>
             </div>
         </div>
@@ -3782,7 +3850,7 @@
                 <div class="table-responsive">
                     <table class="table table-clean table-hover align-middle">
                         <thead>
-                            <tr><th>#</th><th>KODE UNIT</th><th class="text-end">L/JAM</th></tr>
+                            <tr><th>#</th><th>KODE UNIT</th><th class="text-end" title="Selisih rata-rata aktual terhadap standar unit">VS STANDAR</th></tr>
                         </thead>
                         <tbody id="tbodyTopIrit">
                             <tr><td colspan="3" class="text-center text-muted small py-3">Loading data...</td></tr>
@@ -3841,7 +3909,7 @@
         <div class="col-xl-3 col-md-6">
             <div id="cardMeteranRusak" class="glass-card dash-table-card stagger-item" style="--stagger-idx: 12;">
                 <div class="dash-card-head">
-                    <h6 class="dash-card-title"><i class="fa fa-exclamation-triangle me-2"></i>Meteran Rusak</h6>
+                    <h6 class="dash-card-title"><i class="fa fa-exclamation-triangle me-2"></i>Cek Meteran</h6>
                     <button id="btnViewAllMeteranRusak" class="btn btn-xs btn-ghost d-none fw-bold" onclick="openModalMeteranRusak()">
                         Lihat Semua (<span id="countMeteranRusak">0</span>)
                     </button>
@@ -3849,10 +3917,10 @@
                 <div class="table-responsive">
                     <table class="table table-clean table-hover align-middle">
                         <thead>
-                            <tr><th>KODE UNIT</th></tr>
+                            <tr><th>KODE UNIT</th><th class="text-end">KETERANGAN</th></tr>
                         </thead>
                         <tbody id="tbodyMeteranRusak">
-                            <tr><td class="text-center text-muted small py-3">Loading data...</td></tr>
+                            <tr><td colspan="2" class="text-center text-muted small py-3">Loading data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -3867,11 +3935,18 @@
                 <div class="dash-card-head">
                     <div>
                         <h6 class="dash-card-title">Supplier Supply vs Site Consumption</h6>
-                        <span class="dash-card-sub">BBM masuk dari supplier dibanding pemakaian site (Liter)</span>
+                        <span class="dash-card-sub">Tangki utama, seluruh site — pita di antara garis kuning &amp; hijau = sisa BBM di tangki</span>
                     </div>
                 </div>
                 <div class="chart-box chart-box-md">
                     <canvas id="supplyVsConsCanvas"></canvas>
+                </div>
+                <!-- [Fase 20b] Ringkasan periode filter (v7UpdateSupplyStats) — sama dengan rumus Laporan Harian -->
+                <div class="chart-mini-stats">
+                    <div class="chart-mini-stat"><span class="chart-mini-label">Stok Awal</span><span class="chart-mini-value" id="supplyStatAwal">0 L</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">+ BBM Masuk</span><span class="chart-mini-value" id="supplyStatMasuk">0 L</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">− BBM Keluar</span><span class="chart-mini-value" id="supplyStatKeluar">0 L</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">= Stok Akhir</span><span class="chart-mini-value" id="supplyStatAkhir">0 L</span><span class="chart-mini-delta" id="supplyStatSelisih">—</span></div>
                 </div>
             </div>
         </div>
@@ -3921,7 +3996,7 @@
     <div class="modal-content glass-modal">
       <div class="modal-header py-2">
         <h6 class="modal-title mb-0">
-          <i class="fa fa-leaf text-success me-2"></i>Daftar Lengkap Efisiensi Konsumsi Unit
+          <i class="fa fa-leaf text-success me-2"></i>Daftar Unit Ter-Irit terhadap Standar
         </h6>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -3935,8 +4010,8 @@
             <thead class="table-secondary sticky-top">
               <tr>
                 <th style="width: 15%;">#</th>
-                <th style="width: 50%;">Kode Unit</th>
-                <th style="width: 35%;" class="text-end">Rata-Rata</th>
+                <th style="width: 40%;">Kode Unit</th>
+                <th style="width: 45%;" class="text-end">Aktual · Standar · Deviasi</th>
               </tr>
             </thead>
             <tbody id="tbodyModalTopIrit">
@@ -3971,8 +4046,8 @@
             <thead class="table-secondary sticky-top">
               <tr>
                 <th style="width: 15%;">#</th>
-                <th style="width: 50%;">Kode Unit</th>
-                <th style="width: 35%;" class="text-end">Total Liter</th>
+                <th style="width: 45%;">Kode Unit</th>
+                <th style="width: 40%;" class="text-end">Total Liter · Porsi Site</th>
               </tr>
             </thead>
             <tbody id="tbodyModalTopKonsumsi">
@@ -4029,7 +4104,7 @@
     <div class="modal-content glass-modal">
       <div class="modal-header py-2">
         <h6 class="modal-title mb-0">
-          <i class="fa fa-tools text-warning me-2"></i>Daftar Lengkap Unit Meteran Rusak
+          <i class="fa fa-tools text-warning me-2"></i>Daftar Unit Perlu Cek Meteran
         </h6>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -4042,9 +4117,9 @@
           <table class="table table-clean table-hover align-middle mb-0">
             <thead class="table-secondary sticky-top">
               <tr>
-                <th style="width: 15%;">No</th>
-                <th style="width: 50%;">Kode Unit</th>
-                <th style="width: 35%;">Status</th>
+                <th style="width: 12%;">No</th>
+                <th style="width: 28%;">Kode Unit</th>
+                <th style="width: 60%;">Keterangan</th>
               </tr>
             </thead>
             <tbody id="tbodyModalMeteranRusak">
@@ -4953,6 +5028,8 @@
         <span class="badge bg-success">IRIT</span>
         <span class="badge bg-warning">NORMAL</span>
         <span class="badge bg-danger">BOROS</span>
+        <span class="badge bg-info" title="Deviasi di bawah -50%: dicurigai masalah meter">CEK METER</span>
+        <span class="badge bg-secondary" title="Unit belum punya standar konsumsi">TANPA STANDAR</span>
       </span>
     </div>
 
@@ -5085,7 +5162,7 @@
           <td class="text-center fw-bold tabular-nums">${escapeHtml(r.totalLiter ? r.totalLiter + ' L' : '0 L')}</td>
           <td class="text-center text-muted tabular-nums">${escapeHtml(r.deltaHM || '0')}</td>
           <td class="text-center text-brand fw-bold tabular-nums">${escapeHtml(r.aktualRate || '0')} ${escapeHtml(r.satuan || '')}</td>
-          <td class="text-center text-muted tabular-nums">${escapeHtml(r.stdRate || '0')} ${escapeHtml(r.satuan || '')}</td>
+          <td class="text-center text-muted tabular-nums">${r.stdRate === '-' ? '—' : escapeHtml(r.stdRate || '0') + ' ' + escapeHtml(r.satuan || '')}</td>
           <td class="text-center fw-bold tabular-nums ${devClass}">${escapeHtml(r.deviasiText || '0%')}</td>
           <td class="text-center"><span class="badge ${badge} px-2 py-1">${escapeHtml(r.statusText || '-')}</span></td>
         </tr>
@@ -5148,7 +5225,9 @@
        SUB-TAB 1: DATABASE MASTER (TRANSAKSI BBM)
        ========================================================================= -->
   <div id="subViewDbMaster" class="submaster-view v7-stack">
-    <section class="glass-card no-lift v7-form-card stagger-item" id="formMasterDbWrapper" style="--stagger-idx: 1;">
+    <!-- [Fase 18] tanpa stagger-item: animasi masuk berblur pada tabel besar membuat perpindahan sub-tab tersendat;
+         semua sub-tab kini memakai satu transisi ringan (.submaster-enter) -->
+    <section class="glass-card no-lift v7-form-card" id="formMasterDbWrapper">
       <div class="v7-form-head">
         <h6 class="dash-card-title mb-0" id="formMasterTitle"><i class="fa fa-edit text-brand me-2"></i>INPUT TRANSAKSI BBM BARU</h6>
       </div>
@@ -5199,6 +5278,13 @@
           <input type="text" id="adminNoSuratJalan" class="form-control form-control-sm" placeholder="0954/OPS/...">
         </div>
 
+        <!-- [Fase 17] peringatan meter (lonjakan / mundur / melewati data sesudahnya) — hanya peringatan -->
+        <div class="col-12 d-none" id="adminMeterWarningBox">
+          <div class="alert alert-warning py-2 px-2 small mb-0">
+            <i class="fa fa-exclamation-triangle me-1"></i> <span id="adminMeterWarningMsg" class="fw-bold"></span>
+          </div>
+        </div>
+
         <div class="col-12 col-md-5" id="wrapperKeterangan">
           <label class="field-label" for="adminKeterangan">KETERANGAN / CATATAN ADMIN</label>
           <input type="text" id="adminKeterangan" class="form-control form-control-sm" placeholder="Catatan pengisian / voucher...">
@@ -5213,7 +5299,7 @@
       </div>
     </section>
 
-    <section class="glass-card no-lift v7-table-card stagger-item" style="--stagger-idx: 2;">
+    <section class="glass-card no-lift v7-table-card">
       <div class="v7-section-head align-items-center">
         <h6 class="dash-card-title mb-0"><i class="fa fa-database me-2"></i>Database Master Transaksi</h6>
 
@@ -5260,6 +5346,21 @@
           </tbody>
         </table>
       </div>
+
+      <!-- [Fase 18] Nomor halaman (data banyak → tidak semua baris digambar sekaligus) -->
+      <div class="v7-table-foot">
+        <span id="countDbMasterInfo" class="dash-card-sub tabular-nums">Menampilkan 0 dari 0 transaksi</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <nav id="dbMasterPager" class="v7-pager" aria-label="Halaman Database Master"></nav>
+          <label class="field-label mb-0" for="selectDbMasterLimit">BARIS</label>
+          <select id="selectDbMasterLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="changeDbMasterLimit()">
+            <option value="25">25 Baris</option>
+            <option value="50" selected>50 Baris</option>
+            <option value="100">100 Baris</option>
+            <option value="ALL">Semua Baris</option>
+          </select>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -5273,28 +5374,89 @@
       </div>
       <input type="hidden" id="unitRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
-        <div class="col-6 col-md-3">
-          <label class="field-label" for="unitKode">KODE UNIT</label>
-          <input type="text" id="unitKode" class="form-control form-control-sm text-uppercase" placeholder="EX: EXCA-01">
-        </div>
-        <div class="col-6 col-md-3">
-          <label class="field-label" for="unitKategori">KATEGORI</label>
-          <input type="text" id="unitKategori" class="form-control form-control-sm" placeholder="Alat Berat / DT / LV">
-        </div>
         <div class="col-6 col-md-2">
-          <label class="field-label" for="unitSatuan">SATUAN METER</label>
-          <select id="unitSatuan" class="form-select form-select-sm">
-            <option value="HM" selected>HM</option>
-            <option value="KM">KM</option>
+          <label class="field-label" for="unitKode">KODE UNIT</label>
+          <input type="text" id="unitKode" class="form-control form-control-sm text-uppercase" placeholder="EX: EXCA-01" title="Kode Unit tidak bisa diubah saat Edit">
+        </div>
+        <!-- [Fase 18] Kode Tipe (MASTER_UNIT kolom E) → kunci standar; memilih tipe mengisi Jenis, Kategori & Satuan -->
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitKodeTipe">KODE TIPE</label>
+          <select id="unitKodeTipe" class="form-select form-select-sm" onchange="onUnitKodeTipeChange()">
+            <option value="">— Belum ada —</option>
+          </select>
+          <!-- [Fase 18] ID unitStdKonsumsi dipertahankan (izin pengguna): kotak STD diganti teks standar di bawah Kode Tipe -->
+          <small id="unitStdKonsumsi" class="unit-std-hint tabular-nums">Standar: —</small>
+        </div>
+        <!-- [Fase 17] Jenis Unit (MASTER_UNIT kolom G) → Kategori terisi otomatis, masih bisa diganti -->
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitJenisUnit">JENIS UNIT</label>
+          <select id="unitJenisUnit" class="form-select form-select-sm" onchange="onUnitJenisChange()">
+            <option value="">— Pilih —</option>
+            <option value="BULLDOZER">BULLDOZER</option>
+            <option value="DUMP TRUCK">DUMP TRUCK</option>
+            <option value="EXCAVATOR">EXCAVATOR</option>
+            <option value="GRADER">GRADER</option>
+            <option value="TONLY">TONLY</option>
+            <option value="VIBRO">VIBRO</option>
+            <option value="TANDEM ROLLER">TANDEM ROLLER</option>
+            <option value="SUPPORT">SUPPORT</option>
+            <option value="LV">LV</option>
           </select>
         </div>
         <div class="col-6 col-md-2">
-          <label class="field-label" for="unitStdKonsumsi">STD RATE (L/HM)</label>
-          <input type="number" step="0.1" id="unitStdKonsumsi" class="form-control form-control-sm tabular-nums" placeholder="15.0">
+          <label class="field-label" for="unitKategori">KATEGORI</label>
+          <select id="unitKategori" class="form-select form-select-sm">
+            <option value="">— Tidak diubah —</option>
+            <option value="DUMP TRUCK">DUMP TRUCK</option>
+            <option value="ALAT BERAT">ALAT BERAT</option>
+            <option value="LV/SUPPORT">LV/SUPPORT</option>
+            <option value="HDT">HDT</option>
+          </select>
         </div>
-        <div class="col-12 col-md-2 d-flex align-items-end gap-2">
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitSatuan">SATUAN METER</label>
+          <select id="unitSatuan" class="form-select form-select-sm" onchange="updateUnitStdHint()">
+            <option value="HM" selected>HM</option>
+            <option value="KM">KM</option>
+            <!-- [Fase 16] unit tanpa meter (mis. mesin molen, kompresor): tidak ikut efisiensi, audit & cek meteran -->
+            <option value="TANPA METER">Tanpa Meter</option>
+          </select>
+        </div>
+        <!-- [Fase 18] Status_Operasional (MASTER_UNIT kolom D) -->
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitStatus">STATUS</label>
+          <select id="unitStatus" class="form-select form-select-sm">
+            <option value="Active" selected>Active</option>
+            <option value="Standby">Standby</option>
+            <option value="Breakdown">Breakdown</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3 ms-auto d-flex align-items-end gap-2">
           <button onclick="resetUnitForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
           <button onclick="saveUnitForm()" id="btnSaveUnit" class="btn btn-sm btn-brand flex-grow-1 fw-bold">Simpan Unit</button>
+        </div>
+      </div>
+
+      <!-- [Fase 17] Pemetaan otomatis Jenis Unit & Kategori (pratinjau dulu, baru diterapkan) -->
+      <div class="unit-map-bar">
+        <span class="unit-map-hint"><i class="fa fa-info-circle me-1"></i>Standar konsumsi mengikuti Kode Tipe (sub-tab Standar Dealer).</span>
+        <button type="button" id="btnUnitMapPreview" class="btn btn-sm btn-ghost" onclick="previewUnitMapping()"><i class="fa fa-magic me-1"></i>Isi Jenis &amp; Kategori Otomatis</button>
+      </div>
+      <div id="unitMapPanel" class="unit-map-panel d-none">
+        <div id="unitMapSummary" class="unit-map-summary"></div>
+        <div class="table-responsive v7-table-scroll v7-table-scroll--sm">
+          <table class="table table-clean align-middle mb-0">
+            <thead>
+              <tr class="text-center">
+                <th>Unit</th><th>Jenis</th><th>Kategori</th><th>Status</th><th>Dasar</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyUnitMap" class="text-center align-middle"></tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-2">
+          <button type="button" class="btn btn-sm btn-ghost" onclick="closeUnitMapping()">Batal</button>
+          <button type="button" id="btnUnitMapApply" class="btn btn-sm btn-brand fw-bold" onclick="applyUnitMapping()">Terapkan ke Sheet</button>
         </div>
       </div>
     </section>
@@ -5313,15 +5475,18 @@
           <thead>
             <tr class="text-center">
               <th>Kode Unit</th>
+              <th>Kode Tipe</th>
+              <th>Jenis</th>
               <th>Kategori</th>
               <th>Satuan Meter</th>
-              <th>Std Rate Konsumsi</th>
+              <th>Status</th>
+              <th>Std Berlaku</th>
               <th class="v7-col-action">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyMasterUnit" class="text-center align-middle">
             <tr>
-              <td colspan="5" class="py-4">
+              <td colspan="8" class="py-4">
                 <div class="d-flex flex-column gap-3 w-100 px-4">
                   <div class="skeleton-box skel-text w-100"></div>
                   <div class="skeleton-box skel-text w-75 mx-auto"></div>
@@ -5330,6 +5495,21 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- [Fase 19] Nomor halaman (sama seperti Database Master) -->
+      <div class="v7-table-foot">
+        <span id="countUnitInfo" class="dash-card-sub tabular-nums">Menampilkan 0 dari 0 unit</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <nav id="unitPager" class="v7-pager" aria-label="Halaman Master Unit"></nav>
+          <label class="field-label mb-0" for="selectUnitLimit">BARIS</label>
+          <select id="selectUnitLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="changeMasterLimit('UNIT')">
+            <option value="25" selected>25 Baris</option>
+            <option value="50">50 Baris</option>
+            <option value="100">100 Baris</option>
+            <option value="ALL">Semua Baris</option>
+          </select>
+        </div>
       </div>
     </section>
   </div>
@@ -5350,7 +5530,9 @@
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="qrKodeUnit">KODE UNIT TARGET</label>
-          <input type="text" id="qrKodeUnit" class="form-control form-control-sm text-uppercase" placeholder="EXCA-01">
+          <!-- [Fase 18] pilih dari daftar MASTER_UNIT (bisa diketik untuk mencari); server menolak kode yang tidak terdaftar -->
+          <input type="text" id="qrKodeUnit" class="form-control form-control-sm text-uppercase" placeholder="Ketik / pilih unit" list="dlQrKodeUnit" autocomplete="off">
+          <datalist id="dlQrKodeUnit"></datalist>
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="qrLokasi">LOKASI PIT</label>
@@ -5362,7 +5544,7 @@
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="qrKapasitas">KAPASITAS TANGKI (L)</label>
-          <input type="number" id="qrKapasitas" class="form-control form-control-sm tabular-nums" placeholder="400">
+          <input type="number" id="qrKapasitas" class="form-control form-control-sm tabular-nums" placeholder="Kosong = dari Kode Tipe" title="Kosongkan untuk memakai kapasitas tangki dari Kode Tipe unit (Standar Dealer)">
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="qrStatus">STATUS QR</label>
@@ -5410,6 +5592,21 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- [Fase 19] Nomor halaman -->
+      <div class="v7-table-foot">
+        <span id="countQRInfo" class="dash-card-sub tabular-nums">Menampilkan 0 dari 0 stiker</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <nav id="qrPager" class="v7-pager" aria-label="Halaman Master QR"></nav>
+          <label class="field-label mb-0" for="selectQRLimit">BARIS</label>
+          <select id="selectQRLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="changeMasterLimit('QR')">
+            <option value="25" selected>25 Baris</option>
+            <option value="50">50 Baris</option>
+            <option value="100">100 Baris</option>
+            <option value="ALL">Semua Baris</option>
+          </select>
+        </div>
       </div>
     </section>
   </div>
@@ -5487,6 +5684,21 @@
           </tbody>
         </table>
       </div>
+
+      <!-- [Fase 19] Nomor halaman -->
+      <div class="v7-table-foot">
+        <span id="countKaryawanInfo" class="dash-card-sub tabular-nums">Menampilkan 0 dari 0 karyawan</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <nav id="karyawanPager" class="v7-pager" aria-label="Halaman Master Karyawan"></nav>
+          <label class="field-label mb-0" for="selectKaryawanLimit">BARIS</label>
+          <select id="selectKaryawanLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="changeMasterLimit('KARYAWAN')">
+            <option value="25" selected>25 Baris</option>
+            <option value="50">50 Baris</option>
+            <option value="100">100 Baris</option>
+            <option value="ALL">Semua Baris</option>
+          </select>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -5510,8 +5722,20 @@
           <input type="text" id="dealerMerek" class="form-control form-control-sm text-uppercase" placeholder="CATERPILLAR">
         </div>
         <div class="col-6 col-md-2">
-          <label class="field-label" for="dealerKategori">KATEGORI</label>
-          <input type="text" id="dealerKategori" class="form-control form-control-sm text-capitalize" placeholder="Excavator / DT">
+          <label class="field-label" for="dealerKategori">KATEGORI (JENIS)</label>
+          <!-- [Fase 18] daftar Jenis Unit (sama dengan Master Unit) -->
+          <select id="dealerKategori" class="form-select form-select-sm">
+            <option value="">— Pilih —</option>
+            <option value="BULLDOZER">BULLDOZER</option>
+            <option value="DUMP TRUCK">DUMP TRUCK</option>
+            <option value="EXCAVATOR">EXCAVATOR</option>
+            <option value="GRADER">GRADER</option>
+            <option value="TONLY">TONLY</option>
+            <option value="VIBRO">VIBRO</option>
+            <option value="TANDEM ROLLER">TANDEM ROLLER</option>
+            <option value="SUPPORT">SUPPORT</option>
+            <option value="LV">LV</option>
+          </select>
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="dealerSatuan">SATUAN STANDAR</label>
@@ -5526,7 +5750,8 @@
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="dealerToleransi">TOLERANSI (%)</label>
-          <input type="number" step="0.1" id="dealerToleransi" class="form-control form-control-sm tabular-nums" placeholder="5.0">
+          <input type="number" step="0.1" id="dealerToleransi" class="form-control form-control-sm tabular-nums" placeholder="5.0" title="Catatan saja — status audit saat ini memakai ±5% untuk semua tipe">
+          <small class="unit-std-hint">Catatan saja · audit memakai ±5%</small>
         </div>
 
         <div class="col-6 col-md-2 mt-2">
@@ -5542,8 +5767,9 @@
           <input type="number" step="0.1" id="dealerBerat" class="form-control form-control-sm tabular-nums" placeholder="22.0">
         </div>
         <div class="col-6 col-md-2 mt-2">
-          <label class="field-label" for="dealerRata2">ACUAN RATA-RATA</label>
-          <input type="number" step="0.1" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="18.5">
+          <label class="field-label" for="dealerRata2">ACUAN RATA-RATA (OTOMATIS)</label>
+          <!-- [Fase 18] dihitung dari rata-rata beban; di sheet disimpan sebagai rumus =AVERAGE(E:G) -->
+          <input type="number" step="0.01" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="—" readonly tabindex="-1">
         </div>
         <div class="col-12 col-md-4 mt-2 d-flex align-items-end gap-2">
           <button onclick="resetDealerForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
@@ -5589,6 +5815,21 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- [Fase 19] Nomor halaman -->
+      <div class="v7-table-foot">
+        <span id="countDealerInfo" class="dash-card-sub tabular-nums">Menampilkan 0 dari 0 tipe</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <nav id="dealerPager" class="v7-pager" aria-label="Halaman Standar Dealer"></nav>
+          <label class="field-label mb-0" for="selectDealerLimit">BARIS</label>
+          <select id="selectDealerLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="changeMasterLimit('DEALER')">
+            <option value="25" selected>25 Baris</option>
+            <option value="50">50 Baris</option>
+            <option value="100">100 Baris</option>
+            <option value="ALL">Semua Baris</option>
+          </select>
+        </div>
       </div>
     </section>
   </div>
@@ -5680,6 +5921,16 @@
   document.addEventListener('DOMContentLoaded', function() {
     initAdminDefaultDate();
     syncMasterDataRBACUI();
+    // [Fase 17] cek meter Database Master saat unit/HM/tanggal/jam/jenis berubah
+    ['adminNoUnit', 'adminHmKm', 'adminTanggal', 'adminJam', 'adminJenisTx'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', checkAdminMeter);
+    });
+    // [Fase 18] Acuan rata-rata dealer dihitung otomatis dari 3 beban
+    ['dealerRingan', 'dealerSedang', 'dealerBerat'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateDealerAcuan);
+    });
   });
 
   function switchMasterSubTab(subKey, btnEl) {
@@ -5692,25 +5943,36 @@
       btnEl.classList.add('btn-danger', 'active');
     }
 
-    document.querySelectorAll('.submaster-view').forEach(v => v.classList.add('d-none'));
+    document.querySelectorAll('.submaster-view').forEach(v => {
+      v.classList.add('d-none');
+      v.classList.remove('submaster-enter');
+    });
+
+    // [Fase 19] transisi sub-tab: kartu masuk bergantian lalu isi tabel (lihat .submaster-enter di Style)
+    const showSub = function(id) {
+      const v = document.getElementById(id);
+      v.classList.remove('d-none', 'submaster-enter');
+      void v.offsetWidth;
+      v.classList.add('submaster-enter');
+    };
 
     if (subKey === 'DB_MASTER') {
-      document.getElementById('subViewDbMaster').classList.remove('d-none');
+      showSub('subViewDbMaster');
       if(ADMIN_CACHE_ROWS.length === 0) loadAdminMasterTable();
     } else if (subKey === 'MASTER_UNIT') {
-      document.getElementById('subViewMasterUnit').classList.remove('d-none');
+      showSub('subViewMasterUnit');
       if(MASTER_UNIT_CACHE.length === 0) loadMasterUnitTable();
     } else if (subKey === 'MASTER_QR') {
-      document.getElementById('subViewMasterQR').classList.remove('d-none');
+      showSub('subViewMasterQR');
       if(MASTER_QR_CACHE.length === 0) loadMasterQRTable();
     } else if (subKey === 'MASTER_KARYAWAN') {
-      document.getElementById('subViewMasterKaryawan').classList.remove('d-none');
+      showSub('subViewMasterKaryawan');
       if(MASTER_KARYAWAN_CACHE.length === 0) loadMasterKaryawanTable();
     } else if (subKey === 'MASTER_DEALER') {
-      document.getElementById('subViewMasterDealer').classList.remove('d-none');
+      showSub('subViewMasterDealer');
       if(MASTER_DEALER_CACHE.length === 0) loadMasterDealerTable();
     } else if (subKey === 'MASTER_LOKASI') {
-      document.getElementById('subViewMasterLokasi').classList.remove('d-none');
+      showSub('subViewMasterLokasi');
       loadMasterLokasiTable();
     }
     syncMasterDataRBACUI();
@@ -5812,39 +6074,161 @@
           ADMIN_CACHE_ROWS = rows;
           if (!isBackground) {
               document.getElementById('searchDbMaster').value = '';
+              DB_MASTER_PAGE = 1;
           }
-          renderAdminTableFromCache(ADMIN_CACHE_ROWS);
+          // [Fase 18] muat ulang di latar (setelah simpan) tetap di halaman & pencarian yang sama
+          renderAdminTableFromCache(adminFilteredRows());
         })
         .getMasterDataList(getAuthToken());
     }
   }
 
-  function filterAdminMasterTable() {
+  function adminFilteredRows() {
     const keyword = (document.getElementById('searchDbMaster').value || '').toLowerCase();
-    if (!ADMIN_CACHE_ROWS) return;
-    const filtered = ADMIN_CACHE_ROWS.filter(r => {
-      return (r.noUnit || '').toLowerCase().includes(keyword) || 
-             (r.lokasi || '').toLowerCase().includes(keyword) || 
-             (r.noSuratJalan || '').toLowerCase().includes(keyword) || 
-             (r.keterangan || '').toLowerCase().includes(keyword);
+    if (!ADMIN_CACHE_ROWS) return [];
+    if (!keyword) return ADMIN_CACHE_ROWS;
+    return ADMIN_CACHE_ROWS.filter(r => {
+      return String(r.noUnit || '').toLowerCase().includes(keyword) ||
+             String(r.lokasi || '').toLowerCase().includes(keyword) ||
+             String(r.noSuratJalan || '').toLowerCase().includes(keyword) ||
+             String(r.keterangan || '').toLowerCase().includes(keyword);
     });
-    renderAdminTableFromCache(filtered);
+  }
+
+  function filterAdminMasterTable() {
+    DB_MASTER_PAGE = 1; // pencarian baru → kembali ke halaman 1
+    renderAdminTableFromCache(adminFilteredRows());
+  }
+
+  /* [Fase 18] Nomor halaman Database Master: hanya baris di halaman aktif yang digambar */
+  let DB_MASTER_VIEW = [];
+  let DB_MASTER_PAGE = 1;
+
+  function dbMasterPageSize() {
+    const v = (document.getElementById('selectDbMasterLimit') || {}).value || '50';
+    return v === 'ALL' ? Infinity : (parseInt(v, 10) || 50);
+  }
+
+  function changeDbMasterLimit() {
+    DB_MASTER_PAGE = 1;
+    renderAdminTableFromCache(DB_MASTER_VIEW);
+  }
+
+  function goDbMasterPage(p) {
+    DB_MASTER_PAGE = p;
+    renderAdminTableFromCache(DB_MASTER_VIEW);
+    const sc = document.querySelector('#subViewDbMaster .v7-table-scroll');
+    if (sc) sc.scrollTop = 0;
+    animatePageIn(document.getElementById('tbodyAdminMaster'));
+  }
+
+  function renderDbMasterPager(total, pages) {
+    renderV7Pager({
+      navId: 'dbMasterPager', infoId: 'countDbMasterInfo', noun: 'transaksi',
+      total: total, pages: pages, page: DB_MASTER_PAGE, size: dbMasterPageSize(),
+      go: (page) => `onclick="goDbMasterPage(${page})"`
+    });
+  }
+
+  /* [Fase 19] Penggambar pager bersama: info "Menampilkan a–b dari N" + tombol 1 … (p-1) p (p+1) … N */
+  function renderV7Pager(o) {
+    const nav = document.getElementById(o.navId);
+    const info = document.getElementById(o.infoId);
+    const fmt = (n) => Number(n).toLocaleString('id-ID');
+    const cur = o.page, size = o.size, total = o.total, pages = o.pages;
+    if (info) {
+      const from = total ? (cur - 1) * (size === Infinity ? 0 : size) + 1 : 0;
+      const to = size === Infinity ? total : Math.min(total, cur * size);
+      info.textContent = `Menampilkan ${fmt(from)}–${fmt(to)} dari ${fmt(total)} ${o.noun}`;
+    }
+    if (!nav) return;
+    if (pages <= 1) { nav.innerHTML = ''; return; }
+    const nums = [];
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || Math.abs(i - cur) <= 1) nums.push(i);
+      else if (nums[nums.length - 1] !== '…') nums.push('…');
+    }
+    const btn = (label, page, opts) => `<button type="button" class="v7-pager-btn${opts && opts.active ? ' is-active' : ''}" ${opts && opts.disabled ? 'disabled' : ''} ${o.go(page)} aria-label="${opts && opts.aria ? opts.aria : 'Halaman ' + page}">${label}</button>`;
+    let h = btn('<i class="fa fa-chevron-left"></i>', cur - 1, { disabled: cur === 1, aria: 'Halaman sebelumnya' });
+    nums.forEach(n => { h += n === '…' ? '<span class="v7-pager-gap">…</span>' : btn(n, n, { active: n === cur }); });
+    h += btn('<i class="fa fa-chevron-right"></i>', cur + 1, { disabled: cur === pages, aria: 'Halaman berikutnya' });
+    nav.innerHTML = h;
+  }
+
+  /* [Fase 19] Nomor halaman Master Unit / QR / Karyawan / Standar Dealer.
+     Render tabel memanggil masterPageRows(key, data) → hanya baris halaman aktif. */
+  const MASTER_PAGER = {
+    UNIT:     { page: 1, view: [], navId: 'unitPager',     infoId: 'countUnitInfo',     limitId: 'selectUnitLimit',     noun: 'unit',     scroll: '#subViewMasterUnit .v7-table-card .v7-table-scroll',  render: function(d) { renderMasterUnitTable(d); } },
+    QR:       { page: 1, view: [], navId: 'qrPager',       infoId: 'countQRInfo',       limitId: 'selectQRLimit',       noun: 'stiker',   scroll: '#subViewMasterQR .v7-table-card .v7-table-scroll',    render: function(d) { renderMasterQRTable(d); } },
+    KARYAWAN: { page: 1, view: [], navId: 'karyawanPager', infoId: 'countKaryawanInfo', limitId: 'selectKaryawanLimit', noun: 'karyawan', scroll: '#subViewMasterKaryawan .v7-table-card .v7-table-scroll', render: function(d) { renderMasterKaryawanTable(d); } },
+    DEALER:   { page: 1, view: [], navId: 'dealerPager',   infoId: 'countDealerInfo',   limitId: 'selectDealerLimit',   noun: 'tipe',     scroll: '#subViewMasterDealer .v7-table-card .v7-table-scroll', render: function(d) { renderMasterDealerTable(d); } }
+  };
+
+  function masterPageSize(key) {
+    const v = (document.getElementById(MASTER_PAGER[key].limitId) || {}).value || '25';
+    return v === 'ALL' ? Infinity : (parseInt(v, 10) || 25);
+  }
+
+  function masterPageRows(key, data) {
+    const pg = MASTER_PAGER[key];
+    const rows = data || [];
+    pg.view = rows;
+    const size = masterPageSize(key);
+    const pages = size === Infinity ? 1 : Math.max(1, Math.ceil(rows.length / size));
+    if (pg.page > pages) pg.page = pages;
+    if (pg.page < 1) pg.page = 1;
+    renderV7Pager({
+      navId: pg.navId, infoId: pg.infoId, noun: pg.noun,
+      total: rows.length, pages: rows.length ? pages : 0, page: pg.page, size: size,
+      go: (page) => `onclick="goMasterPage('${key}',${page})"`
+    });
+    return size === Infinity ? rows : rows.slice((pg.page - 1) * size, pg.page * size);
+  }
+
+  function goMasterPage(key, p) {
+    const pg = MASTER_PAGER[key];
+    pg.page = p;
+    pg.render(pg.view);
+    const sc = document.querySelector(pg.scroll);
+    if (sc) { sc.scrollTop = 0; animatePageIn(sc.querySelector('tbody')); }
+  }
+
+  // Isi tabel bergeser masuk saat pindah halaman (animasi diulang tiap klik)
+  function animatePageIn(tbody) {
+    if (!tbody) return;
+    tbody.classList.remove('v7-page-in');
+    void tbody.offsetWidth;
+    tbody.classList.add('v7-page-in');
+  }
+
+  function changeMasterLimit(key) {
+    MASTER_PAGER[key].page = 1;
+    MASTER_PAGER[key].render(MASTER_PAGER[key].view);
   }
 
   function renderAdminTableFromCache(dataToRender) {
     const tbody = document.getElementById('tbodyAdminMaster');
     if (!tbody) return;
+    DB_MASTER_VIEW = dataToRender || [];
 
     if (!dataToRender || dataToRender.length === 0) {
       tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Database Master Kosong / Data Tidak Ditemukan</td></tr>`;
+      renderDbMasterPager(0, 0);
       return;
     }
+
+    const size = dbMasterPageSize();
+    const pages = size === Infinity ? 1 : Math.max(1, Math.ceil(dataToRender.length / size));
+    if (DB_MASTER_PAGE > pages) DB_MASTER_PAGE = pages;
+    if (DB_MASTER_PAGE < 1) DB_MASTER_PAGE = 1;
+    const pageRows = size === Infinity ? dataToRender : dataToRender.slice((DB_MASTER_PAGE - 1) * size, DB_MASTER_PAGE * size);
+    renderDbMasterPager(dataToRender.length, pages);
 
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
 
     let html = "";
-    dataToRender.forEach(r => {
+    pageRows.forEach(r => {
       const isSupplier = r.jenisTx === 'MASUK SUPPLIER' || r.jenisTx === 'PENERIMAAN TANGKI';
       
       const deleteButtonHtml = isMasterAdmin
@@ -5888,13 +6272,17 @@
     document.getElementById('adminJam').value = item.jam || '';
     document.getElementById('adminJenisTx').value = item.jenisTx || 'PENGELUARAN UNIT';
     document.getElementById('adminNoUnit').value = item.noUnit || '';
-    document.getElementById('adminLokasi').value = item.lokasi || 'Legislatif';
+    // [Fase 18] lokasi lama (nonaktif / beda huruf besar-kecil) tetap dipilih — sebelumnya dropdown kosong
+    // sehingga lokasi transaksi TERHAPUS saat disimpan
+    if (item.lokasi && typeof ensureSelectOption === 'function') ensureSelectOption('adminLokasi', item.lokasi);
+    else document.getElementById('adminLokasi').value = item.lokasi || '';
     document.getElementById('adminHmKm').value = item.hmKm || 0;
     document.getElementById('adminLiter').value = item.liter || 0;
     document.getElementById('adminNoSuratJalan').value = item.noSuratJalan || '';
     document.getElementById('adminKeterangan').value = item.keterangan || '';
     
     toggleSuratJalanField();
+    hideAdminMeterWarning();
     document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT TRANSAKSI BBM (BARIS ${escapeHtml(item.noBaris || rowIndex)})`;
   }
 
@@ -5907,18 +6295,125 @@
     document.getElementById('adminLiter').value = '';
     document.getElementById('adminNoSuratJalan').value = '';
     document.getElementById('adminKeterangan').value = '';
+    // Form baru selalu mulai dari hari ini & PENGELUARAN UNIT (sebelumnya tanggal baris yang
+    // terakhir diedit tertinggal karena initAdminDefaultDate hanya mengisi kolom kosong)
+    document.getElementById('adminTanggal').value = '';
     initAdminDefaultDate();
+    document.getElementById('adminJenisTx').value = 'PENGELUARAN UNIT';
+    toggleSuratJalanField();
+    hideAdminMeterWarning();
     document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>INPUT TRANSAKSI BBM BARU`;
   }
 
-  function saveAdminForm() {
+  /* [Fase 17 — poin E di Database Master] Peringatan meter. Acuan = pembacaan sah SEBELUM & SESUDAH
+     tanggal+jam yang diisi (server: getMeterContextForAdmin). Hanya peringatan: Simpan pertama
+     menampilkan peringatan, Simpan kedua (angka sama) tetap menyimpan. */
+  let adminMeterConfirmedFor = '';
+  let adminMeterSeq = 0;
+
+  function adminMeterInput() {
+    return {
+      unit: document.getElementById('adminNoUnit').value.trim().toUpperCase(),
+      tgl: document.getElementById('adminTanggal').value,
+      jam: document.getElementById('adminJam').value.trim(),
+      hm: parseFloat(document.getElementById('adminHmKm').value) || 0,
+      jenis: document.getElementById('adminJenisTx').value,
+      rowKey: EDIT_ROW_KEYS.admin || ''
+    };
+  }
+
+  function adminMeterSignature(i) { return [i.unit, i.tgl, i.jam, i.hm, i.rowKey].join('|'); }
+
+  function adminMeterApplies(i) {
+    return i.jenis === 'PENGELUARAN UNIT' && i.unit && i.hm > 0 && /^\d{4}-\d{2}-\d{2}$/.test(i.tgl);
+  }
+
+  function adminMeterWarnings(ctx, hm) {
+    if (!ctx || !ctx.success || ctx.skip) return [];
+    const sat = ctx.satuan === 'KM' ? 'KM' : 'HM';
+    const max = ctx.maxPerDay || 0;
+    const fmt = (n) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+    const dayMs = 86400000;
+    const out = [];
+    const p = ctx.prev, n = ctx.next;
+    if (p) {
+      const days = Math.max(1, (ctx.targetTime - p.t) / dayMs);
+      if (hm < p.v) out.push(`${sat} lebih kecil dari pengisian sebelumnya (${fmt(p.v)} ${sat}, ${p.date}). Meter mundur atau diganti?`);
+      else if (max && hm - p.v > max * days) out.push(`${sat} naik ${fmt(hm - p.v)} dalam ${fmt(Math.round(days))} hari sejak pengisian sebelumnya (${fmt(p.v)} ${sat}, ${p.date}). Batas wajar ${max} ${sat} per hari.`);
+    }
+    if (n) {
+      const days2 = Math.max(1, (n.t - ctx.targetTime) / dayMs);
+      if (hm > n.v) out.push(`${sat} lebih besar dari pengisian sesudahnya (${fmt(n.v)} ${sat}, ${n.date}).`);
+      else if (max && n.v - hm > max * days2) out.push(`Selisih dengan pengisian sesudahnya (${fmt(n.v)} ${sat}, ${n.date}) terlalu besar: ${fmt(n.v - hm)} ${sat}.`);
+    }
+    return out;
+  }
+
+  function hideAdminMeterWarning() {
+    adminMeterConfirmedFor = '';
+    const box = document.getElementById('adminMeterWarningBox');
+    if (box) box.classList.add('d-none');
+  }
+
+  function showAdminMeterWarning(msgs, askConfirm) {
+    const box = document.getElementById('adminMeterWarningBox');
+    const msg = document.getElementById('adminMeterWarningMsg');
+    if (!box || !msg) return;
+    msg.innerHTML = msgs.map(escapeHtml).join('<br>') + ' Mohon periksa kembali angkanya.' +
+      (askConfirm ? '<br>Bila angka sudah benar, tekan <b>Simpan Data</b> sekali lagi.' : '');
+    box.classList.remove('d-none');
+  }
+
+  // cb(ctx|null) — null bila tidak perlu dicek / server tidak terjangkau (penyimpanan tidak dihalangi)
+  function fetchAdminMeterContext(i, cb) {
+    if (!adminMeterApplies(i) || !(typeof google !== 'undefined' && google.script && google.script.run)) { cb(null); return; }
+    google.script.run
+      .withSuccessHandler(function(ctx) { cb(ctx && ctx.success ? ctx : null); })
+      .withFailureHandler(function() { cb(null); })
+      .getMeterContextForAdmin(i.unit, i.tgl, i.jam, i.rowKey, getAuthToken());
+  }
+
+  function checkAdminMeter() {
+    const i = adminMeterInput();
+    const seq = ++adminMeterSeq;
+    if (adminMeterConfirmedFor !== adminMeterSignature(i)) adminMeterConfirmedFor = '';
+    fetchAdminMeterContext(i, function(ctx) {
+      if (seq !== adminMeterSeq) return; // sudah ada isian yang lebih baru
+      const w = adminMeterWarnings(ctx, i.hm);
+      const box = document.getElementById('adminMeterWarningBox');
+      if (w.length) showAdminMeterWarning(w, false);
+      else if (box) box.classList.add('d-none');
+    });
+  }
+
+  function saveAdminForm(skipMeterCheck) {
+    if (skipMeterCheck !== true) {
+      const mi = adminMeterInput();
+      const sig = adminMeterSignature(mi);
+      if (adminMeterApplies(mi) && adminMeterConfirmedFor !== sig) {
+        const btnChk = document.getElementById('btnSaveAdmin');
+        btnChk.disabled = true;
+        fetchAdminMeterContext(mi, function(ctx) {
+          btnChk.disabled = false;
+          const w = adminMeterWarnings(ctx, mi.hm);
+          if (w.length) {
+            adminMeterConfirmedFor = sig;
+            showAdminMeterWarning(w, true);
+            return;
+          }
+          saveAdminForm(true);
+        });
+        return;
+      }
+    }
+    hideAdminMeterWarning();
     const rowIdxVal = document.getElementById('adminRowIndex').value;
     const rawTgl = document.getElementById('adminTanggal').value;
     
     let formattedTgl = rawTgl;
     if (rawTgl && rawTgl.includes('-')) {
       const p = rawTgl.split('-');
-      if (p.length === 3) formattedTgl = `${p[1]}/${p[2]}/${p[0]}`;
+      if (p.length === 3) formattedTgl = [p[1], p[2], p[0]].join('/'); // MM/dd/yyyy (bukan template: lihat audit-gas-strip.mjs)
     }
 
     const dataObj = {
@@ -6005,14 +6500,83 @@
 }
 
   /* --- 2. SUB TAB: MASTER UNIT --- */
+  // [Fase 17] Jenis Unit → Kategori (sama dengan JENIS_KE_KATEGORI_ di Code.js; server mengirim ulang saat memuat)
+  let UNIT_JENIS_KE_KATEGORI = {
+    'BULLDOZER': 'ALAT BERAT', 'EXCAVATOR': 'ALAT BERAT', 'GRADER': 'ALAT BERAT', 'VIBRO': 'ALAT BERAT',
+    'DUMP TRUCK': 'DUMP TRUCK', 'TONLY': 'HDT', 'SUPPORT': 'LV/SUPPORT', 'LV': 'LV/SUPPORT'
+  };
+
+  function onUnitJenisChange() {
+    const jenis = document.getElementById('unitJenisUnit').value;
+    if (jenis && UNIT_JENIS_KE_KATEGORI[jenis]) document.getElementById('unitKategori').value = UNIT_JENIS_KE_KATEGORI[jenis];
+  }
+
+  /* [Fase 18] Kode Tipe → isi otomatis Jenis (Kategori dealer), Kategori & Satuan; standar tampil di bawahnya */
+  let UNIT_DEALER_LIST = [];
+
+  function unitDealerOf(kode) {
+    const k = String(kode || '').trim().toUpperCase();
+    return UNIT_DEALER_LIST.find(d => String(d.kodeTipe).toUpperCase() === k) || null;
+  }
+
+  function fillUnitKodeTipeOptions(current) {
+    const sel = document.getElementById('unitKodeTipe');
+    if (!sel) return;
+    let h = '<option value="">— Belum ada —</option>';
+    UNIT_DEALER_LIST.forEach(d => {
+      h += `<option value="${escapeHtml(d.kodeTipe)}">${escapeHtml(d.kodeTipe)}${d.merek ? ' · ' + escapeHtml(d.merek) : ''}</option>`;
+    });
+    sel.innerHTML = h;
+    if (current) {
+      if (!unitDealerOf(current)) sel.add(new Option(current + ' (tidak ada di Standar Dealer)', current));
+      sel.value = unitDealerOf(current) ? unitDealerOf(current).kodeTipe : current;
+    }
+  }
+
+  function updateUnitStdHint() {
+    const hint = document.getElementById('unitStdKonsumsi');
+    if (!hint) return;
+    const d = unitDealerOf(document.getElementById('unitKodeTipe').value);
+    const satUnit = document.getElementById('unitSatuan').value;
+    hint.classList.remove('is-warn');
+    if (satUnit === 'TANPA METER') { hint.textContent = 'Standar: — (tanpa meter)'; return; }
+    if (!d) { hint.textContent = 'Standar: — (pilih Kode Tipe)'; return; }
+    if (!(d.acuan > 0)) { hint.textContent = 'Standar: — (belum diisi di Standar Dealer)'; hint.classList.add('is-warn'); return; }
+    const satTipe = d.satuan === 'KM' ? 'KM' : 'HM';
+    const angka = d.acuan < 1 ? d.acuan.toFixed(2) : d.acuan.toFixed(1);
+    if (satTipe !== satUnit) {
+      hint.textContent = `Standar tipe ${angka} L per ${satTipe} — tidak dipakai (unit memakai ${satUnit})`;
+      hint.classList.add('is-warn');
+      return;
+    }
+    hint.textContent = `Standar: ${angka} ${satTipe === 'KM' ? 'L/KM' : 'L/Jam'}`;
+  }
+
+  function onUnitKodeTipeChange() {
+    const d = unitDealerOf(document.getElementById('unitKodeTipe').value);
+    if (d) {
+      const jenSel = document.getElementById('unitJenisUnit');
+      if (d.kategori && [...jenSel.options].some(o => o.value === d.kategori)) {
+        jenSel.value = d.kategori;
+        onUnitJenisChange();
+      }
+      if (d.satuan === 'HM' || d.satuan === 'KM') document.getElementById('unitSatuan').value = d.satuan;
+    }
+    updateUnitStdHint();
+  }
+
   function loadMasterUnitTable() {
-    showSkeleton('tbodyMasterUnit', 5);
+    showSkeleton('tbodyMasterUnit', 8);
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(res) {
           if (masterSessionGuard(res)) return;
           if (res && res.success) {
             MASTER_UNIT_CACHE = res.data || [];
+            if (res.jenisKeKategori) UNIT_JENIS_KE_KATEGORI = res.jenisKeKategori;
+            UNIT_DEALER_LIST = res.dealerList || [];
+            fillUnitKodeTipeOptions(document.getElementById('unitKodeTipe').value);
+            updateUnitStdHint();
             document.getElementById('searchUnit').value = '';
             renderMasterUnitTable(MASTER_UNIT_CACHE);
           }
@@ -6025,10 +6589,23 @@
     const keyword = (document.getElementById('searchUnit').value || '').toLowerCase();
     if (!MASTER_UNIT_CACHE) return;
     const filtered = MASTER_UNIT_CACHE.filter(u => {
-      return (u.kodeUnit || '').toLowerCase().includes(keyword) || 
-             (u.kategori || '').toLowerCase().includes(keyword);
+      return (u.kodeUnit || '').toLowerCase().includes(keyword) ||
+             (u.kategori || '').toLowerCase().includes(keyword) ||
+             (u.jenisUnit || '').toLowerCase().includes(keyword) ||
+             (u.status || '').toLowerCase().includes(keyword) ||
+             (u.kodeTipe || '').toLowerCase().includes(keyword);
     });
+    MASTER_PAGER.UNIT.page = 1;
     renderMasterUnitTable(filtered);
+  }
+
+  // Satuan sel sheet ("Liter/HM", "Tanpa Meter") → label ringkas
+  function unitSatuanLabel(s) {
+    const up = String(s || '').toUpperCase();
+    if (up.indexOf('TANPA') !== -1) return 'Tanpa Meter';
+    if (up.indexOf('KM') !== -1) return 'KM';
+    if (up.indexOf('HM') !== -1 || up.indexOf('JAM') !== -1) return 'HM';
+    return up ? s : '—';
   }
 
   function renderMasterUnitTable(dataToRender) {
@@ -6038,13 +6615,14 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
 
+    const pageRows = masterPageRows('UNIT', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Data Unit Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Data Unit Kosong / Tidak Ditemukan</td></tr>';
       return;
     }
 
     let html = '';
-    dataToRender.forEach(u => {
+    pageRows.forEach(u => {
       const deleteBtn = isMasterAdmin 
         ? `<button onclick="deleteUnitRow(${Number(u.rowIndex) || 0})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Hapus</button>`;
@@ -6052,9 +6630,12 @@
       html += `
         <tr>
           <td class="fw-bold text-white">${escapeHtml(u.kodeUnit)}</td>
-          <td>${escapeHtml(u.kategori)}</td>
-          <td><span class="badge badge-location">${escapeHtml(u.satuanMeter)}</span></td>
-          <td class="fw-bold text-brand tabular-nums">${escapeHtml(u.stdKonsumsi)} L/HM</td>
+          <td class="text-muted">${escapeHtml(u.kodeTipe || '—')}</td>
+          <td>${u.jenisUnit ? escapeHtml(u.jenisUnit) : '<span class="text-muted">—</span>'}</td>
+          <td>${escapeHtml(u.kategori || '—')}</td>
+          <td><span class="badge badge-location">${escapeHtml(unitSatuanLabel(u.satuanMeter))}</span></td>
+          <td><span class="unit-status unit-status--${escapeHtml(String(u.status || '').toLowerCase() || 'none')}">${escapeHtml(u.status || '—')}</span></td>
+          <td class="fw-bold text-brand tabular-nums">${escapeHtml(u.stdText || '—')}${u.stdNote ? `<span class="dash-cell-sub">${escapeHtml(u.stdNote)}</span>` : ''}</td>
           <td>
             <button onclick="editUnitRow(${Number(u.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
             ${deleteBtn}
@@ -6071,9 +6652,23 @@
     document.getElementById('unitRowIndex').value = item.rowIndex;
     EDIT_ROW_KEYS.unit = item.rowKey || '';
     document.getElementById('unitKode').value = item.kodeUnit;
-    document.getElementById('unitKategori').value = item.kategori;
-    document.getElementById('unitSatuan').value = item.satuanMeter;
-    document.getElementById('unitStdKonsumsi').value = item.stdKonsumsi;
+    document.getElementById('unitKode').readOnly = true; // [Fase 18] Kode Unit dikunci saat Edit
+    fillUnitKodeTipeOptions(item.kodeTipe || '');
+    const stSel = document.getElementById('unitStatus');
+    const stOk = [...stSel.options].find(o => o.value.toLowerCase() === String(item.status || '').toLowerCase());
+    stSel.value = stOk ? stOk.value : 'Active';
+    // [Fase 17] Kategori & Jenis = dropdown; nilai lama di luar daftar (mis. "EXCAVATOR" hasil rumus lama)
+    // → "Tidak diubah" agar sel di sheet tidak tertimpa tanpa sengaja
+    const katSel = document.getElementById('unitKategori');
+    const katUp = String(item.kategori || '').toUpperCase();
+    katSel.value = [...katSel.options].some(o => o.value && o.value === katUp) ? katUp : '';
+    const jenSel = document.getElementById('unitJenisUnit');
+    const jenUp = String(item.jenisUnit || '').toUpperCase();
+    jenSel.value = [...jenSel.options].some(o => o.value && o.value === jenUp) ? jenUp : '';
+    // [Fase 16] samakan isi sel (mis. "Tanpa Meter", "Liter/KM") dengan pilihan dropdown
+    const satUp = String(item.satuanMeter || '').toUpperCase();
+    document.getElementById('unitSatuan').value = satUp.indexOf('TANPA') !== -1 ? 'TANPA METER' : (satUp.indexOf('KM') !== -1 ? 'KM' : 'HM');
+    updateUnitStdHint();
     document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT MASTER UNIT (${escapeHtml(item.kodeUnit)})`;
   }
 
@@ -6081,19 +6676,28 @@
     document.getElementById('unitRowIndex').value = 0;
     EDIT_ROW_KEYS.unit = '';
     document.getElementById('unitKode').value = '';
+    document.getElementById('unitKode').readOnly = false;
     document.getElementById('unitKategori').value = '';
-    document.getElementById('unitStdKonsumsi').value = '';
+    document.getElementById('unitJenisUnit').value = '';
+    document.getElementById('unitSatuan').value = 'HM';
+    document.getElementById('unitStatus').value = 'Active';
+    fillUnitKodeTipeOptions('');
+    updateUnitStdHint();
     document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT DATA UNIT BARU`;
   }
 
   function saveUnitForm() {
+    // [Fase 17] tanpa stdKonsumsi: MASTER_UNIT tidak punya kolom standar (kolom D = Status_Operasional)
+    // [Fase 18] + Status (kolom D) & Kode Tipe (kolom E)
     const dataObj = {
       rowIndex: document.getElementById('unitRowIndex').value,
       rowKey: EDIT_ROW_KEYS.unit,
       kodeUnit: document.getElementById('unitKode').value.trim(),
-      kategori: document.getElementById('unitKategori').value.trim(),
+      kodeTipe: document.getElementById('unitKodeTipe').value,
+      kategori: document.getElementById('unitKategori').value,
+      jenisUnit: document.getElementById('unitJenisUnit').value,
       satuanMeter: document.getElementById('unitSatuan').value,
-      stdKonsumsi: document.getElementById('unitStdKonsumsi').value
+      status: document.getElementById('unitStatus').value
     };
 
     if (!dataObj.kodeUnit) {
@@ -6121,20 +6725,99 @@
     }
   }
 
+  // [Fase 18] Sebelum menghapus: cek data yang masih memakainya (cb dipanggil dengan teks peringatan / '')
+  function fetchMasterUsageNote(kind, key, cb) {
+    if (!(typeof google !== 'undefined' && google.script && google.script.run)) { cb(''); return; }
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (!res || !res.success) { cb(''); return; }
+        if (kind === 'UNIT') {
+          const parts = [];
+          if (res.qr) parts.push(res.qr + ' stiker QR');
+          if (res.tx) parts.push(res.tx.toLocaleString('id-ID') + ' transaksi');
+          cb(parts.length ? `Unit ini masih dipakai ${parts.join(' dan ')}. Sebaiknya ubah Status menjadi Standby daripada dihapus.` : '');
+        } else {
+          const u = res.units || [];
+          cb(u.length ? `Kode Tipe ini dipakai ${u.length} unit (${u.slice(0, 6).join(', ')}${u.length > 6 ? ', …' : ''}). Standar unit-unit tersebut akan hilang.` : '');
+        }
+      })
+      .withFailureHandler(function() { cb(''); })
+      .getMasterUsage(kind, key, getAuthToken());
+  }
+
   function deleteUnitRow(rowIdx) {
     const target = MASTER_UNIT_CACHE.find(u => u.rowIndex == rowIdx);
     const rowKey = target ? (target.rowKey || '') : '';
-    showConfirmModal("Apakah Anda yakin ingin menghapus baris unit ini?", function() {
-      const clientToken = localStorage.getItem('darkpan_jwt_token');
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(function(res) {
-            if (masterSessionGuard(res)) return;
-            showToast(res.message, res.success ? "success" : "error");
-            loadMasterUnitTable();
-          })
-          .deleteMasterUnit(rowIdx, clientToken, rowKey);
-      }
+    fetchMasterUsageNote('UNIT', target ? target.kodeUnit : '', function(note) {
+      showConfirmModal((note ? note + ' ' : '') + "Tetap hapus baris unit " + (target ? target.kodeUnit : '') + "?", function() {
+        const clientToken = localStorage.getItem('darkpan_jwt_token');
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              if (masterSessionGuard(res)) return;
+              showToast(res.message, res.success ? "success" : "error");
+              loadMasterUnitTable();
+            })
+            .deleteMasterUnit(rowIdx, clientToken, rowKey);
+        }
+      });
+    });
+  }
+
+  /* [Fase 17] Pemetaan otomatis Jenis & Kategori: pratinjau → Terapkan ke Sheet */
+  function closeUnitMapping() {
+    document.getElementById('unitMapPanel').classList.add('d-none');
+  }
+
+  function previewUnitMapping() {
+    if (!(typeof google !== 'undefined' && google.script && google.script.run)) return;
+    const btn = document.getElementById('btnUnitMapPreview');
+    const panel = document.getElementById('unitMapPanel');
+    btn.disabled = true;
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        if (masterSessionGuard(res)) return;
+        if (!res || !res.success) { showToast((res && res.message) || 'Gagal membuat pratinjau.', 'error'); return; }
+        const tbody = document.getElementById('tbodyUnitMap');
+        const sum = document.getElementById('unitMapSummary');
+        const items = res.items || [];
+        const tanpa = res.tanpaJenis || [];
+        let teks = items.length
+          ? `<b>${items.length}</b> dari ${res.totalUnit} unit akan diperbarui. Jenis yang sudah terisi tidak diubah.`
+          : `Semua ${res.totalUnit} unit sudah sesuai. Tidak ada yang perlu diubah.`;
+        if (res.statusDiperbaiki) teks += ` Status yang tidak sah (mis. berisi angka) diisi <b>Active</b> — periksa kembali di sheet bila seharusnya Standby/Breakdown.`;
+        if (tanpa.length) teks += `<br><span class="text-warning">Belum dikenali (isi manual lewat Edit): ${escapeHtml(tanpa.join(', '))}</span>`;
+        sum.innerHTML = teks;
+        const arrow = (a, b) => a === b ? escapeHtml(b || '—') : `<span class="text-muted">${escapeHtml(a || '—')}</span> → <b>${escapeHtml(b || '—')}</b>`;
+        tbody.innerHTML = items.map(it => `
+          <tr>
+            <td class="fw-bold">${escapeHtml(it.kodeUnit)}</td>
+            <td>${arrow(it.jenisLama, it.jenisBaru)}</td>
+            <td>${arrow(it.kategoriLama, it.kategoriBaru)}</td>
+            <td>${arrow(it.statusLama, it.statusBaru)}</td>
+            <td class="text-muted">${escapeHtml(it.dasar || '')}</td>
+          </tr>`).join('');
+        document.getElementById('btnUnitMapApply').disabled = items.length === 0;
+        panel.classList.remove('d-none');
+      })
+      .withFailureHandler(function() { btn.disabled = false; showToast('Tidak dapat terhubung ke server.', 'error'); })
+      .previewMasterUnitMapping(getAuthToken());
+  }
+
+  function applyUnitMapping() {
+    showConfirmModal("Terapkan Jenis & Kategori ini ke sheet MASTER_UNIT?", function() {
+      const btn = document.getElementById('btnUnitMapApply');
+      btn.disabled = true;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          if (masterSessionGuard(res)) return;
+          showToast((res && res.message) || 'Gagal menerapkan pemetaan.', res && res.success ? 'success' : 'error');
+          if (res && res.success) { closeUnitMapping(); loadMasterUnitTable(); }
+        })
+        .withFailureHandler(function() { btn.disabled = false; showToast('Tidak dapat terhubung ke server.', 'error'); })
+        .applyMasterUnitMapping(getAuthToken());
     });
   }
 
@@ -6232,7 +6915,7 @@
       return;
     }
     LOKASI_PICKER = L.map(el, { scrollWheelZoom: false }).setView([-0.5, 117.15], 5);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Citra &copy; Esri' }).addTo(LOKASI_PICKER);
+    L.tileLayer('https:\/\/server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Citra &copy; Esri' }).addTo(LOKASI_PICKER);
     LOKASI_PICKER.on('click', function(e) {
       document.getElementById('lokasiLat').value = e.latlng.lat.toFixed(6);
       document.getElementById('lokasiLng').value = e.latlng.lng.toFixed(6);
@@ -6357,6 +7040,9 @@
           if (masterSessionGuard(res)) return;
           if (res && res.success) {
             MASTER_QR_CACHE = res.data || [];
+            // [Fase 18] pilihan Kode Unit dari MASTER_UNIT
+            const dl = document.getElementById('dlQrKodeUnit');
+            if (dl) dl.innerHTML = (res.unitList || []).map(u => `<option value="${escapeHtml(u)}"></option>`).join('');
             document.getElementById('searchQR').value = '';
             renderMasterQRTable(MASTER_QR_CACHE);
           }
@@ -6372,6 +7058,7 @@
       return (q.qrId || '').toLowerCase().includes(keyword) || 
              (q.kodeUnit || '').toLowerCase().includes(keyword);
     });
+    MASTER_PAGER.QR.page = 1;
     renderMasterQRTable(filtered);
   }
 
@@ -6382,13 +7069,14 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
 
+    const pageRows = masterPageRows('QR', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Data QR Kosong / Tidak Ditemukan</td></tr>';
       return;
     }
 
     let html = '';
-    dataToRender.forEach(q => {
+    pageRows.forEach(q => {
       const deleteBtn = isMasterAdmin 
         ? `<button onclick="deleteQRRow(${Number(q.rowIndex) || 0})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Hapus</button>`;
@@ -6398,7 +7086,8 @@
           <td class="font-monospace text-brand">${escapeHtml(q.qrId)}</td>
           <td class="fw-bold text-white">${escapeHtml(q.kodeUnit)}</td>
           <td>${escapeHtml(q.lokasi)}</td>
-          <td class="tabular-nums">${escapeHtml(q.kapasitas)} L</td>
+          <td class="tabular-nums">${q.kapasitas > 0 ? escapeHtml(q.kapasitas) + ' L'
+            : (q.kapasitasTipe > 0 ? escapeHtml(q.kapasitasTipe) + ' L<span class="dash-cell-sub">dari Kode Tipe</span>' : '<span class="text-muted">—</span><span class="dash-cell-sub">cek kapasitas nonaktif</span>')}</td>
           <td><span class="badge ${q.status === 'Aktif' ? 'bg-success' : 'badge-location'}">${escapeHtml(q.status)}</span></td>
           <td>
             <button onclick="editQRRow(${Number(q.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
@@ -6417,8 +7106,10 @@
     EDIT_ROW_KEYS.qr = item.rowKey || '';
     document.getElementById('qrCodeId').value = item.qrId;
     document.getElementById('qrKodeUnit').value = item.kodeUnit;
-    document.getElementById('qrLokasi').value = item.lokasi;
-    document.getElementById('qrKapasitas').value = item.kapasitas;
+    // [Fase 18] lokasi lama tetap dipilih — sebelumnya dropdown kosong lalu server mengganti jadi "Legislatif"
+    if (item.lokasi && typeof ensureSelectOption === 'function') ensureSelectOption('qrLokasi', item.lokasi);
+    else document.getElementById('qrLokasi').value = item.lokasi || '';
+    document.getElementById('qrKapasitas').value = item.kapasitas > 0 ? item.kapasitas : '';
     document.getElementById('qrStatus').value = item.status;
     document.getElementById('titleFormQR').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT STIKER QR (${escapeHtml(item.qrId)})`;
   }
@@ -6512,6 +7203,7 @@
       return (k.nik || '').toLowerCase().includes(keyword) || 
              (k.nama || '').toLowerCase().includes(keyword);
     });
+    MASTER_PAGER.KARYAWAN.page = 1;
     renderMasterKaryawanTable(filtered);
   }
 
@@ -6522,13 +7214,14 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
 
+    const pageRows = masterPageRows('KARYAWAN', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Data Karyawan Kosong / Tidak Ditemukan</td></tr>';
       return;
     }
 
     let html = '';
-    dataToRender.forEach(k => {
+    pageRows.forEach(k => {
       const deleteBtn = isMasterAdmin 
         ? `<button onclick="deleteKaryawanRow(${Number(k.rowIndex) || 0})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Hapus</button>`;
@@ -6573,8 +7266,9 @@
     document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-user-plus text-brand me-2"></i>INPUT DATA KARYAWAN / OPERATOR BARU`;
   }
 
-  function saveKaryawanForm() {
+  function saveKaryawanForm(allowDupNama) {
     const dataObj = {
+      allowDupNama: allowDupNama === true, // [Fase 18] nama kembar → konfirmasi dulu
       rowIndex: document.getElementById('karyawanRowIndex').value,
       rowKey: EDIT_ROW_KEYS.karyawan,
       nik: document.getElementById('karyawanNik').value.trim(),
@@ -6599,6 +7293,10 @@
           btn.innerHTML = `Simpan Karyawan`;
           btn.disabled = false;
           if (masterSessionGuard(res)) return;
+          if (res && res.needConfirm) {
+            showConfirmModal(res.message, function() { saveKaryawanForm(true); });
+            return;
+          }
           showToast(res.message, res.success ? "success" : "error");
           if (res.success) {
             resetKaryawanForm();
@@ -6659,6 +7357,7 @@
              (d.merek || '').toLowerCase().includes(keyword) ||
              (d.kategori || '').toLowerCase().includes(keyword);
     });
+    MASTER_PAGER.DEALER.page = 1;
     renderMasterDealerTable(filtered);
   }
 
@@ -6669,6 +7368,7 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
 
+    const pageRows = masterPageRows('DEALER', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
       tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Data Standar Dealer Kosong / Tidak Ditemukan</td></tr>';
       return;
@@ -6681,8 +7381,8 @@
     };
 
     let html = '';
-    dataToRender.forEach(d => {
-      const deleteBtn = isMasterAdmin 
+    pageRows.forEach(d => {
+      const deleteBtn = isMasterAdmin
         ? `<button onclick="deleteDealerRow(${Number(d.rowIndex) || 0})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Hapus</button>`;
 
@@ -6715,14 +7415,19 @@
     EDIT_ROW_KEYS.dealer = item.rowKey || '';
     document.getElementById('dealerKode').value = item.kodeTipe;
     document.getElementById('dealerMerek').value = item.merek;
-    document.getElementById('dealerKategori').value = item.kategori;
-    document.getElementById('dealerSatuan').value = item.satuan;
+    // [Fase 18] Kategori = dropdown Jenis; nilai lama di luar daftar tetap ditampilkan
+    const katD = String(item.kategori || '').trim().toUpperCase();
+    const katSelD = document.getElementById('dealerKategori');
+    if (katD && ![...katSelD.options].some(o => o.value === katD)) katSelD.add(new Option(katD + ' (lama)', katD));
+    katSelD.value = katD;
+    document.getElementById('dealerSatuan').value = String(item.satuan || '').toUpperCase().indexOf('KM') !== -1 ? 'Liter/KM' : 'Liter/HM';
     document.getElementById('dealerRingan').value = item.bebanRingan;
     document.getElementById('dealerSedang').value = item.bebanSedang;
     document.getElementById('dealerBerat').value = item.bebanBerat;
     document.getElementById('dealerRata2').value = item.acuanRata2;
     document.getElementById('dealerKapasitas').value = item.kapasitas;
     document.getElementById('dealerToleransi').value = item.toleransi;
+    updateDealerAcuan();
     document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT STANDAR DEALER (${escapeHtml(item.kodeTipe)})`;
   }
 
@@ -6741,8 +7446,17 @@
     document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-cogs text-brand me-2"></i>INPUT DATA STANDAR DEALER BARU`;
   }
 
-  function saveDealerForm() {
+  // [Fase 18] Acuan Rata-rata = rata-rata beban yang terisi (sama dengan rumus =AVERAGE di sheet)
+  function updateDealerAcuan() {
+    const vals = ['dealerRingan', 'dealerSedang', 'dealerBerat']
+      .map(id => parseFloat(document.getElementById(id).value))
+      .filter(n => !isNaN(n));
+    document.getElementById('dealerRata2').value = vals.length ? (Math.round(vals.reduce((a, b) => a + b, 0) / vals.length * 100) / 100) : '';
+  }
+
+  function saveDealerForm(cascade) {
     const dataObj = {
+      cascade: cascade === true, // [Fase 18] ganti Kode Tipe yang dipakai unit → konfirmasi dulu
       rowIndex: document.getElementById('dealerRowIndex').value,
       rowKey: EDIT_ROW_KEYS.dealer,
       kodeTipe: document.getElementById('dealerKode').value.trim().toUpperCase(),
@@ -6772,10 +7486,15 @@
           btn.innerHTML = `Simpan Standar`;
           btn.disabled = false;
           if (masterSessionGuard(res)) return;
+          if (res && res.needConfirm) {
+            showConfirmModal(res.message, function() { saveDealerForm(true); });
+            return;
+          }
           showToast(res.message, res.success ? "success" : "error");
           if (res.success) {
             resetDealerForm();
             loadMasterDealerTable();
+            MASTER_UNIT_CACHE = []; // standar/Kode Tipe unit berubah → tabel Unit dimuat ulang saat dibuka
           }
         })
         .saveMasterStandarDealer(dataObj, getAuthToken());
@@ -6785,17 +7504,21 @@
   function deleteDealerRow(rowIdx) {
     const target = MASTER_DEALER_CACHE.find(d => d.rowIndex == rowIdx);
     const rowKey = target ? (target.rowKey || '') : '';
-    showConfirmModal("Apakah Anda yakin ingin menghapus baris Standar Dealer ini?", function() {
-      const clientToken = localStorage.getItem('darkpan_jwt_token');
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(function(res) {
-            if (masterSessionGuard(res)) return;
-            showToast(res.message, res.success ? "success" : "error");
-            loadMasterDealerTable();
-          })
-          .deleteMasterStandarDealer(rowIdx, clientToken, rowKey);
-      }
+    // [Fase 18] beri tahu bila tipe masih dipakai unit (standarnya akan hilang)
+    fetchMasterUsageNote('TIPE', target ? target.kodeTipe : '', function(note) {
+      showConfirmModal((note ? note + ' ' : '') + "Tetap hapus Standar Dealer " + (target ? target.kodeTipe : '') + "?", function() {
+        const clientToken = localStorage.getItem('darkpan_jwt_token');
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              if (masterSessionGuard(res)) return;
+              showToast(res.message, res.success ? "success" : "error");
+              loadMasterDealerTable();
+              MASTER_UNIT_CACHE = [];
+            })
+            .deleteMasterStandarDealer(rowIdx, clientToken, rowKey);
+        }
+      });
     });
   }
 </script>
@@ -8689,7 +9412,8 @@
         }
 
         // Reset acuan anomali agar kapasitas/HM unit sebelumnya tidak terbawa ke unit berikutnya
-        currentUnitMasterMeta = { lastHmKm: 0, kapasitasTangki: 9999 };
+        currentUnitMasterMeta = { lastHmKm: 0, kapasitasTangki: 9999, unitStatus: '' };
+        meterSpikeConfirmedFor = null;
 
         $('#modalScanToFill').modal('show');
         // [Fase 11 #8] Daftar operator (Master_Karyawan, wajib login) & lokasi (MASTER_LOKASI) dimuat
@@ -8746,6 +9470,13 @@
                     }
                     // HM/KM terakhir unit → aktifkan cek "HM/KM mundur" di runAnomalyCheck()
                     currentUnitMasterMeta.lastHmKm = (res && parseFloat(res.lastHmKm)) || 0;
+                    // [Fase 16 #16.8] acuan peringatan lonjakan (waktu pembacaan terakhir, satuan, ambang/hari)
+                    currentUnitMasterMeta.lastHmKmTime = (res && Number(res.lastHmKmTime)) || 0;
+                    currentUnitMasterMeta.lastHmKmDate = (res && res.lastHmKmDate) || '';
+                    currentUnitMasterMeta.satuanMeter = (res && res.satuanMeter) || 'HM';
+                    currentUnitMasterMeta.maxPerDay = (res && Number(res.maxPerDay)) || 0;
+                    // [Fase 18] status unit di Master Unit (Breakdown → peringatan, tidak memblokir)
+                    currentUnitMasterMeta.unitStatus = (res && res.unitStatus) || '';
                     runAnomalyCheck();
                 })
                 .getLastOperatorByUnit(kodeUnit, getAuthToken());
@@ -8779,6 +9510,15 @@
             return;
         }
 
+        // [Fase 16 #16.8] Kenaikan HM/KM tidak wajar → minta konfirmasi (tekan Simpan sekali lagi)
+        const spike = getMeterSpikeInfo();
+        if (spike && meterSpikeConfirmedFor !== String(payload.hmKm)) {
+            meterSpikeConfirmedFor = String(payload.hmKm);
+            $('#anomalyWarningBox').removeClass('d-none');
+            $('#anomalyWarningMsg').html(escapeHtml(meterSpikeMessage(spike)) + '<br>Bila angka sudah benar, tekan <b>Simpan Transaksi</b> sekali lagi.');
+            return;
+        }
+
         $('#btnSubmitScanFill').prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
 
         try {
@@ -8803,6 +9543,24 @@
        PEMBACA QR VIA KAMERA NATIVE / FILE FOTO
        ------------------------------------------------------------------------- */
     let currentUnitMasterMeta = { lastHmKm: 0, kapasitasTangki: 9999 };
+    let meterSpikeConfirmedFor = null; // [Fase 16] nilai HM/KM yang sudah dikonfirmasi pengguna
+
+    /* [Fase 16 #16.8] Lonjakan: kenaikan sejak pembacaan sah terakhir > ambang per hari berlalu
+       (HM 24/hari, KM 300/hari — dari server). Bukan pemblokir: hanya minta konfirmasi. */
+    function getMeterSpikeInfo() {
+        const m = currentUnitMasterMeta || {};
+        const inputHm = parseFloat($('#scanHmKm').val()) || 0;
+        if (!(inputHm > 0 && m.lastHmKm > 0 && m.maxPerDay > 0 && inputHm >= m.lastHmKm)) return null;
+        const days = Math.max(1, m.lastHmKmTime ? (Date.now() - m.lastHmKmTime) / 86400000 : 1);
+        const naik = inputHm - m.lastHmKm;
+        if (naik <= m.maxPerDay * days) return null;
+        return { naik: naik, last: m.lastHmKm, lastDate: m.lastHmKmDate || '', sat: m.satuanMeter === 'KM' ? 'KM' : 'HM' };
+    }
+
+    function meterSpikeMessage(s) {
+        const fmt = (n) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+        return `${s.sat} naik ${fmt(s.naik)} sejak pengisian terakhir (${fmt(s.last)} ${s.sat}${s.lastDate ? ', ' + s.lastDate : ''}). Mohon periksa kembali angkanya.`;
+    }
 
     function handleQrFileInput(inputEl) {
         if (!inputEl.files || inputEl.files.length === 0) return;
@@ -8849,10 +9607,20 @@
             messages.push(`Pengisian (${inputLiter}L) melebihi kapasitas tangki unit (${currentUnitMasterMeta.kapasitasTangki}L)!`);
         }
 
+        // [Fase 16 #16.8] Peringatan lonjakan (tidak memblokir; konfirmasi saat Simpan)
+        const spike = isError ? null : getMeterSpikeInfo();
+        // [Fase 18] Unit berstatus Breakdown di Master Unit → peringatan saja
+        const breakdownNote = String(currentUnitMasterMeta.unitStatus || '').toUpperCase() === 'BREAKDOWN'
+            ? 'Unit ini berstatus Breakdown di Master Unit. Pastikan unit memang sudah beroperasi kembali.' : '';
+
         if (isError) {
             warningBox.removeClass('d-none');
             warningMsg.html(messages.join('<br>'));
             btnSubmit.addClass('btn-secondary').removeClass('btn-danger').prop('disabled', true);
+        } else if (spike || breakdownNote) {
+            warningBox.removeClass('d-none');
+            warningMsg.html([spike ? escapeHtml(meterSpikeMessage(spike)) : '', escapeHtml(breakdownNote)].filter(Boolean).join('<br>'));
+            btnSubmit.addClass('btn-danger').removeClass('btn-secondary').prop('disabled', false);
         } else {
             warningBox.addClass('d-none');
             warningMsg.html('');
@@ -9394,6 +10162,9 @@ function renderDashboardUI(data) {
 
   // 4. CHARTS UPDATE
   if (data.chartLabels && data.chartLabels.length > 0) {
+    supplySiteData = Array.isArray(data.chartMasukSite)
+      ? { stokAwal: data.supplyStokAwal, masuk: data.chartMasukSite, keluar: data.chartKeluarSite || [] }
+      : null;
     updateCharts(
       data.chartLabels, 
       data.chartMasuk, 
@@ -9401,7 +10172,8 @@ function renderDashboardUI(data) {
       data.chartAlatBerat, 
       data.chartDumptruck,
       data.chartPieLabels,
-      data.chartPieData
+      data.chartPieData,
+      data.chartLvSupport
     );
   }
 
@@ -9442,7 +10214,10 @@ function renderTableTopIrit(items) {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
     const val = item.rateText || item.val || '-';
-    tbody.innerHTML += `<tr><th>${escapeHtml(rank)}</th><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end fw-bold">${escapeHtml(val)}</td></tr>`;
+    // [Fase 16] nilai = deviasi terhadap standar unit; aktual & standar di tooltip
+    const tip = item.aktualText ? `Aktual ${item.aktualText} · Standar ${item.stdText || '-'}` : '';
+    const tone = (typeof item.deviasi === 'number' && item.deviasi < 0) ? 'text-success' : '';
+    tbody.innerHTML += `<tr><th>${escapeHtml(rank)}</th><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end fw-bold tabular-nums ${tone}" title="${escapeHtml(tip)}">${escapeHtml(val)}</td></tr>`;
   });
 }
 
@@ -9472,10 +10247,11 @@ function renderModalTableTopIrit(dataList) {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
     const val = item.rateText || item.val || '-';
+    const sub = item.aktualText ? `${item.aktualText} · std ${item.stdText || '-'}` : '';
     html += `<tr>
               <td>${escapeHtml(rank)}</td>
               <td class="fw-bold text-success">${escapeHtml(unit)}</td>
-              <td class="text-end fw-bold">${escapeHtml(val)}</td>
+              <td class="text-end"><span class="fw-bold tabular-nums">${escapeHtml(val)}</span>${sub ? `<span class="dash-cell-sub tabular-nums">${escapeHtml(sub)}</span>` : ''}</td>
             </tr>`;
   });
   tbody.innerHTML = html;
@@ -9520,7 +10296,9 @@ function renderTableTopKonsumsi(items) {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
     const val = item.totalLiterText || item.val || '-';
-    tbody.innerHTML += `<tr><th>${escapeHtml(rank)}</th><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end fw-bold">${escapeHtml(val)}</td></tr>`;
+    // [Fase 16] porsi unit terhadap total konsumsi site
+    const pct = item.pctText ? `<span class="dash-cell-pct tabular-nums" title="Porsi dari total konsumsi site">${escapeHtml(item.pctText)}</span>` : '';
+    tbody.innerHTML += `<tr><th>${escapeHtml(rank)}</th><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end fw-bold tabular-nums">${escapeHtml(val)}${pct}</td></tr>`;
   });
 }
 
@@ -9550,10 +10328,11 @@ function renderModalTableTopKonsumsi(dataList) {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
     const val = item.totalLiterText || item.val || '-';
+    const pct = item.pctText ? `<span class="dash-cell-pct tabular-nums">${escapeHtml(item.pctText)}</span>` : '';
     html += `<tr>
               <td>${escapeHtml(rank)}</td>
               <td class="fw-bold text-brand">${escapeHtml(unit)}</td>
-              <td class="text-end fw-bold">${escapeHtml(val)}</td>
+              <td class="text-end fw-bold tabular-nums">${escapeHtml(val)}${pct}</td>
             </tr>`;
   });
   tbody.innerHTML = html;
@@ -9707,7 +10486,7 @@ function renderTableMeteranRusak(items) {
   tbody.innerHTML = '';
 
   if (!globalMeteranRusakData || globalMeteranRusakData.length === 0) {
-    tbody.innerHTML = '<tr><td class="text-center text-success small py-3">Semua Meteran Normal</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="2" class="text-center text-success small py-3">Semua Meteran Normal</td></tr>';
     return;
   }
 
@@ -9715,9 +10494,21 @@ function renderTableMeteranRusak(items) {
   const top5Data = globalMeteranRusakData.slice(0, 5);
   top5Data.forEach(item => {
     const unit = item.unit || item.kodeUnit || '-';
-    // Menambahkan text-white fw-bold agar tampil sama elegan seperti Top Unit 
-    tbody.innerHTML += `<tr><td class="fw-bold text-white">${escapeHtml(unit)}</td></tr>`;
+    // [Fase 16] keterangan singkat (lengkapnya di tooltip & pop-up)
+    const singkat = item.kondisiSingkat || item.kondisi || 'Cek meter';
+    tbody.innerHTML += `<tr><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end dash-cell-note" title="${escapeHtml(item.kondisi || singkat)}">${escapeHtml(singkat)}</td></tr>`;
   });
+}
+
+// [Fase 16] Label & warna jenis temuan Cek Meteran
+function cekMeterTag(jenis) {
+  switch (String(jenis || '').toUpperCase()) {
+    case 'TANPA_ANGKA': return { label: 'Tanpa angka', cls: 'bg-warning' };
+    case 'LONJAKAN':    return { label: 'Lonjakan', cls: 'bg-danger' };
+    case 'MUNDUR':      return { label: 'Mundur', cls: 'bg-danger' };
+    case 'DEVIASI':     return { label: 'Deviasi ekstrem', cls: 'bg-info' };
+    default:            return { label: 'Cek meter', cls: 'bg-warning' };
+  }
 }
 
 function openModalMeteranRusak() {
@@ -9745,10 +10536,11 @@ function renderModalTableMeteranRusak(dataList) {
   dataList.forEach((item, idx) => {
     const unit = item.unit || item.kodeUnit || '-';
     const kondisi = item.kondisi || 'METERAN RUSAK / 0';
+    const tag = cekMeterTag(item.jenis);
     html += `<tr>
               <td>${idx + 1}</td>
               <td class="fw-bold text-warning">${escapeHtml(unit)}</td>
-              <td><span class="badge bg-danger">${escapeHtml(kondisi)}</span></td>
+              <td><span class="badge ${tag.cls}">${escapeHtml(tag.label)}</span><span class="dash-cell-sub">${escapeHtml(kondisi)}</span></td>
             </tr>`;
   });
   tbody.innerHTML = html;
@@ -9763,32 +10555,63 @@ function filterModalMeteranRusak() {
   renderModalTableMeteranRusak(filtered);
 }
 
-function updateCharts(labels, masukData, keluarData, alatBeratData, dumptruckData, pieLabels, pieData) {
+/* [Fase 20b] Supplier vs Site = stok TANGKI UTAMA (seluruh site).
+   Garis kuning = stok awal periode + total BBM masuk; garis hijau = total BBM keluar.
+   Jarak kedua garis = sisa BBM di tangki. Data server per titik → dijumlah berjalan di klien. */
+let supplyRawData = { masuk: [], keluar: [], stokAwal: 0 };
+let supplySiteData = null; // diisi renderDashboardUI dari server (supplyStokAwal, chartMasukSite, chartKeluarSite)
+function v7Cumulative(arr, start) {
+  let s = Number(start) || 0;
+  return (arr || []).map(v => (s += Number(v) || 0));
+}
+function v7UpdateSupplyStats() {
+  const sum = (a) => (a || []).reduce((x, v) => x + (Number(v) || 0), 0);
+  const awal = supplyRawData.stokAwal;
+  const masuk = sum(supplyRawData.masuk), keluar = sum(supplyRawData.keluar);
+  const akhir = awal + masuk - keluar, beda = akhir - awal;
+  const fmt = (n) => Math.round(n).toLocaleString('id-ID') + ' L';
+  const set = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el && el.textContent !== txt) animateCountUp(el, txt);
+  };
+  set('supplyStatAwal', fmt(awal));
+  set('supplyStatMasuk', fmt(masuk));
+  set('supplyStatKeluar', fmt(keluar));
+  set('supplyStatAkhir', fmt(akhir));
+  const sel = document.getElementById('supplyStatSelisih');
+  if (sel) {
+    // Pembanding terhadap Stok Awal (bukan angka tambahan): Stok Akhir sudah final
+    sel.textContent = beda > 0 ? `▲ ${fmt(beda)}` : (beda < 0 ? `▼ ${fmt(-beda)}` : 'Tidak berubah');
+    sel.title = 'Selisih terhadap Stok Awal periode ini. Angka Stok Akhir di atas sudah mencakup selisih tersebut.';
+    sel.classList.toggle('is-up', beda > 0);
+    sel.classList.toggle('is-down', beda < 0);
+  }
+}
+
+function updateCharts(labels, masukData, keluarData, alatBeratData, dumptruckData, pieLabels, pieData, lvSupportData) {
   if (supplyChart && labels) {
+    // Seri seluruh site + stok awal dari server; bila belum ada (server lama) → seri filter, mulai 0
+    const site = supplySiteData && Array.isArray(supplySiteData.masuk) && supplySiteData.masuk.length === labels.length ? supplySiteData : null;
+    const m = site ? site.masuk : masukData;
+    const k = site ? site.keluar : keluarData;
+    const awal = site ? (Number(site.stokAwal) || 0) : 0;
     supplyChart.data.labels = labels;
-    if (masukData) supplyChart.data.datasets[0].data = masukData;
-    if (keluarData) supplyChart.data.datasets[1].data = keluarData;
+    if (m) { supplyRawData.masuk = m.slice(); supplyChart.data.datasets[0].data = v7Cumulative(m, awal); }
+    if (k) { supplyRawData.keluar = k.slice(); supplyChart.data.datasets[1].data = v7Cumulative(k, 0); }
+    supplyRawData.stokAwal = awal;
     supplyChart.update();
+    v7UpdateSupplyStats();
   }
   if (trendChart && labels) {
     trendChart.data.labels = labels;
-    
-    if (Array.isArray(dumptruckData) && dumptruckData.length > 0) {
-      trendChart.data.datasets[0].data = dumptruckData;
-    } else if (Array.isArray(keluarData) && keluarData.length > 0) {
-      trendChart.data.datasets[0].data = keluarData.map(v => Math.round(v * 0.35));
-    }
-
-    if (Array.isArray(alatBeratData) && alatBeratData.length > 0) {
-      trendChart.data.datasets[1].data = alatBeratData;
-    } else if (Array.isArray(keluarData) && keluarData.length > 0) {
-      trendChart.data.datasets[1].data = keluarData.map(v => Math.round(v * 0.65));
-    }
-
-    if (Array.isArray(keluarData) && keluarData.length > 0) {
-      trendChart.data.datasets[2].data = keluarData;
-    }
-
+    // [Fase 21] Hanya data asli dari server. Dulu bila rincian kosong, klien MENGARANG
+    // Dumptruck = 35% / Alat Berat = 65% dari total → dihapus; rincian kosong = seri kosong.
+    const asli = (a) => (Array.isArray(a) && a.length === labels.length) ? a : [];
+    const ds = trendChart.data.datasets;
+    ds[0].data = asli(dumptruckData);
+    ds[1].data = asli(alatBeratData);
+    ds[2].data = asli(keluarData);
+    if (ds[3]) ds[3].data = asli(lvSupportData);
     trendChart.update();
   }
   if (pieChart) {
@@ -9940,6 +10763,8 @@ function v7TooltipStyle(t) {
     usePointStyle: true,
     titleFont: { size: 12, weight: '700', family: t.fontFamily },
     bodyFont: { size: 12, weight: '600', family: t.fontFamily },
+    // [Fase 21] tooltip muncul cepat — sebelumnya ikut durasi animasi grafik 900 ms sehingga tampak pudar
+    animation: { duration: 120 },
     callbacks: {
       label: function (ctx) {
         const raw = (ctx.parsed && typeof ctx.parsed === 'object') ? ctx.parsed.y : ctx.parsed;
@@ -9998,6 +10823,8 @@ function v7LineDataset(t, color, opt) {
     borderWidth: opt.width || 2,
     borderDash: opt.dash || [],
     tension: 0.42,
+    // [Fase 21] lengkung 'monotone': tetap halus tapi TIDAK melewati nilai titik (tanpa puncak/lembah palsu)
+    cubicInterpolationMode: 'monotone',
     pointRadius: 0,
     pointHitRadius: 12,
     pointHoverRadius: 5,
@@ -10098,10 +10925,20 @@ const v7TrendStatsPlugin = {
     };
     if (!vals.length) return;
     const total = vals.reduce((a, b) => a + b, 0);
+    const peak = Math.max.apply(null, vals), low = Math.min.apply(null, vals);
     set('trendStatTotal', total);
     set('trendStatAvg', total / vals.length);
-    set('trendStatPeak', Math.max.apply(null, vals));
-    set('trendStatLow', Math.min.apply(null, vals));
+    set('trendStatPeak', peak);
+    set('trendStatLow', low);
+    // [Fase 21] kapan puncak/terendah terjadi + satuan rata-rata mengikuti granularitas filter
+    const labels = chart.data.labels || [];
+    const when = (v) => labels[ds.data.map(Number).indexOf(v)] || '';
+    const txt = (id, s) => { const el = document.getElementById(id); if (el) el.textContent = s; };
+    txt('trendStatPeakDate', when(peak));
+    txt('trendStatLowDate', when(low));
+    const per = { daily: 'hari', weekly: 'minggu', monthly: 'bulan', yearly: 'tahun' };
+    const g = (typeof CURRENT_GRANULARITY !== 'undefined' && per[String(CURRENT_GRANULARITY).toLowerCase()]) || 'titik';
+    txt('trendStatAvgLabel', 'Rata-rata / ' + g);
   }
 };
 
@@ -10122,24 +10959,60 @@ function applyV7ChartTheme() {
   const t = getThemeTokens();
 
   if (trendChart) {
-    // Video V7: satu area hijau tebal + garis pembanding putus-putus tipis
+    // [Fase 21b] Total Site = area hijau halus (di belakang); Alat Berat / Dump Truck / LV-Support =
+    // garis tipis tanpa isi, masing-masing dari 0 (bukan bertumpuk — di mode gelap terlalu berat).
+    // Warna sama dengan titik di tombol seri (.series-dot--*).
     const ds = trendChart.data.datasets;
     const hidden = ds.map(d => !!d.hidden);
-    if (ds[0]) Object.assign(ds[0], v7LineDataset(t, withAlpha(t.toneBlue, 0.75), { width: 1.5, dash: [4, 4] }));
-    if (ds[1]) Object.assign(ds[1], v7LineDataset(t, t.toneRose, { width: 1.5, dash: [5, 4] }));
-    if (ds[2]) Object.assign(ds[2], v7LineDataset(t, t.toneGreen, { fill: true, alpha: 0.42, width: 2.5 }));
+    const garis = (color) => Object.assign(v7LineDataset(t, color, { width: 1.8 }), { order: 0 });
+    if (ds[0]) Object.assign(ds[0], garis(t.toneBlue));
+    if (ds[1]) Object.assign(ds[1], garis(t.toneAmber));
+    if (ds[3]) Object.assign(ds[3], garis(t.toneRose));
+    if (ds[2]) Object.assign(ds[2], v7LineDataset(t, t.toneGreen, { fill: true, alpha: 0.42, width: 2.5 }), { order: 1 });
     ds.forEach((d, i) => { d.hidden = hidden[i]; });
     const opt = v7CartesianOptions(t);
     opt.plugins.legend = { display: false };
+    // Tooltip: Total Site dulu, lalu tiap kelompok + porsinya terhadap total hari itu
+    const urutan = { 2: 0, 1: 1, 0: 2, 3: 3 };
+    opt.plugins.tooltip.itemSort = (a, b) => (urutan[a.datasetIndex] ?? 9) - (urutan[b.datasetIndex] ?? 9);
+    opt.plugins.tooltip.callbacks.label = function (ctx) {
+      const v = Number(ctx.parsed.y || 0);
+      const nama = ctx.dataset.label || '';
+      let porsi = '';
+      if (ctx.datasetIndex !== 2) {
+        const total = Number((ds[2].data || [])[ctx.dataIndex]) || 0;
+        if (total > 0) porsi = ` (${Math.round(v / total * 100)}%)`;
+      }
+      return ` ${nama}: ${v.toLocaleString('id-ID')} L${porsi}`;
+    };
     trendChart.options = opt;
     trendChart.update('none');
   }
 
   if (supplyChart) {
+    // [Fase 20] Masuk = tangga (naik tegak di hari kiriman), Keluar = area naik bertahap
     const ds = supplyChart.data.datasets;
-    if (ds[0]) Object.assign(ds[0], v7LineDataset(t, t.toneAmber, { width: 1.8, dash: [6, 4] }));
-    if (ds[1]) Object.assign(ds[1], v7LineDataset(t, t.toneGreen, { fill: true, alpha: 0.36, width: 2.5 }));
-    supplyChart.options = v7CartesianOptions(t);
+    // Kuning = stok awal + masuk (tangga, naik tegak TEPAT di hari kiriman — 'before' di Chart.js);
+    // pita di antara kuning & hijau = isi tangki. Hijau = total pemakaian.
+    if (ds[0]) Object.assign(ds[0], v7LineDataset(t, t.toneAmber, { width: 2.2 }),
+      { tension: 0, stepped: 'before', fill: '+1', backgroundColor: withAlpha(t.toneAmber, 0.13) });
+    if (ds[1]) Object.assign(ds[1], v7LineDataset(t, t.toneGreen, { width: 2.5 }), { tension: 0.25 });
+    const opt = v7CartesianOptions(t);
+    opt.plugins.tooltip.callbacks.label = function (ctx) {
+      const raw = ctx.datasetIndex === 0 ? supplyRawData.masuk : supplyRawData.keluar;
+      const titik = Number((raw || [])[ctx.dataIndex]) || 0;
+      const nama = ctx.datasetIndex === 0 ? 'Masuk' : 'Keluar';
+      const ket = ctx.datasetIndex === 0 ? 'stok awal + masuk' : 'total keluar';
+      return ` ${nama} hari ini: ${titik.toLocaleString('id-ID')} L · ${ket} ${Number(ctx.parsed.y || 0).toLocaleString('id-ID')} L`;
+    };
+    opt.plugins.tooltip.callbacks.footer = function (items) {
+      const it = items && items[0];
+      if (!it) return '';
+      const d = supplyChart.data.datasets;
+      const sisa = (Number(d[0].data[it.dataIndex]) || 0) - (Number(d[1].data[it.dataIndex]) || 0);
+      return `Sisa di tangki: ${sisa.toLocaleString('id-ID')} L`;
+    };
+    supplyChart.options = opt;
     supplyChart.update('none');
   }
 
@@ -10183,7 +11056,7 @@ function initCharts() {
 
   const restore = (p, i) => (p && p.data[i]) ? p.data[i] : [];
 
-  // 1. SUPPLIER SUPPLY VS SITE CONSUMPTION (spline halus)
+  // 1. SUPPLIER SUPPLY VS SITE CONSUMPTION (kumulatif — data tersimpan sudah kumulatif)
   const ctx1 = document.getElementById('supplyVsConsCanvas');
   if (ctx1) {
     supplyChart = new Chart(ctx1.getContext('2d'), {
@@ -10191,8 +11064,8 @@ function initCharts() {
       data: {
         labels: prev.supply ? prev.supply.labels : [],
         datasets: [
-          { label: 'BBM Masuk (Supplier)', data: restore(prev.supply, 0) },
-          { label: 'BBM Keluar (Site Cons)', data: restore(prev.supply, 1) }
+          { label: 'Stok Awal + BBM Masuk', data: restore(prev.supply, 0) },
+          { label: 'BBM Keluar (Pemakaian)', data: restore(prev.supply, 1) }
         ]
       },
       plugins: [v7RevealPlugin],
@@ -10208,9 +11081,10 @@ function initCharts() {
       data: {
         labels: prev.trend ? prev.trend.labels : [],
         datasets: [
-          { label: 'Unit Dumptruck - Support', data: restore(prev.trend, 0) },
-          { label: 'Unit Alat Berat', data: restore(prev.trend, 1) },
-          { label: 'Konsumsi BBM Site', data: restore(prev.trend, 2) }
+          { label: 'Dump Truck', data: restore(prev.trend, 0) },
+          { label: 'Alat Berat', data: restore(prev.trend, 1) },
+          { label: 'Total Site', data: restore(prev.trend, 2) },
+          { label: 'LV / Support', data: restore(prev.trend, 3) }
         ]
       },
       plugins: [v7RevealPlugin, v7TrendStatsPlugin],
@@ -10591,10 +11465,11 @@ function initDashMap() {
   if (!el) return null;
   DASH_MAP = L.map(el, { zoomControl: true, attributionControl: true, scrollWheelZoom: false, worldCopyJump: true })
     .setView([-0.5, 117.15], 5); // tampilan awal Indonesia tengah; disesuaikan ke titik setelah data masuk
-  const satelit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  // "\/\/" = "//" — ditulis begitu agar tidak terpotong pembersih komentar Apps Script (lihat audit-gas-strip.mjs)
+  const satelit = L.tileLayer('https:\/\/server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19, attribution: 'Citra &copy; Esri'
   });
-  const jalan = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const jalan = L.tileLayer('https:\/\/tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19, attribution: '&copy; OpenStreetMap'
   });
   satelit.addTo(DASH_MAP);
