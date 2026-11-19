@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=f122f4785c"></script>
-    <script src="./pages-offline-ui.js?v=f122f4785c" defer></script>
-    <script src="./pages-install.js?v=f122f4785c" defer></script>
+    <script src="./gas-adapter.js?v=9cda0edc80"></script>
+    <script src="./pages-offline-ui.js?v=9cda0edc80" defer></script>
+    <script src="./pages-install.js?v=9cda0edc80" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -10507,6 +10507,7 @@ function cekMeterTag(jenis) {
     case 'LONJAKAN':    return { label: 'Lonjakan', cls: 'bg-danger' };
     case 'MUNDUR':      return { label: 'Mundur', cls: 'bg-danger' };
     case 'DEVIASI':     return { label: 'Deviasi ekstrem', cls: 'bg-info' };
+    case 'SATUAN':      return { label: 'Cek satuan', cls: 'bg-warning' }; // [Fase 22] HM yang ternyata odometer
     default:            return { label: 'Cek meter', cls: 'bg-warning' };
   }
 }
