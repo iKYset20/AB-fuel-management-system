@@ -45,7 +45,8 @@
         getMasterQRData:        { auth: true,  latest: false },
         getLastOperatorByUnit:  { auth: true,  latest: false },
         getMasterQRFullList:    { auth: true,  latest: true },
-        getMasterLokasiMap:     { auth: true,  latest: true }   // Fase 12: titik peta Dashboard
+        getMasterLokasiMap:     { auth: true,  latest: true },  // Fase 12: titik peta Dashboard
+        getUnitCodeList:        { auth: true,  latest: true }   // Fase 27: pengaman kode unit tetap jalan saat offline
     };
     /* Selain fungsi baca, fungsi ini aman diulang sekali saat jaringan baru pulih:
        handleIdempotentSync menolak transaction_id ganda di server; sisanya hanya memperbarui sesi/kehadiran. */

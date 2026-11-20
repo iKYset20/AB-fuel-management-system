@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=9cda0edc80"></script>
-    <script src="./pages-offline-ui.js?v=9cda0edc80" defer></script>
-    <script src="./pages-install.js?v=9cda0edc80" defer></script>
+    <script src="./gas-adapter.js?v=bf9b8efd11"></script>
+    <script src="./pages-offline-ui.js?v=bf9b8efd11" defer></script>
+    <script src="./pages-install.js?v=bf9b8efd11" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -2371,8 +2371,34 @@
     }
     .profil-stat-icon--ok { background: var(--status-success-bg); color: var(--status-success); }
     .profil-stat-icon--warn { background: var(--status-warning-bg); color: var(--status-warning); }
-    .profil-stat-label { display: block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text-muted); }
-    .profil-stat-value { display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profil-stat-label { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text-muted); }
+    .profil-stat-value { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* [Fase 28] Profil lebih rapi: tombol simpan foto kecil di kanan, kartu Keluar, aksi user berlabel */
+    .profil-avatar-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .profil-avatar-actions .field-hint { margin: 0; transition: color 0.2s ease; }
+    .profil-avatar-actions .field-hint.is-pending { color: var(--status-warning); font-weight: 600; }
+    .profil-avatar-actions .btn:disabled { opacity: 0.45; }
+    .profil-card-icon--warn { background: var(--status-error-bg) !important; color: var(--status-error) !important; }
+    .profil-logout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .profil-logout-grid .btn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 38px; display: inline-flex; align-items: center; justify-content: center; }
+    @media (min-width: 992px) and (max-width: 1199.98px) { .profil-logout-grid { grid-template-columns: 1fr; } }
+    .profil-logout-grid .btn-ghost-danger { border-color: color-mix(in srgb, var(--status-error) 35%, transparent) !important; }
+    .profil-logout-grid + .profil-note { margin-top: 12px; }
+    .icon-action-label { display: none; }
+    @media (min-width: 992px) {
+        .icon-action--labeled { width: auto; padding: 0 12px; gap: 6px; border-radius: var(--radius-pill); font-weight: 600; }
+        .icon-action--labeled .icon-action-label { display: inline; font-size: 0.72rem; }
+    }
+    @media (max-width: 575.98px) {
+        .profil-logout-grid { grid-template-columns: 1fr; }
+    }
+    /* HP/tablet (satu kolom): urutan Foto → Kata Sandi → Sesi → Keluar (kartu Keluar paling bawah) */
+    @media (max-width: 991.98px) {
+        .profil-main-row { flex-direction: column; flex-wrap: nowrap; gap: 1rem; margin: 0; }
+        .profil-main-row > .profil-col { display: contents !important; } /* menimpa .d-flex (Bootstrap !important) */
+        .profil-main-row .profil-card--keluar { order: 9; }
+    }
 
     /* Banner wajib ganti kata sandi */
     .profil-banner {
@@ -3259,6 +3285,47 @@
     /* Master Unit: teks standar di bawah Kode Tipe & chip status */
     .unit-std-hint { display: block; margin-top: 4px; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); line-height: 1.3; }
     .unit-std-hint.is-warn { color: var(--status-warning); }
+    /* [Fase 24] Serial No: monospace kecil agar nomor rangka mudah dibaca & dicocokkan */
+    .unit-serial { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; letter-spacing: 0.02em; white-space: nowrap; color: var(--text-muted); }
+    /* [Fase 26] No Lambung · Keterangan di bawah kode unit; masa berlaku STNK di bawah status */
+    .unit-ket { font-weight: 500; max-width: 220px; margin-inline: auto; white-space: normal; }
+    .unit-stnk { white-space: nowrap; }
+
+    /* [Fase 27c] Kartu Stok: kotak ketik unit + daftar per jenis */
+    .ks-unit-combo { position: relative; }
+    .ks-unit-combo .form-control { padding-left: 34px; padding-right: 32px; }
+    .ks-unit-combo-icon, .ks-unit-combo-caret {
+        position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none;
+        font-size: 0.72rem; color: var(--text-muted); z-index: 2;
+    }
+    .ks-unit-combo-icon { left: 14px; }
+    .ks-unit-combo-caret { right: 14px; transition: transform var(--dur-lift, 0.2s) ease; }
+    .ks-unit-combo:has(.ks-unit-list:not(.d-none)) .ks-unit-combo-caret { transform: translateY(-50%) rotate(180deg); }
+    /* kartu filter di atas kartu KPI saat daftar terbuka (backdrop-filter membuat konteks tumpukan sendiri) */
+    .v7-filter-card:has(.ks-unit-list:not(.d-none)) { position: relative; z-index: 40; }
+    .ks-unit-list {
+        position: absolute; top: calc(100% + 6px); left: 0; right: 0; min-width: 220px; z-index: 50;
+        max-height: min(340px, 55vh); overflow-y: auto; overscroll-behavior: contain;
+        background: var(--modal-solid); border: 1px solid var(--border-glass); border-radius: 14px;
+        box-shadow: var(--shadow-card); padding: 6px;
+        animation: v7FadeIn 0.14s ease-out;
+    }
+    .ks-unit-group {
+        position: sticky; top: -6px; background: var(--modal-solid);
+        font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--text-muted); padding: 8px 10px 4px;
+    }
+    .ks-unit-opt {
+        display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px; cursor: pointer;
+        font-weight: 600; font-size: 0.82rem; color: var(--text-primary); font-variant-numeric: tabular-nums;
+    }
+    .ks-unit-opt:hover, .ks-unit-opt.is-active { background: color-mix(in srgb, var(--brand-primary) 16%, transparent); }
+    .ks-unit-opt.is-selected { color: var(--brand-primary); }
+    .ks-unit-status { font-size: 0.66rem; font-weight: 700; color: var(--status-warning); }
+    .ks-unit-jenis { margin-left: auto; font-size: 0.66rem; font-weight: 500; color: var(--text-muted); }
+    .ks-unit-empty { padding: 10px; font-size: 0.78rem; color: var(--text-muted); }
+    .unit-stnk.is-soon { color: var(--status-warning); font-weight: 600; }
+    .unit-stnk.is-expired { color: var(--status-error); font-weight: 700; }
     .unit-status { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 0.66rem; font-weight: 700; background: var(--bg-inset); color: var(--text-secondary); }
     .unit-status--active { background: var(--status-success-bg); color: var(--status-success); }
     .unit-status--breakdown { background: var(--status-error-bg); color: var(--status-error); }
@@ -3288,7 +3355,8 @@
     @keyframes dashMapSpin { to { transform: rotate(360deg); } }
 
     /* Avatar ilustrasi: grid rapi */
-    .preset-avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 10px; }
+    /* [Fase 28] 10 pilihan = 5 per baris × 2 baris (tanpa avatar sendirian di baris kedua) */
+    .preset-avatar-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 72px)); justify-content: space-between; gap: 12px 10px; }
     .preset-avatar-grid .preset-avatar-item { width: 100%; height: auto; aspect-ratio: 1; }
 
     /* =========================================================================
@@ -4156,10 +4224,19 @@
         </div>
         <div class="row g-2 align-items-end">
             <div class="col-md-4">
-                <label class="field-label" for="selectKartuStokUnit">
-                    <i class="fa fa-truck me-1"></i>PILIH UNIT (ALAT BERAT / DT)
+                <label class="field-label" for="kartuStokUnitSearch">
+                    <i class="fa fa-truck me-1"></i>PILIH UNIT
                 </label>
-                <select id="selectKartuStokUnit" class="form-select form-select-sm form-pill fw-bold" onchange="applyKartuStokFilter()">
+                <!-- [Fase 27c] kotak ketik + daftar per jenis (ketik "86" → E 861, E 866 …; Enter = pilih).
+                     <select> asli tetap memegang nilai & onchange (disembunyikan). -->
+                <div class="ks-unit-combo" id="kartuStokUnitCombo">
+                    <i class="fa fa-search ks-unit-combo-icon" aria-hidden="true"></i>
+                    <input type="text" id="kartuStokUnitSearch" class="form-control form-control-sm form-pill fw-bold" placeholder="Ketik / pilih kode unit" autocomplete="off" spellcheck="false"
+                        role="combobox" aria-expanded="false" aria-controls="kartuStokUnitList" aria-autocomplete="list">
+                    <i class="fa fa-chevron-down ks-unit-combo-caret" aria-hidden="true"></i>
+                    <div id="kartuStokUnitList" class="ks-unit-list d-none" role="listbox"></div>
+                </div>
+                <select id="selectKartuStokUnit" class="form-select form-select-sm form-pill fw-bold d-none" onchange="applyKartuStokFilter()" aria-hidden="true" tabindex="-1">
                     <option value="">Memuat Daftar Unit...</option>
                 </select>
             </div>
@@ -4300,6 +4377,116 @@
         loadKartuStokData();
     }
 
+    /* [Fase 27c] Kotak ketik unit Kartu Stok: daftar per jenis + saring saat mengetik.
+       Pencocokan longgar sama dengan pengaman kode unit ("86" → E 861/E 866; "d9" → D 09). */
+    let KS_UNITS = [];      // [{ kode, status, jenis }]
+    let KS_SHOWN = [];      // hasil saring yang tampil
+    let KS_ACTIVE = -1;     // indeks sorotan (panah atas/bawah)
+    const KS_LABEL = { 'TONLY': 'Tonly (HDT)', 'LV': 'LV', '': 'Lainnya (Jenis belum diisi)' };
+    const ksKey = (v) => (typeof unitLooseKey === 'function' ? unitLooseKey(v)
+        : String(v == null ? '' : v).toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/([A-Z])0+(\d)/g, '$1$2'));
+    const ksJenisLabel = (j) => KS_LABEL[j] !== undefined ? KS_LABEL[j] : j.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
+    function ksSetUnits(data) {
+        KS_UNITS = [];
+        if (Array.isArray(data.unitGroups) && data.unitGroups.length) {
+            data.unitGroups.forEach(g => g.units.forEach(u => KS_UNITS.push({ kode: u.kode, status: u.status || '', jenis: g.jenis || '' })));
+        } else if (Array.isArray(data.unitList)) {
+            data.unitList.forEach(k => KS_UNITS.push({ kode: k, status: '', jenis: '' }));
+        }
+        const inp = document.getElementById('kartuStokUnitSearch');
+        if (inp && document.activeElement !== inp) inp.value = data.selectedUnit || '';
+    }
+
+    function ksRenderList(q) {
+        const box = document.getElementById('kartuStokUnitList');
+        if (!box) return;
+        const qk = ksKey(q), qu = String(q || '').trim().toUpperCase();
+        KS_SHOWN = !qk ? KS_UNITS.slice() : KS_UNITS.filter(u => ksKey(u.kode).includes(qk) || u.kode.toUpperCase().includes(qu))
+            .sort((a, b) => (ksKey(b.kode).startsWith(qk) ? 1 : 0) - (ksKey(a.kode).startsWith(qk) ? 1 : 0));
+        if (qk && KS_SHOWN.length) KS_ACTIVE = Math.max(0, Math.min(KS_ACTIVE, KS_SHOWN.length - 1)); else if (!qk) KS_ACTIVE = -1;
+        const cur = document.getElementById('selectKartuStokUnit').value;
+        if (!KS_SHOWN.length) { box.innerHTML = `<div class="ks-unit-empty">Unit "${escapeHtml(q)}" tidak ditemukan</div>`; return; }
+        let html = '', lastJ = null;
+        KS_SHOWN.forEach((u, i) => {
+            if (!qk && u.jenis !== lastJ) { lastJ = u.jenis; html += `<div class="ks-unit-group">${escapeHtml(ksJenisLabel(u.jenis))}</div>`; }
+            const st = u.status && u.status.toLowerCase() !== 'active' ? `<span class="ks-unit-status">${escapeHtml(u.status)}</span>` : '';
+            const sub = qk ? `<span class="ks-unit-jenis">${escapeHtml(ksJenisLabel(u.jenis))}</span>` : '';
+            html += `<div class="ks-unit-opt${i === KS_ACTIVE ? ' is-active' : ''}${u.kode === cur ? ' is-selected' : ''}" role="option" data-i="${i}">${escapeHtml(u.kode)}${st}${sub}</div>`;
+        });
+        box.innerHTML = html;
+        const act = box.querySelector('.ks-unit-opt.is-active') || (!qk && box.querySelector('.ks-unit-opt.is-selected'));
+        if (act) act.scrollIntoView({ block: 'nearest' });
+    }
+
+    function ksOpen() {
+        const box = document.getElementById('kartuStokUnitList');
+        const inp = document.getElementById('kartuStokUnitSearch');
+        if (!box || !inp) return;
+        box.classList.remove('d-none');
+        inp.setAttribute('aria-expanded', 'true');
+        ksRenderList('');
+    }
+
+    function ksClose() {
+        const box = document.getElementById('kartuStokUnitList');
+        const inp = document.getElementById('kartuStokUnitSearch');
+        if (box) box.classList.add('d-none');
+        if (inp) { inp.setAttribute('aria-expanded', 'false'); inp.value = document.getElementById('selectKartuStokUnit').value || inp.value; }
+        KS_ACTIVE = -1;
+    }
+
+    function ksPick(kode) {
+        const sel = document.getElementById('selectKartuStokUnit');
+        const inp = document.getElementById('kartuStokUnitSearch');
+        if (!sel || !kode) return;
+        if (inp) inp.value = kode;
+        const changed = sel.value !== kode;
+        sel.value = kode;
+        ksClose();
+        if (changed) sel.dispatchEvent(new Event('change')); // memicu onchange="applyKartuStokFilter()"
+    }
+
+    (function initKsUnitCombo() {
+        const inp = document.getElementById('kartuStokUnitSearch');
+        const box = document.getElementById('kartuStokUnitList');
+        if (!inp || !box) return;
+        inp.addEventListener('focus', function() { inp.select(); ksOpen(); });
+        inp.addEventListener('click', function() { if (box.classList.contains('d-none')) ksOpen(); });
+        inp.addEventListener('input', function() { KS_ACTIVE = 0; box.classList.remove('d-none'); ksRenderList(inp.value); });
+        inp.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (box.classList.contains('d-none')) ksOpen();
+                const n = KS_SHOWN.length;
+                if (!n) return;
+                KS_ACTIVE = e.key === 'ArrowDown' ? (KS_ACTIVE + 1) % n : (KS_ACTIVE <= 0 ? n - 1 : KS_ACTIVE - 1);
+                ksRenderList(inp.value === document.getElementById('selectKartuStokUnit').value ? '' : inp.value);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const exact = KS_UNITS.find(u => ksKey(u.kode) === ksKey(inp.value));
+                const pick = KS_SHOWN[KS_ACTIVE] || exact || (KS_SHOWN.length === 1 ? KS_SHOWN[0] : null);
+                if (pick) { ksPick(pick.kode); inp.blur(); }
+            } else if (e.key === 'Escape') {
+                ksClose(); inp.blur();
+            }
+        });
+        inp.addEventListener('blur', function() {
+            setTimeout(function() {
+                if (box.classList.contains('d-none')) return;
+                const exact = KS_UNITS.find(u => ksKey(u.kode) === ksKey(inp.value));
+                if (exact && exact.kode !== document.getElementById('selectKartuStokUnit').value) ksPick(exact.kode);
+                else ksClose();
+            }, 150);
+        });
+        // mousedown (bukan click) agar terpilih sebelum kotak kehilangan fokus
+        box.addEventListener('mousedown', function(e) {
+            const opt = e.target.closest('.ks-unit-opt');
+            e.preventDefault();
+            if (opt) ksPick(KS_SHOWN[Number(opt.dataset.i)].kode);
+        });
+    })();
+
     function resetKartuStokFilter() {
         initKartuStokDates();
         loadKartuStokData(true);
@@ -4339,14 +4526,25 @@
 
         // 1. Populate Dropdown Unit
         const selectUnit = document.getElementById('selectKartuStokUnit');
-        if (selectUnit && data.unitList) {
+        if (selectUnit && (data.unitGroups || data.unitList)) {
             const currentVal = data.selectedUnit;
+            const opt = (kode, status) => {
+                const st = status && status.toLowerCase() !== 'active' ? ` · ${status}` : '';
+                return `<option value="${escapeHtml(kode)}" ${kode === currentVal ? 'selected' : ''}>${escapeHtml(kode + st)}</option>`;
+            };
             let html = '';
-            data.unitList.forEach(u => {
-                const selected = (u === currentVal) ? 'selected' : '';
-                html += `<option value="${escapeHtml(u)}" ${selected}>${escapeHtml(u)}</option>`;
-            });
+            if (Array.isArray(data.unitGroups) && data.unitGroups.length) {
+                // [Fase 27b] dikelompokkan per Jenis Unit (urut seperti Master Unit), nomor urut alami
+                const label = { 'TONLY': 'Tonly (HDT)', 'LV': 'LV', '': 'Lainnya (Jenis belum diisi)' };
+                data.unitGroups.forEach(g => {
+                    const name = label[g.jenis] !== undefined ? label[g.jenis] : g.jenis.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+                    html += `<optgroup label="${escapeHtml(name + ' (' + g.units.length + ')')}">` + g.units.map(u => opt(u.kode, u.status)).join('') + '</optgroup>';
+                });
+            } else {
+                data.unitList.forEach(u => { html += opt(u, ''); }); // cache lama (offline) tanpa kelompok
+            }
             selectUnit.innerHTML = html;
+            ksSetUnits(data); // [Fase 27c] kotak ketik
         }
 
         // 2. Update 4 Kartu KPI
@@ -5252,7 +5450,9 @@
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="adminNoUnit">KODE UNIT</label>
-          <input type="text" id="adminNoUnit" class="form-control form-control-sm text-uppercase" placeholder="EX: E 861">
+          <input type="text" id="adminNoUnit" class="form-control form-control-sm text-uppercase" placeholder="EX: E 861" list="dlUnitCodes" autocomplete="off">
+          <!-- [Fase 27] kode unit tidak terdaftar → keterangan + Simpan ditolak -->
+          <small id="adminUnitHint" class="unit-std-hint is-warn d-none"></small>
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="adminLokasi">LOKASI PIT / SITE</label>
@@ -5431,6 +5631,38 @@
             <option value="Breakdown">Breakdown</option>
           </select>
         </div>
+        <!-- [Fase 24] Serial No (MASTER_UNIT kolom H) & Tahun Unit (kolom I) -->
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitSerialNo">SERIAL NO</label>
+          <input type="text" id="unitSerialNo" class="form-control form-control-sm text-uppercase" placeholder="Nomor rangka" maxlength="60" autocomplete="off">
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="field-label" for="unitThnUnit">TAHUN UNIT</label>
+          <input type="number" id="unitThnUnit" class="form-control form-control-sm tabular-nums" placeholder="mis. 2022" min="1950" max="2100" step="1" inputmode="numeric">
+        </div>
+        <!-- [Fase 25] khusus Dump Truck / Tonly: muncul bila Jenis Unit dipilih (MASTER_UNIT kolom J & K) -->
+        <div class="col-6 col-md-2 unit-dt-field d-none">
+          <label class="field-label" for="unitNoMesin">NO MESIN</label>
+          <input type="text" id="unitNoMesin" class="form-control form-control-sm text-uppercase" placeholder="Nomor mesin" maxlength="60" autocomplete="off">
+        </div>
+        <div class="col-6 col-md-2 unit-dt-field d-none">
+          <label class="field-label" for="unitStnk">STNK / NO KEND</label>
+          <input type="text" id="unitStnk" class="form-control form-control-sm text-uppercase" placeholder="No STNK / kendaraan" maxlength="60" autocomplete="off">
+        </div>
+        <!-- [Fase 26] kendaraan (Dump Truck / Tonly / LV / Support): No Lambung (kolom L) & masa berlaku STNK (kolom M) -->
+        <div class="col-6 col-md-2 unit-dt-field d-none">
+          <label class="field-label" for="unitExpStnk">STNK BERLAKU S/D</label>
+          <input type="date" id="unitExpStnk" class="form-control form-control-sm tabular-nums">
+        </div>
+        <div class="col-6 col-md-2 unit-dt-field d-none">
+          <label class="field-label" for="unitNoLambung">NO LAMBUNG</label>
+          <input type="text" id="unitNoLambung" class="form-control form-control-sm text-uppercase" placeholder="mis. FT-01" maxlength="60" autocomplete="off">
+        </div>
+        <!-- [Fase 26] Keterangan (kolom N) — semua unit -->
+        <div class="col-6 col-md-4">
+          <label class="field-label" for="unitKet">KETERANGAN</label>
+          <input type="text" id="unitKet" class="form-control form-control-sm" placeholder="mis. Support mekanik" maxlength="200" autocomplete="off">
+        </div>
         <div class="col-12 col-md-3 ms-auto d-flex align-items-end gap-2">
           <button onclick="resetUnitForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
           <button onclick="saveUnitForm()" id="btnSaveUnit" class="btn btn-sm btn-brand flex-grow-1 fw-bold">Simpan Unit</button>
@@ -5480,13 +5712,15 @@
               <th>Kategori</th>
               <th>Satuan Meter</th>
               <th>Status</th>
+              <th>Serial No</th>
+              <th>Thn</th>
               <th>Std Berlaku</th>
               <th class="v7-col-action">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyMasterUnit" class="text-center align-middle">
             <tr>
-              <td colspan="8" class="py-4">
+              <td colspan="10" class="py-4">
                 <div class="d-flex flex-column gap-3 w-100 px-4">
                   <div class="skeleton-box skel-text w-100"></div>
                   <div class="skeleton-box skel-text w-75 mx-auto"></div>
@@ -5622,20 +5856,26 @@
       <input type="hidden" id="karyawanRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
         <div class="col-6 col-md-2">
-          <label class="field-label" for="karyawanNik">NIK / ID KARYAWAN</label>
-          <input type="text" id="karyawanNik" class="form-control form-control-sm" placeholder="NIK-001">
+          <label class="field-label" for="karyawanNik">ID KARYAWAN</label>
+          <!-- [Fase 27] kosongkan → ID urut otomatis (ABIKN-0001 …) -->
+          <input type="text" id="karyawanNik" class="form-control form-control-sm text-uppercase" placeholder="Otomatis">
         </div>
         <div class="col-6 col-md-3">
           <label class="field-label" for="karyawanNama">NAMA LENGKAP</label>
           <input type="text" id="karyawanNama" class="form-control form-control-sm" placeholder="Nama Operator / Driver">
         </div>
+        <!-- [Fase 27] Jabatan & Departemen = dropdown (daftar dari server; sama dengan dropdown di sheet) -->
         <div class="col-6 col-md-2">
           <label class="field-label" for="karyawanJabatan">JABATAN</label>
-          <input type="text" id="karyawanJabatan" class="form-control form-control-sm" placeholder="Operator EXCA / Driver DT">
+          <select id="karyawanJabatan" class="form-select form-select-sm" onchange="onKaryawanJabatanChange()">
+            <option value="">— Pilih —</option>
+          </select>
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="karyawanDept">DEPARTEMEN</label>
-          <input type="text" id="karyawanDept" class="form-control form-control-sm" placeholder="Produksi / Mining">
+          <select id="karyawanDept" class="form-select form-select-sm">
+            <option value="">— Pilih —</option>
+          </select>
         </div>
         <div class="col-6 col-md-1">
           <label class="field-label" for="karyawanStatus">STATUS</label>
@@ -5722,7 +5962,7 @@
           <input type="text" id="dealerMerek" class="form-control form-control-sm text-uppercase" placeholder="CATERPILLAR">
         </div>
         <div class="col-6 col-md-2">
-          <label class="field-label" for="dealerKategori">KATEGORI (JENIS)</label>
+          <label class="field-label" for="dealerKategori">JENIS UNIT</label>
           <!-- [Fase 18] daftar Jenis Unit (sama dengan Master Unit) -->
           <select id="dealerKategori" class="form-select form-select-sm">
             <option value="">— Pilih —</option>
@@ -5793,7 +6033,7 @@
             <tr class="text-center">
               <th>Kode Tipe</th>
               <th>Merek / Brand</th>
-              <th>Kategori</th>
+              <th>Jenis Unit</th>
               <th>Satuan</th>
               <th>Beban Ringan</th>
               <th>Beban Sedang</th>
@@ -5926,6 +6166,11 @@
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', checkAdminMeter);
     });
+    // [Fase 27] kode unit dirapikan / ditandai saat kolom ditinggalkan
+    const elUnit = document.getElementById('adminNoUnit');
+    if (elUnit) elUnit.addEventListener('blur', function() { checkAdminUnitCode(false); });
+    const elJenis = document.getElementById('adminJenisTx');
+    if (elJenis) elJenis.addEventListener('change', function() { checkAdminUnitCode(false); });
     // [Fase 18] Acuan rata-rata dealer dihitung otomatis dari 3 beban
     ['dealerRingan', 'dealerSedang', 'dealerBerat'].forEach(function(id) {
       const el = document.getElementById(id);
@@ -6059,6 +6304,7 @@
   function loadAdminMasterTable(isBackground = false) {
     if (!isBackground) {
         showSkeleton('tbodyAdminMaster', 11);
+        if (typeof loadUnitCodeList === 'function') loadUnitCodeList(); // [Fase 27] daftar kode unit resmi
     }
     
     if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -6257,9 +6503,34 @@
     tbody.innerHTML = html;
   }
 
+  /* [Fase 27] Pengaman kode unit Database Master (hanya PENGELUARAN UNIT). Saat Edit, kode unit lama yang
+     tidak diubah tetap boleh (data lama dari unit yang sudah dihapus). → true bila boleh disimpan. */
+  let ADMIN_EDIT_ORIG_UNIT = '';
+  function checkAdminUnitCode(onSave) {
+    const el = document.getElementById('adminNoUnit');
+    const hint = document.getElementById('adminUnitHint');
+    if (!el || !hint) return true;
+    const val = el.value.trim();
+    const jenis = document.getElementById('adminJenisTx').value;
+    const tetap = ADMIN_EDIT_ORIG_UNIT && val.toUpperCase() === ADMIN_EDIT_ORIG_UNIT.toUpperCase();
+    if (jenis !== 'PENGELUARAN UNIT' || !val || tetap || typeof resolveUnitCode !== 'function') { hint.classList.add('d-none'); return true; }
+    const ru = resolveUnitCode(val);
+    if (ru.ok) {
+      if (ru.kode && ru.kode !== val) el.value = ru.kode;
+      hint.classList.add('d-none');
+      return true;
+    }
+    hint.textContent = unitUnknownText(ru);
+    hint.classList.remove('d-none');
+    if (onSave) { showToast(unitUnknownText(ru), 'error'); el.focus(); }
+    return false;
+  }
+
   function editAdminRow(rowIndex) {
     const item = ADMIN_CACHE_ROWS.find(r => r.rowIndex == rowIndex);
     if (!item) return;
+    ADMIN_EDIT_ORIG_UNIT = String(item.noUnit || '').trim(); // [Fase 27]
+    document.getElementById('adminUnitHint').classList.add('d-none');
     document.getElementById('adminRowIndex').value = item.rowIndex;
     EDIT_ROW_KEYS.admin = item.rowKey || '';
 
@@ -6289,6 +6560,8 @@
   function resetAdminForm() {
     document.getElementById('adminRowIndex').value = 0;
     EDIT_ROW_KEYS.admin = '';
+    ADMIN_EDIT_ORIG_UNIT = ''; // [Fase 27]
+    document.getElementById('adminUnitHint').classList.add('d-none');
     document.getElementById('adminJam').value = '';
     document.getElementById('adminNoUnit').value = '';
     document.getElementById('adminHmKm').value = '';
@@ -6387,6 +6660,7 @@
   }
 
   function saveAdminForm(skipMeterCheck) {
+    if (!checkAdminUnitCode(true)) return; // [Fase 27] kode unit tidak terdaftar → tidak disimpan
     if (skipMeterCheck !== true) {
       const mi = adminMeterInput();
       const sig = adminMeterSignature(mi);
@@ -6509,6 +6783,29 @@
   function onUnitJenisChange() {
     const jenis = document.getElementById('unitJenisUnit').value;
     if (jenis && UNIT_JENIS_KE_KATEGORI[jenis]) document.getElementById('unitKategori').value = UNIT_JENIS_KE_KATEGORI[jenis];
+    toggleUnitDtFields();
+  }
+
+  // [Fase 25] No Mesin & STNK hanya untuk kendaraan (Dump Truck & Tonly/HDT — sheet "Dumptruck" Daftar Alat)
+  // [Fase 26] + LV & Support (sheet "Kendaraan Kecil"): juga No Lambung & masa berlaku STNK
+  const UNIT_DT_JENIS = ['DUMP TRUCK', 'TONLY', 'LV', 'SUPPORT'];
+
+  // [Fase 26] Status masa berlaku STNK: lewat / ≤ 30 hari lagi / masih berlaku
+  function stnkExpInfo(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return null;
+    const exp = new Date(+m[1], +m[2] - 1, +m[3]);
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const days = Math.round((exp - now) / 86400000);
+    const tgl = exp.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (days < 0) return { cls: 'is-expired', text: 'STNK habis ' + tgl };
+    if (days <= 30) return { cls: 'is-soon', text: 'STNK s/d ' + tgl + ' (' + days + ' hari)' };
+    return { cls: '', text: 'STNK s/d ' + tgl };
+  }
+  function isUnitDtJenis(j) { return UNIT_DT_JENIS.indexOf(String(j || '').toUpperCase()) !== -1; }
+  function toggleUnitDtFields() {
+    const show = isUnitDtJenis(document.getElementById('unitJenisUnit').value);
+    document.querySelectorAll('.unit-dt-field').forEach(el => el.classList.toggle('d-none', !show));
   }
 
   /* [Fase 18] Kode Tipe → isi otomatis Jenis (Kategori dealer), Kategori & Satuan; standar tampil di bawahnya */
@@ -6566,7 +6863,7 @@
   }
 
   function loadMasterUnitTable() {
-    showSkeleton('tbodyMasterUnit', 8);
+    showSkeleton('tbodyMasterUnit', 10);
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(res) {
@@ -6593,7 +6890,14 @@
              (u.kategori || '').toLowerCase().includes(keyword) ||
              (u.jenisUnit || '').toLowerCase().includes(keyword) ||
              (u.status || '').toLowerCase().includes(keyword) ||
-             (u.kodeTipe || '').toLowerCase().includes(keyword);
+             (u.kodeTipe || '').toLowerCase().includes(keyword) ||
+             (u.serialNo || '').toLowerCase().includes(keyword) ||
+             (u.noMesin || '').toLowerCase().includes(keyword) ||
+             (u.stnk || '').toLowerCase().includes(keyword) ||
+             (u.noLambung || '').toLowerCase().includes(keyword) ||
+             (u.ket || '').toLowerCase().includes(keyword) ||
+             (keyword === 'stnk habis' && stnkExpInfo(u.expStnk) && stnkExpInfo(u.expStnk).cls === 'is-expired') ||
+             String(u.thnUnit || '').includes(keyword);
     });
     MASTER_PAGER.UNIT.page = 1;
     renderMasterUnitTable(filtered);
@@ -6617,7 +6921,7 @@
 
     const pageRows = masterPageRows('UNIT', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Data Unit Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Data Unit Kosong / Tidak Ditemukan</td></tr>';
       return;
     }
 
@@ -6629,12 +6933,14 @@
 
       html += `
         <tr>
-          <td class="fw-bold text-white">${escapeHtml(u.kodeUnit)}</td>
+          <td class="fw-bold text-white">${escapeHtml(u.kodeUnit)}${(u.noLambung || u.ket) ? `<span class="dash-cell-sub unit-ket">${u.noLambung ? escapeHtml(u.noLambung) : ''}${u.noLambung && u.ket ? ' · ' : ''}${u.ket ? escapeHtml(u.ket) : ''}</span>` : ''}</td>
           <td class="text-muted">${escapeHtml(u.kodeTipe || '—')}</td>
           <td>${u.jenisUnit ? escapeHtml(u.jenisUnit) : '<span class="text-muted">—</span>'}</td>
           <td>${escapeHtml(u.kategori || '—')}</td>
           <td><span class="badge badge-location">${escapeHtml(unitSatuanLabel(u.satuanMeter))}</span></td>
-          <td><span class="unit-status unit-status--${escapeHtml(String(u.status || '').toLowerCase() || 'none')}">${escapeHtml(u.status || '—')}</span></td>
+          <td><span class="unit-status unit-status--${escapeHtml(String(u.status || '').toLowerCase() || 'none')}">${escapeHtml(u.status || '—')}</span>${(() => { const s = stnkExpInfo(u.expStnk); return s ? `<span class="dash-cell-sub unit-stnk ${s.cls}">${escapeHtml(s.text)}</span>` : ''; })()}</td>
+          <td class="unit-serial">${u.serialNo ? escapeHtml(u.serialNo) : '<span class="text-muted">—</span>'}${(u.noMesin || u.stnk) ? `<span class="dash-cell-sub">${u.noMesin ? 'Mesin ' + escapeHtml(u.noMesin) : ''}${u.noMesin && u.stnk ? ' · ' : ''}${u.stnk ? 'STNK ' + escapeHtml(u.stnk) : ''}</span>` : ''}</td>
+          <td class="tabular-nums">${u.thnUnit ? escapeHtml(u.thnUnit) : '<span class="text-muted">—</span>'}</td>
           <td class="fw-bold text-brand tabular-nums">${escapeHtml(u.stdText || '—')}${u.stdNote ? `<span class="dash-cell-sub">${escapeHtml(u.stdNote)}</span>` : ''}</td>
           <td>
             <button onclick="editUnitRow(${Number(u.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
@@ -6668,6 +6974,14 @@
     // [Fase 16] samakan isi sel (mis. "Tanpa Meter", "Liter/KM") dengan pilihan dropdown
     const satUp = String(item.satuanMeter || '').toUpperCase();
     document.getElementById('unitSatuan').value = satUp.indexOf('TANPA') !== -1 ? 'TANPA METER' : (satUp.indexOf('KM') !== -1 ? 'KM' : 'HM');
+    document.getElementById('unitSerialNo').value = item.serialNo || '';
+    document.getElementById('unitThnUnit').value = item.thnUnit || '';
+    document.getElementById('unitNoMesin').value = item.noMesin || '';
+    document.getElementById('unitStnk').value = item.stnk || '';
+    document.getElementById('unitNoLambung').value = item.noLambung || '';
+    document.getElementById('unitExpStnk').value = item.expStnk || '';
+    document.getElementById('unitKet').value = item.ket || '';
+    toggleUnitDtFields();
     updateUnitStdHint();
     document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT MASTER UNIT (${escapeHtml(item.kodeUnit)})`;
   }
@@ -6681,6 +6995,14 @@
     document.getElementById('unitJenisUnit').value = '';
     document.getElementById('unitSatuan').value = 'HM';
     document.getElementById('unitStatus').value = 'Active';
+    document.getElementById('unitSerialNo').value = '';
+    document.getElementById('unitThnUnit').value = '';
+    document.getElementById('unitNoMesin').value = '';
+    document.getElementById('unitStnk').value = '';
+    document.getElementById('unitNoLambung').value = '';
+    document.getElementById('unitExpStnk').value = '';
+    document.getElementById('unitKet').value = '';
+    toggleUnitDtFields();
     fillUnitKodeTipeOptions('');
     updateUnitStdHint();
     document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT DATA UNIT BARU`;
@@ -6697,8 +7019,18 @@
       kategori: document.getElementById('unitKategori').value,
       jenisUnit: document.getElementById('unitJenisUnit').value,
       satuanMeter: document.getElementById('unitSatuan').value,
-      status: document.getElementById('unitStatus').value
+      status: document.getElementById('unitStatus').value,
+      serialNo: document.getElementById('unitSerialNo').value.trim().toUpperCase(), // [Fase 24]
+      thnUnit: document.getElementById('unitThnUnit').value.trim(),
+      ket: document.getElementById('unitKet').value.trim() // [Fase 26]
     };
+    // [Fase 25] No Mesin & STNK hanya dikirim untuk Dump Truck / Tonly (jenis lain → kolom J/K tidak disentuh)
+    if (isUnitDtJenis(dataObj.jenisUnit)) {
+      dataObj.noMesin = document.getElementById('unitNoMesin').value.trim().toUpperCase();
+      dataObj.stnk = document.getElementById('unitStnk').value.trim().toUpperCase();
+      dataObj.noLambung = document.getElementById('unitNoLambung').value.trim().toUpperCase(); // [Fase 26]
+      dataObj.expStnk = document.getElementById('unitExpStnk').value; // yyyy-mm-dd atau ""
+    }
 
     if (!dataObj.kodeUnit) {
       showToast("Kode Unit wajib diisi!", "warning");
@@ -7177,6 +7509,49 @@
   }
 
   /* --- 4. SUB TAB: MASTER KARYAWAN --- */
+  // [Fase 27] daftar dropdown (server mengirim ulang saat memuat; ini cadangan sebelum termuat)
+  let KARYAWAN_LISTS = {
+    jabatan: ['Operator Excavator', 'Operator Bulldozer', 'Operator Grader', 'Operator Vibro Roller', 'Driver DT AB', 'Driver Tonly',
+      'Driver Bus', 'Driver Fuelman', 'Driver Self Loader/Lowboy', 'Driver Water Tank', 'Driver'],
+    departemen: ['Operator', 'Driver'],
+    status: ['Aktif', 'Nonaktif'],
+    nextId: ''
+  };
+
+  // isi <select>; nilai lama di luar daftar tetap ditampilkan sebagai pilihan agar tidak hilang saat disimpan
+  function fillKaryawanSelect(id, list, current) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Pilih —</option>' + list.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+    if (current) {
+      const hit = list.find(v => v.toLowerCase() === String(current).toLowerCase());
+      if (!hit) sel.add(new Option(current, current));
+      sel.value = hit || current;
+    }
+  }
+
+  function fillKaryawanDropdowns(item) {
+    fillKaryawanSelect('karyawanJabatan', KARYAWAN_LISTS.jabatan, item ? item.jabatan : '');
+    fillKaryawanSelect('karyawanDept', KARYAWAN_LISTS.departemen, item ? item.departemen : '');
+    const st = document.getElementById('karyawanStatus');
+    if (st) {
+      const cur = item ? item.status : 'Aktif';
+      st.innerHTML = KARYAWAN_LISTS.status.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+      const hit = KARYAWAN_LISTS.status.find(v => v.toLowerCase() === String(cur || '').toLowerCase());
+      if (!hit && cur) st.add(new Option(cur, cur));
+      st.value = hit || cur || 'Aktif';
+    }
+    const nikEl = document.getElementById('karyawanNik');
+    if (nikEl && !item) nikEl.placeholder = KARYAWAN_LISTS.nextId ? 'Otomatis: ' + KARYAWAN_LISTS.nextId : 'Otomatis';
+  }
+
+  // Jabatan "Operator …" / "Driver …" → Departemen ikut terisi
+  function onKaryawanJabatanChange() {
+    const j = document.getElementById('karyawanJabatan').value;
+    const dep = KARYAWAN_LISTS.departemen.find(d => j.toLowerCase().indexOf(d.toLowerCase()) === 0);
+    if (dep) document.getElementById('karyawanDept').value = dep;
+  }
+
   function loadMasterKaryawanTable() {
     showSkeleton('tbodyMasterKaryawan', 6);
     if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -7185,6 +7560,12 @@
           if (masterSessionGuard(res)) return;
           if (res && res.success) {
             MASTER_KARYAWAN_CACHE = res.data || [];
+            // [Fase 27] daftar dropdown dari server
+            if (Array.isArray(res.jabatanList) && res.jabatanList.length) KARYAWAN_LISTS.jabatan = res.jabatanList;
+            if (Array.isArray(res.departemenList) && res.departemenList.length) KARYAWAN_LISTS.departemen = res.departemenList;
+            if (Array.isArray(res.statusList) && res.statusList.length) KARYAWAN_LISTS.status = res.statusList;
+            KARYAWAN_LISTS.nextId = res.nextId || '';
+            if (!(parseInt(document.getElementById('karyawanRowIndex').value, 10) >= 2)) fillKaryawanDropdowns(null);
             document.getElementById('searchKaryawan').value = '';
             renderMasterKaryawanTable(MASTER_KARYAWAN_CACHE);
           } else {
@@ -7200,8 +7581,10 @@
     const keyword = (document.getElementById('searchKaryawan').value || '').toLowerCase();
     if (!MASTER_KARYAWAN_CACHE) return;
     const filtered = MASTER_KARYAWAN_CACHE.filter(k => {
-      return (k.nik || '').toLowerCase().includes(keyword) || 
-             (k.nama || '').toLowerCase().includes(keyword);
+      return (k.nik || '').toLowerCase().includes(keyword) ||
+             (k.nama || '').toLowerCase().includes(keyword) ||
+             (k.jabatan || '').toLowerCase().includes(keyword) ||
+             (k.departemen || '').toLowerCase().includes(keyword);
     });
     MASTER_PAGER.KARYAWAN.page = 1;
     renderMasterKaryawanTable(filtered);
@@ -7250,9 +7633,7 @@
     EDIT_ROW_KEYS.karyawan = item.rowKey || '';
     document.getElementById('karyawanNik').value = item.nik;
     document.getElementById('karyawanNama').value = item.nama;
-    document.getElementById('karyawanJabatan').value = item.jabatan;
-    document.getElementById('karyawanDept').value = item.departemen;
-    document.getElementById('karyawanStatus').value = item.status;
+    fillKaryawanDropdowns(item); // [Fase 27] Jabatan / Departemen / Status = dropdown
     document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT MASTER KARYAWAN (${escapeHtml(item.nama)})`;
   }
 
@@ -7261,8 +7642,7 @@
     EDIT_ROW_KEYS.karyawan = '';
     document.getElementById('karyawanNik').value = '';
     document.getElementById('karyawanNama').value = '';
-    document.getElementById('karyawanJabatan').value = '';
-    document.getElementById('karyawanDept').value = '';
+    fillKaryawanDropdowns(null); // [Fase 27]
     document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-user-plus text-brand me-2"></i>INPUT DATA KARYAWAN / OPERATOR BARU`;
   }
 
@@ -7271,7 +7651,7 @@
       allowDupNama: allowDupNama === true, // [Fase 18] nama kembar → konfirmasi dulu
       rowIndex: document.getElementById('karyawanRowIndex').value,
       rowKey: EDIT_ROW_KEYS.karyawan,
-      nik: document.getElementById('karyawanNik').value.trim(),
+      nik: document.getElementById('karyawanNik').value.trim().toUpperCase(),
       nama: document.getElementById('karyawanNama').value.trim(),
       jabatan: document.getElementById('karyawanJabatan').value.trim(),
       departemen: document.getElementById('karyawanDept').value.trim(),
@@ -7625,7 +8005,7 @@
                     </div>
                 </div>
                 <div class="profil-stat">
-                    <span class="profil-stat-icon"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>
+                    <span class="profil-stat-icon" id="profilSessionIcon"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>
                     <div class="min-w-0">
                         <span class="profil-stat-label">Sesi berlaku s.d. (WITA)</span>
                         <span class="profil-stat-value" id="profilSessionExpiry">-</span>
@@ -7650,10 +8030,10 @@
             </div>
         </div>
 
-        <div class="row grid-align-row g-3">
+        <div class="row grid-align-row g-3 profil-main-row">
 
             <!-- Kolom kiri: Foto profil + Sesi & perangkat -->
-            <div class="col-12 col-lg-5 d-flex flex-column gap-3">
+            <div class="col-12 col-lg-5 d-flex flex-column gap-3 profil-col">
                 <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 1;">
                     <div class="profil-card-head">
                         <span class="profil-card-icon"><i class="fa fa-camera" aria-hidden="true"></i></span>
@@ -7688,50 +8068,38 @@
                         <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Yoga&amp;backgroundColor=d1f4e6&amp;glassesProbability=0&amp;gestureProbability=0" class="preset-avatar-item" onclick="selectPresetAvatar(this.src)" alt="Avatar ilustrasi 9" loading="lazy">
                     </div>
 
-                    <!-- TOMBOL SIMPAN FOTO PROFIL -->
-                    <button type="button" id="btnSaveAvatar" class="btn btn-sm btn-brand fw-bold w-100" onclick="saveProfileAvatar()">
-                        <i class="fa fa-save me-1"></i> SIMPAN / UBAH FOTO PROFIL
-                    </button>
+                    <!-- TOMBOL SIMPAN FOTO PROFIL — [Fase 28] kecil di kanan, aktif setelah foto/avatar baru dipilih -->
+                    <div class="profil-avatar-actions">
+                        <span class="field-hint" id="profilAvatarHint">Pilih foto atau avatar, lalu simpan.</span>
+                        <button type="button" id="btnSaveAvatar" class="btn btn-sm btn-brand fw-bold px-4" onclick="saveProfileAvatar()" disabled>
+                            <i class="fa fa-save me-1"></i> Simpan Foto
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Sesi & Perangkat (L1) -->
-                <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 2;">
+                <!-- [Fase 28] Keluar: satu tempat untuk kedua cara keluar (HP: paling bawah) -->
+                <div class="glass-card no-lift profil-card profil-card--keluar stagger-item" style="--stagger-idx: 2;">
                     <div class="profil-card-head">
-                        <span class="profil-card-icon"><i class="fa fa-laptop" aria-hidden="true"></i></span>
+                        <span class="profil-card-icon profil-card-icon--warn"><i class="fa fa-sign-out-alt" aria-hidden="true"></i></span>
                         <div>
-                            <h6 class="dash-card-title mb-0">Sesi &amp; Perangkat</h6>
-                            <span class="dash-card-sub">Kendalikan di mana akun Anda sedang masuk</span>
+                            <h6 class="dash-card-title mb-0">Keluar Akun</h6>
+                            <span class="dash-card-sub">Akhiri sesi di perangkat ini atau di semua perangkat</span>
                         </div>
                     </div>
-                    <!-- [Fase 11 #6] Daftar sesi aktif dari server (renderMySessions); isi awal = perangkat ini -->
-                    <div class="profil-session-meta">
-                        <span id="profilSessionCount">Memuat perangkat…</span>
-                        <button type="button" class="profil-session-refresh" id="btnRefreshSessions" title="Muat ulang daftar perangkat" aria-label="Muat ulang daftar perangkat"><i class="fa fa-sync-alt" aria-hidden="true"></i></button>
-                    </div>
-                    <div class="profil-session-list" id="profilSessionList" aria-live="polite">
-                        <div class="profil-session">
-                            <span class="profil-session-icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
-                            <div class="min-w-0 flex-grow-1">
-                                <strong>Perangkat ini</strong>
-                                <small>Berakhir otomatis setelah 15 menit tanpa aktivitas</small>
-                            </div>
-                            <span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>
-                        </div>
-                    </div>
-                    <p class="profil-note">Curiga akun dipakai orang lain? Gunakan <strong>Keluar dari semua perangkat</strong>, lalu ganti kata sandi Anda.</p>
-                    <div class="d-grid gap-2">
-                        <button type="button" id="btnLogoutAllDevices" class="btn btn-ghost fw-bold">
-                            <i class="fa fa-power-off me-2" aria-hidden="true"></i>Keluar dari semua perangkat
+                    <div class="profil-logout-grid">
+                        <button type="button" class="btn btn-sm btn-ghost fw-bold" onclick="handleProfilLogout()">
+                            <i class="fa fa-sign-out-alt me-2"></i>Keluar di perangkat ini
                         </button>
-                        <button type="button" class="btn btn-ghost-danger w-100 fw-bold" onclick="handleProfilLogout()">
-                            <i class="fa fa-sign-out-alt me-2"></i>Keluar (Logout ke Guest)
+                        <button type="button" id="btnLogoutAllDevices" class="btn btn-sm btn-ghost-danger fw-bold">
+                            <i class="fa fa-power-off me-2" aria-hidden="true"></i>Keluar di semua perangkat
                         </button>
                     </div>
+                    <p class="profil-note mb-0">Curiga akun dipakai orang lain? Pilih <strong>Keluar di semua perangkat</strong>, lalu ganti kata sandi Anda.</p>
                 </div>
             </div>
 
-            <!-- Kolom kanan: Keamanan & ubah kata sandi -->
-            <div class="col-12 col-lg-7 d-flex flex-column gap-3">
+            <!-- Kolom kanan: Keamanan & ubah kata sandi + Sesi & Perangkat -->
+            <div class="col-12 col-lg-7 d-flex flex-column gap-3 profil-col">
                 <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 1;" id="cardUbahPassword">
                     <div class="profil-card-head">
                         <span class="profil-card-icon"><i class="fa fa-shield-alt" aria-hidden="true"></i></span>
@@ -7741,22 +8109,23 @@
                         </div>
                     </div>
                     <form id="formUbahPassword" onsubmit="handleChangePassword(event)" novalidate>
+                        <!-- [Fase 28] layar lebar: tiga isian sejajar (tidak memanjang ±1.000 px) -->
                         <div class="row g-3">
-                            <div class="col-12">
+                            <div class="col-12 col-xl-4">
                                 <label class="field-label" for="pwLama">KATA SANDI SAAT INI</label>
                                 <div class="pw-field">
                                     <input type="password" id="pwLama" class="form-control form-pill" required autocomplete="current-password" maxlength="128">
                                     <button type="button" class="pw-eye" data-target="pwLama" aria-label="Tampilkan kata sandi" aria-pressed="false"><i class="fa fa-eye" aria-hidden="true"></i></button>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-6 col-xl-4">
                                 <label class="field-label" for="pwBaru">KATA SANDI BARU</label>
                                 <div class="pw-field">
                                     <input type="password" id="pwBaru" class="form-control form-pill" required minlength="8" autocomplete="new-password" maxlength="128">
                                     <button type="button" class="pw-eye" data-target="pwBaru" aria-label="Tampilkan kata sandi" aria-pressed="false"><i class="fa fa-eye" aria-hidden="true"></i></button>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-6 col-xl-4">
                                 <label class="field-label" for="pwKonfirmasi">ULANGI KATA SANDI BARU</label>
                                 <div class="pw-field">
                                     <input type="password" id="pwKonfirmasi" class="form-control form-pill" required autocomplete="new-password" maxlength="128">
@@ -7782,6 +8151,32 @@
                             </button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Sesi & Perangkat (L1) — [Fase 28] dipindah ke kanan, di bawah kata sandi -->
+                <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 2;">
+                    <div class="profil-card-head">
+                        <span class="profil-card-icon"><i class="fa fa-laptop" aria-hidden="true"></i></span>
+                        <div>
+                            <h6 class="dash-card-title mb-0">Sesi &amp; Perangkat</h6>
+                            <span class="dash-card-sub">Kendalikan di mana akun Anda sedang masuk</span>
+                        </div>
+                    </div>
+                    <!-- [Fase 11 #6] Daftar sesi aktif dari server (renderMySessions); isi awal = perangkat ini -->
+                    <div class="profil-session-meta">
+                        <span id="profilSessionCount">Memuat perangkat…</span>
+                        <button type="button" class="profil-session-refresh" id="btnRefreshSessions" title="Muat ulang daftar perangkat" aria-label="Muat ulang daftar perangkat"><i class="fa fa-sync-alt" aria-hidden="true"></i></button>
+                    </div>
+                    <div class="profil-session-list" id="profilSessionList" aria-live="polite">
+                        <div class="profil-session">
+                            <span class="profil-session-icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
+                            <div class="min-w-0 flex-grow-1">
+                                <strong>Perangkat ini</strong>
+                                <small>Berakhir otomatis setelah 15 menit tanpa aktivitas</small>
+                            </div>
+                            <span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -8063,6 +8458,8 @@
             const expEl = document.getElementById('profilSessionExpiry');
             const tokPayload = decodeTokenPayload(getAuthToken());
             if (expEl) expEl.textContent = (tokPayload && tokPayload.exp) ? formatWaktuSingkat(tokPayload.exp) : '-';
+            setSessionExpiryTone(tokPayload && tokPayload.exp); // [Fase 28]
+            setAvatarDirty(false);                              // [Fase 28] belum ada pilihan baru
             showMustChangeBanner(!!activeSession.mustChange);
 
             loadMySessions(); // [Fase 11 #6] daftar perangkat yang sedang masuk
@@ -8399,7 +8796,7 @@
                         showMustChangeBanner(false);
                         const expEl = document.getElementById('profilSessionExpiry');
                         const p = decodeTokenPayload(res.token);
-                        if (expEl && p && p.exp) expEl.textContent = formatWaktuSingkat(p.exp);
+                        if (expEl && p && p.exp) { expEl.textContent = formatWaktuSingkat(p.exp); setSessionExpiryTone(p.exp); }
                     }
                 })
                 .withFailureHandler(function(err) {
@@ -8444,12 +8841,33 @@
         return res;
     }
 
+    // [Fase 28] Tombol Simpan Foto aktif hanya bila ada foto/avatar baru yang belum disimpan
+    function setAvatarDirty(dirty, hint) {
+        const btn = document.getElementById('btnSaveAvatar');
+        const h = document.getElementById('profilAvatarHint');
+        if (btn) btn.disabled = !dirty;
+        if (h) {
+            h.textContent = hint || (dirty ? 'Pilihan baru belum disimpan.' : 'Pilih foto atau avatar, lalu simpan.');
+            h.classList.toggle('is-pending', !!dirty);
+        }
+    }
+
+    // [Fase 28] Sisa sesi ≤ 30 menit → ikon "Sesi berlaku" kuning
+    function setSessionExpiryTone(exp) {
+        const ic = document.getElementById('profilSessionIcon');
+        if (!ic) return;
+        const ms = Number(exp) < 1e12 ? Number(exp) * 1000 : Number(exp);
+        const left = ms - Date.now();
+        ic.classList.toggle('profil-stat-icon--warn', !!ms && left < 30 * 60000);
+    }
+
     function selectPresetAvatar(srcUrl) {
         // '' = monogram inisial (disimpan sebagai avatar kosong)
         AVATAR_USE_MONOGRAM = !srcUrl;
         selectedTempAvatarUrl = srcUrl || '';
         document.getElementById('profilAvatarImg').src = srcUrl || currentMonogramUrl();
         markSelectedPreset(srcUrl || '');
+        setAvatarDirty(true);
     }
 
     function previewAvatarUpload(event) {
@@ -8495,6 +8913,7 @@
                 AVATAR_USE_MONOGRAM = false;
                 document.getElementById('profilAvatarImg').src = selectedTempAvatarUrl;
                 markSelectedPreset(selectedTempAvatarUrl);
+                setAvatarDirty(true); // [Fase 28]
             };
             img.src = e.target.result;
         };
@@ -8521,8 +8940,10 @@
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run
                 .withSuccessHandler(function(res) {
-                    btnSave.disabled = false;
-                    btnSave.innerHTML = '<i class="fa fa-save me-1"></i> SIMPAN / UBAH FOTO PROFIL';
+                    btnSave.innerHTML = '<i class="fa fa-save me-1"></i> Simpan Foto';
+                    // [Fase 28] tersimpan → tombol nonaktif lagi sampai ada pilihan baru
+                    if (res && res.success) setAvatarDirty(false, 'Foto profil tersimpan.');
+                    else btnSave.disabled = false;
                     if (handleSessionExpired(res)) return;
                     showToast(res.message, res.success ? "success" : "error");
                     if (res && res.success) {
@@ -8533,15 +8954,15 @@
                 })
                 .withFailureHandler(function(err) {
                     btnSave.disabled = false;
-                    btnSave.innerHTML = '<i class="fa fa-save me-1"></i> SIMPAN / UBAH FOTO PROFIL';
+                    btnSave.innerHTML = '<i class="fa fa-save me-1"></i> Simpan Foto';
                     showToast("Gagal menyimpan foto profil: " + err.message, "error");
                 })
                 .saveUserProfileAvatar(activeSession.username, selectedTempAvatarUrl, getAuthToken());
         } else {
             activeSession.avatarUrl = selectedTempAvatarUrl;
             localStorage.setItem('darkpan_user_session', JSON.stringify(activeSession));
-            btnSave.disabled = false;
-            btnSave.innerHTML = '<i class="fa fa-save me-1"></i> SIMPAN / UBAH FOTO PROFIL';
+            btnSave.innerHTML = '<i class="fa fa-save me-1"></i> Simpan Foto';
+            setAvatarDirty(false, 'Foto profil tersimpan.');
             showToast("Foto profil berhasil diperbarui!", "success");
             if (typeof updateAuthUI === 'function') updateAuthUI('ADMIN');
         }
@@ -8781,14 +9202,14 @@
                     <td class="text-nowrap">${badgeStatus}</td>
                     <td>
                         <div class="d-flex align-items-center justify-content-center gap-2">
-                            <button class="icon-action ${inactive ? 'icon-action--success' : 'icon-action--danger'}" onclick="toggleUserStatus(${jsArg(u.username)})" title="${toggleTitle}" aria-label="${toggleTitle}"${selfDis}>
-                                <i class="fa ${inactive ? 'fa-user-check' : 'fa-user-slash'}"></i>
+                            <button class="icon-action icon-action--labeled ${inactive ? 'icon-action--success' : 'icon-action--danger'}" onclick="toggleUserStatus(${jsArg(u.username)})" title="${toggleTitle}" aria-label="${toggleTitle}"${selfDis}>
+                                <i class="fa ${inactive ? 'fa-user-check' : 'fa-user-slash'}"></i><span class="icon-action-label">${inactive ? 'Aktifkan' : 'Nonaktifkan'}</span>
                             </button>
-                            <button class="icon-action icon-action--warning" onclick="resetUserPassword(${jsArg(u.username)})" title="Reset ke kata sandi sementara (acak)" aria-label="Reset kata sandi">
-                                <i class="fa fa-redo"></i>
+                            <button class="icon-action icon-action--labeled icon-action--warning" onclick="resetUserPassword(${jsArg(u.username)})" title="Reset ke kata sandi sementara (acak)" aria-label="Reset kata sandi">
+                                <i class="fa fa-redo"></i><span class="icon-action-label">Reset sandi</span>
                             </button>
-                            <button class="icon-action icon-action--danger" onclick="deleteSubAdmin(${jsArg(u.username)})" title="Hapus User" aria-label="Hapus user"${selfDis}>
-                                <i class="fa fa-trash"></i>
+                            <button class="icon-action icon-action--labeled icon-action--danger" onclick="deleteSubAdmin(${jsArg(u.username)})" title="Hapus User" aria-label="Hapus user"${selfDis}>
+                                <i class="fa fa-trash"></i><span class="icon-action-label">Hapus</span>
                             </button>
                         </div>
                     </td>
@@ -9147,7 +9568,9 @@
 
                 <div class="input-group pill-input-group">
                   <span class="input-group-text"><i class="fa fa-barcode"></i></span>
-                  <input type="text" id="scanUnitCode" class="form-control fw-bold" placeholder="Scan QR atau Ketik Kode Unit" onblur="lookupMasterQR(this.value)" required>
+                  <input type="text" id="scanUnitCode" class="form-control fw-bold" placeholder="Scan QR atau Ketik Kode Unit" onblur="lookupMasterQR(this.value)" required list="dlUnitCodes" autocomplete="off">
+                  <!-- [Fase 27] saran kode unit resmi (MASTER_UNIT) — dipakai juga Database Master -->
+                  <datalist id="dlUnitCodes"></datalist>
 
                   <button type="button" class="btn btn-brand fw-bold px-3" onclick="document.getElementById('qrFileInput').click()">
                     <i class="fa fa-camera me-1"></i>Scan
@@ -9401,6 +9824,68 @@
     }
 
     /* -------------------------------------------------------------------------
+       [Fase 27] PENGAMAN KODE UNIT — daftar kode resmi MASTER_UNIT + pencocok (sama dengan
+       resolveUnitCode_ di Code.js): persis → kode itu; tanpa spasi/tanda baca & nol depan sama
+       ("ec2", "EC02", "ec-02" → "EC 02") → kode resmi; selain itu tidak dikenal + saran mirip.
+       Dipakai Scan-to-Fill & Database Master. Daftar ikut tersimpan offline (adaptor Pages).
+       ------------------------------------------------------------------------- */
+    let UNIT_CODE_LIST = null; // null = belum termuat → kode tidak dicek (hanya diberi catatan)
+
+    function loadUnitCodeList(cb) {
+        if (!(typeof google !== 'undefined' && google.script && google.script.run)) { if (cb) cb(); return; }
+        google.script.run
+            .withSuccessHandler(function(res) {
+                if (res && res.success && Array.isArray(res.units) && res.units.length) {
+                    UNIT_CODE_LIST = res.units;
+                    const dl = document.getElementById('dlUnitCodes');
+                    if (dl) dl.innerHTML = res.units.map(u => `<option value="${escapeHtml(u.kode)}"></option>`).join('');
+                }
+                if (cb) cb();
+            })
+            .withFailureHandler(function() { if (cb) cb(); })
+            .getUnitCodeList(getAuthToken());
+    }
+
+    function unitLooseKey(v) {
+        return String(v == null ? '' : v).trim().toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/([A-Z])0+(\d)/g, '$1$2');
+    }
+
+    function unitEditDistance(a, b) {
+        const d = [];
+        for (let i = 0; i <= a.length; i++) d[i] = [i];
+        for (let j = 1; j <= b.length; j++) d[0][j] = j;
+        for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+            d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        }
+        return d[a.length][b.length];
+    }
+
+    // → { ok, kode, saran[], unit } ; checked:false bila daftar belum termuat
+    function resolveUnitCode(input) {
+        const raw = String(input == null ? '' : input).trim();
+        if (!UNIT_CODE_LIST) return { ok: true, kode: raw.toUpperCase(), checked: false };
+        if (!raw) return { ok: false, kode: '', saran: [], checked: true };
+        const up = raw.toUpperCase().replace(/\s+/g, ' ');
+        const k = unitLooseKey(raw);
+        const exact = UNIT_CODE_LIST.find(u => u.kode.toUpperCase() === up);
+        if (exact) return { ok: true, kode: exact.kode, unit: exact, checked: true };
+        const hits = UNIT_CODE_LIST.filter(u => unitLooseKey(u.kode) === k);
+        if (hits.length === 1) return { ok: true, kode: hits[0].kode, unit: hits[0], checked: true, fixed: true };
+        const pref = (k.match(/^[A-Z]+/) || [''])[0];
+        const saran = hits.length > 1 ? hits.map(u => u.kode).slice(0, 3) : UNIT_CODE_LIST
+            .map(u => { const ck = unitLooseKey(u.kode); return { c: u.kode, d: unitEditDistance(k, ck) + ((ck.match(/^[A-Z]+/) || [''])[0] === pref ? 0 : 1) }; })
+            .filter(x => x.d <= 2)
+            .sort((a, b) => a.d - b.d || a.c.localeCompare(b.c, 'id', { numeric: true }))
+            .slice(0, 3).map(x => x.c);
+        return { ok: false, kode: raw.toUpperCase(), saran: saran, checked: true };
+    }
+
+    function unitUnknownText(r) {
+        return `Kode unit ${r.kode} tidak terdaftar di Master Unit.` +
+            (r.saran && r.saran.length ? ` Mungkin maksud Anda: ${r.saran.join(', ')}?` : ' Daftarkan dulu di Master Unit bila unit ini memang baru.');
+    }
+
+    /* -------------------------------------------------------------------------
        FITUR SCAN-TO-FILL ENGINE
        ------------------------------------------------------------------------- */
     function openModalScanToFill() {
@@ -9420,6 +9905,7 @@
         // ulang setiap modal dibuka — sebelumnya hanya sekali saat halaman dibuka (sering masih Guest)
         loadMasterKaryawanDropdown();
         if (typeof loadMasterLokasiDinamis === 'function') loadMasterLokasiDinamis();
+        loadUnitCodeList(); // [Fase 27] daftar kode unit resmi (saran ketik + pengaman salah input)
         $('#scanUnitCode').val('');
         $('#scanHmKm').val('');
         $('#scanLiter').val('');
@@ -9509,6 +9995,17 @@
             $('#scanAlertMsg').removeClass('d-none alert-info alert-success').addClass('alert-danger').text('Harap lengkapi semua field yang wajib diisi.');
             return;
         }
+
+        // [Fase 27] Kode unit wajib terdaftar di Master Unit (ketikan dirapikan ke kode resmi)
+        const ru = resolveUnitCode(payload.kodeUnit);
+        if (!ru.ok) {
+            $('#scanAlertMsg').removeClass('d-none alert-info alert-success').addClass('alert-danger').text(unitUnknownText(ru));
+            $('#scanUnitCode').trigger('focus');
+            return;
+        }
+        payload.kodeUnit = ru.kode;
+        $('#scanUnitCode').val(ru.kode);
+        if (!ru.checked) showToast('Daftar unit belum termuat (offline) — pastikan kode unit sudah benar.', 'warning');
 
         // [Fase 16 #16.8] Kenaikan HM/KM tidak wajar → minta konfirmasi (tekan Simpan sekali lagi)
         const spike = getMeterSpikeInfo();
@@ -9644,8 +10141,18 @@
                         currentUnitMasterMeta.kapasitasTangki = 9999;
                         if (res && res.inactive) {
                             $('#scanAlertMsg').removeClass('d-none alert-info alert-success').addClass('alert-danger').text(res.message);
+                            fetchLastOperator(inputVal);
+                        } else {
+                            // [Fase 27] bukan stiker QR → anggap kode unit ketikan: rapikan / tandai bila tak dikenal
+                            const ru = resolveUnitCode(inputVal);
+                            if (ru.ok) {
+                                $('#scanUnitCode').val(ru.kode);
+                                if (ru.checked) $('#scanAlertMsg').addClass('d-none');
+                                fetchLastOperator(ru.kode);
+                            } else {
+                                $('#scanAlertMsg').removeClass('d-none alert-info alert-success').addClass('alert-danger').text(unitUnknownText(ru));
+                            }
                         }
-                        fetchLastOperator(inputVal);
                     }
                     runAnomalyCheck();
                 })
