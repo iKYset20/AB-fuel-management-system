@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=bf9b8efd11"></script>
-    <script src="./pages-offline-ui.js?v=bf9b8efd11" defer></script>
-    <script src="./pages-install.js?v=bf9b8efd11" defer></script>
+    <script src="./gas-adapter.js?v=519f7c9ae0"></script>
+    <script src="./pages-offline-ui.js?v=519f7c9ae0" defer></script>
+    <script src="./pages-install.js?v=519f7c9ae0" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3324,6 +3324,9 @@
     .ks-unit-status { font-size: 0.66rem; font-weight: 700; color: var(--status-warning); }
     .ks-unit-jenis { margin-left: auto; font-size: 0.66rem; font-weight: 500; color: var(--text-muted); }
     .ks-unit-empty { padding: 10px; font-size: 0.78rem; color: var(--text-muted); }
+    /* [Fase 30] kotak ketik di dalam modal (Nama Operator Scan-to-Fill): modal memotong isi yang keluar → daftar lebih pendek */
+    .type-combo .form-control { font-size: 0.8rem; }
+    .type-combo-list { max-height: min(232px, 38vh); }
     .unit-stnk.is-soon { color: var(--status-warning); font-weight: 600; }
     .unit-stnk.is-expired { color: var(--status-error); font-weight: 700; }
     .unit-status { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 0.66rem; font-weight: 700; background: var(--bg-inset); color: var(--text-secondary); }
@@ -9886,6 +9889,89 @@
     }
 
     /* -------------------------------------------------------------------------
+       [Fase 30] KOTAK KETIK UNTUK <select> PANJANG (mis. Nama Operator Scan-to-Fill)
+       <select> asli tetap memegang nilai (disembunyikan); pilihan hanya dari daftarnya.
+       Ketik sebagian nama → disaring (awal kata didahulukan); panah/Enter/Esc; ketuk untuk pilih.
+       ------------------------------------------------------------------------- */
+    function attachTypeCombo(selectId, cfg) {
+        const sel = document.getElementById(selectId);
+        if (!sel || sel.dataset.combo) return;
+        cfg = cfg || {};
+        sel.dataset.combo = '1';
+        const wrap = document.createElement('div');
+        wrap.className = 'ks-unit-combo type-combo';
+        wrap.innerHTML = `<i class="fa fa-search ks-unit-combo-icon" aria-hidden="true"></i>
+            <input type="text" id="${selectId}Search" class="form-control form-pill fw-bold" placeholder="${escapeHtml(cfg.placeholder || 'Ketik / pilih')}" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="${selectId}List">
+            <i class="fa fa-chevron-down ks-unit-combo-caret" aria-hidden="true"></i>
+            <div id="${selectId}List" class="ks-unit-list type-combo-list d-none" role="listbox"></div>`;
+        sel.parentNode.insertBefore(wrap, sel);
+        sel.classList.add('d-none');
+        sel.required = false;              // validasi lewat JS (input tersembunyi tidak bisa difokus browser)
+        sel.tabIndex = -1;
+        sel.setAttribute('aria-hidden', 'true');
+        const inp = wrap.querySelector('input'), box = wrap.querySelector('.ks-unit-list');
+        const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        let shown = [], active = -1;
+        const opts = () => [...sel.options].filter(o => o.value && !o.disabled).map(o => ({ v: o.value, t: o.text }));
+        const sync = () => { const o = sel.options[sel.selectedIndex]; inp.value = (o && o.value) ? o.text : ''; };
+        const render = (q) => {
+            const nq = norm(q);
+            const all = opts();
+            shown = !nq ? all : all.filter(o => norm(o.t).includes(nq))
+                .sort((a, b) => ((' ' + norm(b.t)).includes(' ' + nq) ? 1 : 0) - ((' ' + norm(a.t)).includes(' ' + nq) ? 1 : 0));
+            if (nq && shown.length) active = Math.max(0, Math.min(active, shown.length - 1)); else if (!nq) active = -1;
+            if (!shown.length) { box.innerHTML = `<div class="ks-unit-empty">${escapeHtml(all.length ? (cfg.emptyText || 'Tidak ditemukan') + ' "' + q + '"' : (cfg.loadingText || 'Daftar belum termuat'))}</div>`; return; }
+            box.innerHTML = shown.map((o, i) => `<div class="ks-unit-opt${i === active ? ' is-active' : ''}${o.v === sel.value ? ' is-selected' : ''}" role="option" data-i="${i}">${escapeHtml(o.t)}</div>`).join('');
+            const act = box.querySelector('.ks-unit-opt.is-active') || (!nq && box.querySelector('.ks-unit-opt.is-selected'));
+            if (act) act.scrollIntoView({ block: 'nearest' });
+        };
+        const open = () => { box.classList.remove('d-none'); inp.setAttribute('aria-expanded', 'true'); render(''); };
+        const close = () => { box.classList.add('d-none'); inp.setAttribute('aria-expanded', 'false'); active = -1; sync(); };
+        const pick = (v) => {
+            const changed = sel.value !== v;
+            sel.value = v; close();
+            if (changed) sel.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+        inp.addEventListener('focus', () => { inp.select(); open(); });
+        inp.addEventListener('click', () => { if (box.classList.contains('d-none')) open(); });
+        inp.addEventListener('input', () => { active = 0; box.classList.remove('d-none'); render(inp.value); });
+        inp.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (box.classList.contains('d-none')) open();
+                if (!shown.length) return;
+                active = e.key === 'ArrowDown' ? (active + 1) % shown.length : (active <= 0 ? shown.length - 1 : active - 1);
+                const cur = sel.options[sel.selectedIndex];
+                render(cur && inp.value === cur.text ? '' : inp.value);
+            } else if (e.key === 'Enter') {
+                e.preventDefault(); // jangan kirim form saat memilih
+                const exact = opts().find(o => norm(o.t) === norm(inp.value));
+                const p = shown[active] || exact || (shown.length === 1 ? shown[0] : null);
+                if (p) { pick(p.v); inp.blur(); }
+            } else if (e.key === 'Escape') {
+                e.stopPropagation(); close(); inp.blur(); // Esc tidak menutup modal
+            }
+        });
+        inp.addEventListener('blur', () => setTimeout(() => {
+            if (box.classList.contains('d-none')) return;
+            const exact = opts().find(o => norm(o.t) === norm(inp.value));
+            if (exact && exact.v !== sel.value) pick(exact.v); else close();
+        }, 150));
+        box.addEventListener('mousedown', (e) => {
+            const el = e.target.closest('.ks-unit-opt');
+            e.preventDefault();
+            if (el) pick(shown[Number(el.dataset.i)].v);
+        });
+        sel.addEventListener('change', sync);
+        sel._comboSync = sync;
+        sync();
+    }
+    function syncTypeCombo(selectId) {
+        const s = document.getElementById(selectId);
+        if (s && s._comboSync) s._comboSync();
+    }
+
+    /* -------------------------------------------------------------------------
        FITUR SCAN-TO-FILL ENGINE
        ------------------------------------------------------------------------- */
     function openModalScanToFill() {
@@ -9901,6 +9987,8 @@
         meterSpikeConfirmedFor = null;
 
         $('#modalScanToFill').modal('show');
+        // [Fase 30] Nama Operator bisa diketik (sekali pasang)
+        attachTypeCombo('scanOperator', { placeholder: 'Ketik / pilih nama operator', emptyText: 'Nama tidak ditemukan:', loadingText: 'Memuat daftar operator…' });
         // [Fase 11 #8] Daftar operator (Master_Karyawan, wajib login) & lokasi (MASTER_LOKASI) dimuat
         // ulang setiap modal dibuka — sebelumnya hanya sekali saat halaman dibuka (sering masih Guest)
         loadMasterKaryawanDropdown();
@@ -9927,6 +10015,7 @@
                             select.append($('<option></option>').val(nama).text(nama));
                         });
                         if (cur) ensureSelectOption('scanOperator', cur);
+                        syncTypeCombo('scanOperator'); // [Fase 30]
                     }
                 })
                 .getMasterKaryawanList(getAuthToken());
@@ -9945,6 +10034,7 @@
             el.add(opt);
         }
         el.value = opt.value;
+        syncTypeCombo(selectId); // [Fase 30] kotak ketik ikut menampilkan pilihan
     }
 
     function fetchLastOperator(kodeUnit) {
