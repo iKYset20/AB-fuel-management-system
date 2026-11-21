@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=2158c9d18c"></script>
-    <script src="./pages-offline-ui.js?v=2158c9d18c" defer></script>
-    <script src="./pages-install.js?v=2158c9d18c" defer></script>
+    <script src="./gas-adapter.js?v=aabe665273"></script>
+    <script src="./pages-offline-ui.js?v=aabe665273" defer></script>
+    <script src="./pages-install.js?v=aabe665273" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -1229,6 +1229,30 @@
     @keyframes pulseTextGlow {
         from { text-shadow: 0 0 0 transparent; opacity: 0.9; }
         to   { text-shadow: 0 0 14px currentColor; opacity: 1; }
+    }
+    /* [Fase 35] Tanda KRITIS tetap tampil di iPhone/iPad (Safari/WebKit).
+       Masalah: denyut lama menganimasikan box-shadow pada kartu kaca (backdrop-filter) — WebKit tidak
+       menggambar ulang animasi itu, dan bila "Kurangi Gerakan" aktif animasi berhenti tanpa sisa tanda.
+       Solusi: cincin merah di lapisan ::after (punya layer GPU sendiri) yang berdenyut lewat opacity saja;
+       saat Kurangi Gerakan → cincin tetap menyala diam (tidak hilang). Kelas/ID tidak berubah. */
+    .glass-card.glow-alert { position: relative; animation: none; }
+    .glass-card.glow-alert::after {
+        content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; z-index: 1;
+        border: 1px solid rgba(239, 68, 68, 0.70);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.22), 0 0 18px rgba(239, 68, 68, 0.35);
+        opacity: 0.35;
+        -webkit-transform: translateZ(0); transform: translateZ(0);
+        animation: alertRing 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes alertRing { from { opacity: 0.35; } to { opacity: 1; } }
+    .badge.glow-alert {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+        -webkit-transform: translateZ(0); transform: translateZ(0);
+        animation: alertBadge 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes alertBadge { from { opacity: 0.65; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+        .glass-card.glow-alert::after, .badge.glow-alert { opacity: 1; }
     }
     .pulse-alert-text { animation: heartbeatAlert 1.8s var(--ease-out-soft) infinite alternate; }
     @keyframes heartbeatAlert {
