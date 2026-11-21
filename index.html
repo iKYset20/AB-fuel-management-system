@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=519f7c9ae0"></script>
-    <script src="./pages-offline-ui.js?v=519f7c9ae0" defer></script>
-    <script src="./pages-install.js?v=519f7c9ae0" defer></script>
+    <script src="./gas-adapter.js?v=2158c9d18c"></script>
+    <script src="./pages-offline-ui.js?v=2158c9d18c" defer></script>
+    <script src="./pages-install.js?v=2158c9d18c" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -4496,6 +4496,7 @@
     }
 
     function loadKartuStokData(isReset = false) {
+        if (typeof isUserGuest === 'function' && isUserGuest()) return; // [Fase 32] wajib login
         const selectedUnit = document.getElementById('selectKartuStokUnit') ? document.getElementById('selectKartuStokUnit').value : '';
         const tglAwal = document.getElementById('inputKartuStokAwal') ? document.getElementById('inputKartuStokAwal').value : '';
         const tglAkhir = document.getElementById('inputKartuStokAkhir') ? document.getElementById('inputKartuStokAkhir').value : '';
@@ -4508,11 +4509,15 @@
 
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run
-                .withSuccessHandler(renderKartuStokUI)
+                .withSuccessHandler(function(data) {
+                    // [Fase 32] wajib login: sesi berakhir → kembali ke Guest
+                    if (data && data.authError) { if (typeof handleSessionExpired === 'function') handleSessionExpired(data); return; }
+                    renderKartuStokUI(data);
+                })
                 .withFailureHandler(function(err) {
                     console.error("Kartu Stok Sync Error:", err);
                 })
-                .getKartuStokNativeData(filterObj);
+                .getKartuStokNativeData(filterObj, getAuthToken());
         }
     }
 
@@ -4896,6 +4901,7 @@
   }
 
   function loadLaporanHarianData() {
+    if (typeof isUserGuest === 'function' && isUserGuest()) return; // [Fase 32] wajib login
     const filterObj = {
       tglLaporan: document.getElementById('filterTglLaporan') ? document.getElementById('filterTglLaporan').value : '',
       lokasiKerja: document.getElementById('filterLokasiLaporan') ? document.getElementById('filterLokasiLaporan').value : 'Semua Lokasi'
@@ -4903,11 +4909,15 @@
 
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
-        .withSuccessHandler(renderLaporanHarian)
+        .withSuccessHandler(function(data) {
+          // [Fase 32] wajib login: sesi berakhir → kembali ke Guest
+          if (data && data.authError) { if (typeof handleSessionExpired === 'function') handleSessionExpired(data); return; }
+          renderLaporanHarian(data);
+        })
         .withFailureHandler(function(err) {
           console.error("Laporan Harian Sync Error:", err);
         })
-        .getLaporanHarianData(filterObj);
+        .getLaporanHarianData(filterObj, getAuthToken());
     }
   }
 
@@ -5274,6 +5284,7 @@
   let cachedKalibrasiRows = [];
 
   function loadKalibrasiData() {
+    if (typeof isUserGuest === 'function' && isUserGuest()) return; // [Fase 32] wajib login
     const filterObj = {
       tglAwal: document.getElementById('filterKalAwal') ? document.getElementById('filterKalAwal').value : '',
       tglAkhir: document.getElementById('filterKalAkhir') ? document.getElementById('filterKalAkhir').value : '',
@@ -5282,11 +5293,15 @@
 
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
-        .withSuccessHandler(renderKalibrasi)
+        .withSuccessHandler(function(data) {
+          // [Fase 32] wajib login: sesi berakhir → kembali ke Guest
+          if (data && data.authError) { if (typeof handleSessionExpired === 'function') handleSessionExpired(data); return; }
+          renderKalibrasi(data);
+        })
         .withFailureHandler(function(err) {
           console.error("Kalibrasi Sync Error:", err);
         })
-        .getKalibrasiData(filterObj);
+        .getKalibrasiData(filterObj, getAuthToken());
     }
   }
 
@@ -9771,7 +9786,18 @@
     /* -------------------------------------------------------------------------
        NAVIGASI TAB & SINKRONISASI TAMPILAN RBAC
        ------------------------------------------------------------------------- */
+    // [Fase 32] Kartu Stok, Laporan Harian & Kalibrasi berisi rincian per unit → wajib login
+    const LOGIN_ONLY_TABS = { KARTU_STOK: 'Kartu Stok', LAPORAN: 'Laporan Harian', KALIBRASI: 'Audit Kalibrasi' };
+
     function switchTab(tabKey, el) {
+        if (LOGIN_ONLY_TABS[tabKey] && typeof isUserGuest === 'function' && isUserGuest()) {
+            if (typeof closeSubBubble === 'function') closeSubBubble();
+            switchTab('PROFIL');
+            if (typeof showAlertModal === 'function') {
+                showAlertModal('Menu ' + LOGIN_ONLY_TABS[tabKey] + ' hanya untuk pengguna terdaftar. Silakan login terlebih dahulu.', 'Akses Terbatas', 'lock');
+            }
+            return;
+        }
         $('.btn-tab-nav, .mobile-nav-btn').removeClass('active');
         if (el) $(el).addClass('active');
 
@@ -10098,11 +10124,13 @@
         if (!ru.checked) showToast('Daftar unit belum termuat (offline) — pastikan kode unit sudah benar.', 'warning');
 
         // [Fase 16 #16.8] Kenaikan HM/KM tidak wajar → minta konfirmasi (tekan Simpan sekali lagi)
-        const spike = getMeterSpikeInfo();
-        if (spike && meterSpikeConfirmedFor !== String(payload.hmKm)) {
+        // [Fase 31] HM/KM mundur juga cukup dikonfirmasi (mis. meter diganti/direset); tetap tercatat di Cek Meteran
+        const back = getMeterBackInfo();
+        const spike = back ? null : getMeterSpikeInfo();
+        if ((back || spike) && meterSpikeConfirmedFor !== String(payload.hmKm)) {
             meterSpikeConfirmedFor = String(payload.hmKm);
             $('#anomalyWarningBox').removeClass('d-none');
-            $('#anomalyWarningMsg').html(escapeHtml(meterSpikeMessage(spike)) + '<br>Bila angka sudah benar, tekan <b>Simpan Transaksi</b> sekali lagi.');
+            $('#anomalyWarningMsg').html(escapeHtml(back ? meterBackMessage(back) : meterSpikeMessage(spike)) + '<br>Bila angka sudah benar, tekan <b>Simpan Transaksi</b> sekali lagi.');
             return;
         }
 
@@ -10149,6 +10177,19 @@
         return `${s.sat} naik ${fmt(s.naik)} sejak pengisian terakhir (${fmt(s.last)} ${s.sat}${s.lastDate ? ', ' + s.lastDate : ''}). Mohon periksa kembali angkanya.`;
     }
 
+    /* [Fase 31] HM/KM lebih kecil dari pembacaan terakhir → peringatan + konfirmasi (bukan pemblokir) */
+    function getMeterBackInfo() {
+        const m = currentUnitMasterMeta || {};
+        const inputHm = parseFloat($('#scanHmKm').val()) || 0;
+        if (!(inputHm > 0 && m.lastHmKm > 0 && inputHm < m.lastHmKm)) return null;
+        return { input: inputHm, last: m.lastHmKm, lastDate: m.lastHmKmDate || '', sat: m.satuanMeter === 'KM' ? 'KM' : 'HM' };
+    }
+
+    function meterBackMessage(b) {
+        const fmt = (n) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+        return `${b.sat} ${fmt(b.input)} lebih kecil dari pengisian terakhir (${fmt(b.last)} ${b.sat}${b.lastDate ? ', ' + b.lastDate : ''}). Mohon periksa kembali angkanya — bila meter memang diganti atau direset, boleh lanjut dan tulis alasannya di Keterangan.`;
+    }
+
     function handleQrFileInput(inputEl) {
         if (!inputEl.files || inputEl.files.length === 0) return;
         
@@ -10184,11 +10225,7 @@
         let isError = false;
         let messages = [];
 
-        if (inputHm > 0 && currentUnitMasterMeta.lastHmKm > 0 && inputHm < currentUnitMasterMeta.lastHmKm) {
-            isError = true;
-            messages.push(`Nilai HM/KM (${inputHm}) lebih kecil dari catatan terakhir (${currentUnitMasterMeta.lastHmKm})!`);
-        }
-
+        // [Fase 31] HM/KM mundur tidak lagi memblokir → peringatan + konfirmasi saat Simpan (lihat getMeterBackInfo)
         if (inputLiter > 0 && currentUnitMasterMeta.kapasitasTangki > 0 && inputLiter > currentUnitMasterMeta.kapasitasTangki) {
             isError = true;
             messages.push(`Pengisian (${inputLiter}L) melebihi kapasitas tangki unit (${currentUnitMasterMeta.kapasitasTangki}L)!`);
@@ -10196,6 +10233,7 @@
 
         // [Fase 16 #16.8] Peringatan lonjakan (tidak memblokir; konfirmasi saat Simpan)
         const spike = isError ? null : getMeterSpikeInfo();
+        const back = isError ? null : getMeterBackInfo();
         // [Fase 18] Unit berstatus Breakdown di Master Unit → peringatan saja
         const breakdownNote = String(currentUnitMasterMeta.unitStatus || '').toUpperCase() === 'BREAKDOWN'
             ? 'Unit ini berstatus Breakdown di Master Unit. Pastikan unit memang sudah beroperasi kembali.' : '';
@@ -10204,9 +10242,9 @@
             warningBox.removeClass('d-none');
             warningMsg.html(messages.join('<br>'));
             btnSubmit.addClass('btn-secondary').removeClass('btn-danger').prop('disabled', true);
-        } else if (spike || breakdownNote) {
+        } else if (back || spike || breakdownNote) {
             warningBox.removeClass('d-none');
-            warningMsg.html([spike ? escapeHtml(meterSpikeMessage(spike)) : '', escapeHtml(breakdownNote)].filter(Boolean).join('<br>'));
+            warningMsg.html([back ? escapeHtml(meterBackMessage(back)) : '', spike ? escapeHtml(meterSpikeMessage(spike)) : '', escapeHtml(breakdownNote)].filter(Boolean).join('<br>'));
             btnSubmit.addClass('btn-danger').removeClass('btn-secondary').prop('disabled', false);
         } else {
             warningBox.addClass('d-none');
@@ -10661,7 +10699,7 @@ function loadLiveDashboardData() {
         if (syncText) syncText.innerText = "Sync Error!";
         if (typeof jQuery !== 'undefined') $('#spinner').removeClass('show');
       })
-      .getDashboardNativeData(filterObj);
+      .getDashboardNativeData(filterObj, getAuthToken());
   } else {
     if (syncText) syncText.innerText = "Local Preview";
     if (typeof jQuery !== 'undefined') $('#spinner').removeClass('show');

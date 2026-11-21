@@ -39,7 +39,7 @@
        walau argumennya berbeda (mis. tanggal Dashboard/Laporan sudah berganti hari). */
     var CACHEABLE = {
         getDashboardNativeData: { auth: false, latest: true },
-        getLaporanHarianData:   { auth: false, latest: true },
+        getLaporanHarianData:   { auth: true,  latest: true },  // Fase 32: wajib login → dihapus saat logout
         getMasterLokasiList:    { auth: false, latest: true },
         getMasterKaryawanList:  { auth: true,  latest: true },
         getMasterQRData:        { auth: true,  latest: false },
