@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=7d7188d498"></script>
-    <script src="./pages-offline-ui.js?v=7d7188d498" defer></script>
-    <script src="./pages-install.js?v=7d7188d498" defer></script>
+    <script src="./gas-adapter.js?v=f4e3a33ff7"></script>
+    <script src="./pages-offline-ui.js?v=f4e3a33ff7" defer></script>
+    <script src="./pages-install.js?v=f4e3a33ff7" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -1694,6 +1694,65 @@
         .v7-section-head > .v7-print-btn { width: 100%; }
         #kalibrasiContainer .v7-filter-group > .v7-print-btn { grid-column: 1 / -1; width: 100%; }
     }
+    /* =========================================================================
+       [Fase 42] PRESISI TATA LETAK — kolom mengikuti LEBAR KARTU (container query), bukan lebar layar.
+       Masalah: di layar ±1.000–1.400px sidebar memakan ±270px, tetapi grid desktop (col-md-*) tetap
+       6 kolom → isian terpotong, tombol terlipat 2 baris (membesar) & menembus kartu.
+       Hanya CSS — ID, onclick & logika tidak berubah.
+       ========================================================================= */
+    .v7-form-card, .v7-filter-card { container: v7card / inline-size; }
+    .v7-form-card .btn, .v7-filter-card .btn { white-space: nowrap; }
+    .v7-form-card .form-select, .v7-filter-card .form-select {
+        padding-right: 1.9rem; background-position: right 0.6rem center;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .v7-form-card .form-control { text-overflow: ellipsis; }
+
+    /* Form Master Data (Database Master / Unit / QR / Karyawan / Standar Dealer / Lokasi): kartu sempit → 3 kolom */
+    @container v7card (min-width: 480px) and (max-width: 899.98px) {
+        .v7-form-grid > [class*="col-md-1"], .v7-form-grid > [class*="col-md-2"], .v7-form-grid > [class*="col-md-3"] { flex: 0 0 auto; width: 33.3333%; }
+        .v7-form-grid > [class*="col-md-4"], .v7-form-grid > [class*="col-md-5"], .v7-form-grid > [class*="col-md-6"] { flex: 0 0 auto; width: 66.6667%; }
+        /* baris aksi Simpan: selebar kartu, rata kanan, tombol selebar isinya (tidak membesar) */
+        .v7-form-grid > .d-flex.align-items-end:has(> .btn-brand) { width: 100%; justify-content: flex-end; margin-left: 0 !important; }
+        .v7-form-grid > .d-flex.align-items-end:has(> .btn-brand) > .btn.flex-grow-1 { flex-grow: 0 !important; min-width: 160px; } /* utilitas Bootstrap flex-grow-1 ber-!important */
+        /* Master Lokasi: "Pakai lokasi saya" sebaris dengan Latitude & Longitude */
+        .v7-form-grid > .d-flex.align-items-end:not(:has(> .btn-brand)) { width: 33.3333%; }
+    }
+
+    /* Master Karyawan (kartu lebar): Status 1/12 terlalu sempit & tombol Simpan menembus kartu → bagi ulang */
+    @container v7card (min-width: 900px) {
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(1) { flex: 0 0 auto; width: 15%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(2) { flex: 0 0 auto; width: 22%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(3),
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(4) { flex: 0 0 auto; width: 16%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(5) { flex: 0 0 auto; width: 12%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(6) { flex: 0 0 auto; width: 19%; }
+    }
+
+    /* Laporan Harian: judul di atas, filter + tombol satu baris (Tanggal 30% · Lokasi 30% · Cetak & WA 40%) */
+    @container v7card (max-width: 1099.98px) {
+        #laporanHarianContainer .v7-filter-card > .row > .col-lg-5,
+        #laporanHarianContainer .v7-filter-card > .row > .col-lg-7 { flex: 0 0 auto; width: 100%; }
+    }
+    @container v7card (min-width: 560px) {
+        #laporanHarianContainer .v7-filter-card .row .row > .col-md-4:nth-child(1),
+        #laporanHarianContainer .v7-filter-card .row .row > .col-md-4:nth-child(2) { flex: 0 0 auto; width: 30%; }
+        #laporanHarianContainer .v7-filter-card .row .row > .col-md-4:nth-child(3) { flex: 0 0 auto; width: 40%; }
+    }
+
+    /* Kartu Stok: Unit 40% · Tanggal 30% + 30% · tombol Terapkan & Reset di baris sendiri (rata kanan) */
+    @container v7card (min-width: 560px) and (max-width: 999.98px) {
+        #kartuStokContainer .v7-filter-card .row > .col-md-4 { flex: 0 0 auto; width: 40%; }
+        #kartuStokContainer .v7-filter-card .row > .col-md-3 { flex: 0 0 auto; width: 30%; }
+        #kartuStokContainer .v7-filter-card .row > .col-md-2 { flex: 0 0 auto; width: 100%; justify-content: flex-end; }
+        #kartuStokContainer .v7-filter-card .row > .col-md-2 > .btn.w-100 { width: auto !important; min-width: 140px; }
+    }
+
+    /* Tabel Database Master: isi satu baris (baris ramping); tabel lebar → geser ke samping di dalam kartu */
+    .v7-table-card:has(#tbodyAdminMaster) thead th { white-space: nowrap; }
+    #tbodyAdminMaster td { white-space: nowrap; }
+    #tbodyAdminMaster td:nth-child(10) { white-space: normal; min-width: 160px; max-width: 280px; }
+
     /* Perangkat tanpa backdrop-filter: tetap pakai latar pekat agar teks terbaca */
     @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
         .mobile-bottom-nav { background: var(--shell-glass-strong) !important; }
@@ -5070,12 +5129,58 @@
     tbody.innerHTML = html;
   }
 
-  /* [Fase 41] Laporan Harian → teks WhatsApp: stok, pemakaian per lokasi (A–Z), rincian per baris */
+  /* [Fase 42] Catatan (Note) manual di bawah pesan WA — mis. "Peminjaman dari : …" (tidak masuk akumulasi
+     stok, jadi diisi sendiri). Tersimpan di perangkat ini (localStorage) agar tidak perlu diketik ulang. */
+  const WA_NOTE_KEY = 'ab_wa_note_laporan';
+  function readWaNote() { try { return localStorage.getItem(WA_NOTE_KEY) || ''; } catch (e) { return ''; } }
+  function saveWaNote(v) { try { localStorage.setItem(WA_NOTE_KEY, v); } catch (e) {} }
+
   function shareLaporanHarianWA() {
     if (typeof isUserGuest === 'function' && isUserGuest()) {
       if (typeof showAlertModal === 'function') showAlertModal("Kirim laporan ke WhatsApp hanya untuk pengguna terdaftar.", "Akses Terbatas", "lock");
       return;
     }
+    let modal = document.getElementById('modalWaNoteLaporan');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'modalWaNoteLaporan';
+      modal.tabIndex = -1;
+      modal.setAttribute('aria-hidden', 'true');
+      modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content glass-modal">
+            <div class="modal-header py-2">
+              <h6 class="modal-title fw-bold d-flex align-items-center gap-2"><i class="fab fa-whatsapp" style="color:#25D366"></i> Kirim Laporan ke WhatsApp</h6>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+              <label class="field-label d-block mb-1" for="waNoteText">CATATAN / NOTE (OPSIONAL)</label>
+              <textarea id="waNoteText" class="form-control form-control-sm" rows="5" maxlength="1500"
+                placeholder="Contoh:&#10;Peminjaman dari :&#10;* KSO ROW 44/YUDIKATIF : 26.500 L"></textarea>
+              <div class="dash-card-sub mt-2">Ditaruh di bagian bawah pesan, di atas tautan Report. Tersimpan di perangkat ini untuk laporan berikutnya — kosongkan bila tidak perlu.</div>
+            </div>
+            <div class="modal-footer py-2">
+              <button type="button" class="btn btn-sm btn-ghost px-3" data-bs-dismiss="modal">Batal</button>
+              <button type="button" class="btn btn-sm btn-brand fw-bold px-4" id="btnWaNoteSend"><i class="fab fa-whatsapp me-1"></i> Kirim ke WA</button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#btnWaNoteSend').addEventListener('click', function () {
+        const note = document.getElementById('waNoteText').value.replace(/\s+$/, '');
+        saveWaNote(note);
+        bootstrap.Modal.getOrCreateInstance(modal).hide();
+        sendLaporanHarianWA(note);
+      });
+    }
+    document.getElementById('waNoteText').value = readWaNote();
+    bootstrap.Modal.getOrCreateInstance(modal).show();
+  }
+
+  /* [Fase 41] Laporan Harian → teks WhatsApp: stok, pemakaian per lokasi (A–Z), rincian per baris
+     [Fase 42] + Note (manual) & tautan Report di bagian paling bawah */
+  function sendLaporanHarianWA(note) {
     const val = (id) => { const el = document.getElementById(id); return el ? (el.value !== undefined && el.tagName !== 'SPAN' ? el.value : el.innerText).trim() : ''; };
     const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
     const rows = cachedLaporanRows || [];
@@ -5106,6 +5211,9 @@
       });
       if (rows.length > MAKS) L.push('… dan ' + (rows.length - MAKS) + ' transaksi lain (lihat Cetak / PDF)');
     }
+    const n = String(note || '').trim();
+    if (n) L.push('', '*Note*', n);
+    L.push('', '📊Report : ' + WA_REPORT_URL);
     shareToWhatsApp(L.join('\n'));
   }
 
@@ -5274,7 +5382,7 @@
 <header class="v7-page-head stagger-item">
   <div>
     <span class="live-chip v7-page-chip"><i class="fa fa-balance-scale"></i><span class="dash-hero-eyebrow">Laporan &amp; Audit</span></span>
-    <h2 class="v7-page-title">Kalibrasi Flowmeter</h2>
+    <h2 class="v7-page-title">Audit Kalibrasi Konsumsi BBM</h2>
     <p class="v7-page-sub">Evaluasi akurasi pengisian solar berdasar benchmark standar dealer</p>
   </div>
 </header>
@@ -5428,7 +5536,7 @@
     const total = parseFloat(d.totalAudited) || 0;
     const pct = (n) => total > 0 ? ' (' + ((parseFloat(n) || 0) / total * 100).toFixed(1).replace('.', ',') + '%)' : '';
     openPrintableReport({
-      title: 'AUDIT KALIBRASI FLOWMETER',
+      title: 'AUDIT KALIBRASI KONSUMSI BBM',
       fileName: 'Audit_Kalibrasi_' + awal + '_' + akhir + '_' + String(lokasi).replace(/\s+/g, '_'),
       subtitle: 'Evaluasi konsumsi aktual terhadap standar dealer per unit',
       meta: [['Periode', awal + ' s/d ' + akhir], ['Lokasi', lokasi]],
@@ -10706,6 +10814,8 @@ function shareToWhatsApp(text) {
   if (!w) window.location.href = url; // pop-up diblokir / mode aplikasi iOS
 }
 
+// [Fase 42] Tautan "📊Report" di bawah pesan WA ("\/\/": aman dari pembuang komentar Apps Script)
+const WA_REPORT_URL = 'https:\/\/ikyset20.github.io/AB-fuel-management-system/';
 const WA_BULAN_ = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 const WA_HARI_ = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 function waTanggalText(iso, withDay) {
@@ -10741,6 +10851,7 @@ function shareDashboardWA() {
   if (boros.length) { L.push('', '*Unit BOROS (' + boros.length + ')*'); boros.slice(0, 10).forEach(x => L.push('- ' + x.unit + ' ' + (x.deviasiText || ''))); if (boros.length > 10) L.push('… dan ' + (boros.length - 10) + ' unit lain'); }
   const cek = d.meteranRusakList || [];
   if (cek.length) { L.push('', '*Perlu cek meter (' + cek.length + ')*'); cek.slice(0, 10).forEach(x => L.push('- ' + x.unit + ': ' + (x.kondisiSingkat || x.kondisi || ''))); if (cek.length > 10) L.push('… dan ' + (cek.length - 10) + ' unit lain'); }
+  L.push('', '📊Report : ' + WA_REPORT_URL);
   shareToWhatsApp(L.join('\n'));
 }
 
