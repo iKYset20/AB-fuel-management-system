@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=f4e3a33ff7"></script>
-    <script src="./pages-offline-ui.js?v=f4e3a33ff7" defer></script>
-    <script src="./pages-install.js?v=f4e3a33ff7" defer></script>
+    <script src="./gas-adapter.js?v=ca28fb35a9"></script>
+    <script src="./pages-offline-ui.js?v=ca28fb35a9" defer></script>
+    <script src="./pages-install.js?v=ca28fb35a9" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -1721,11 +1721,11 @@
 
     /* Master Karyawan (kartu lebar): Status 1/12 terlalu sempit & tombol Simpan menembus kartu → bagi ulang */
     @container v7card (min-width: 900px) {
-        #subViewMasterKaryawan .v7-form-grid > :nth-child(1) { flex: 0 0 auto; width: 15%; }
-        #subViewMasterKaryawan .v7-form-grid > :nth-child(2) { flex: 0 0 auto; width: 22%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(1) { flex: 0 0 auto; width: 14%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(2) { flex: 0 0 auto; width: 21%; }
         #subViewMasterKaryawan .v7-form-grid > :nth-child(3),
         #subViewMasterKaryawan .v7-form-grid > :nth-child(4) { flex: 0 0 auto; width: 16%; }
-        #subViewMasterKaryawan .v7-form-grid > :nth-child(5) { flex: 0 0 auto; width: 12%; }
+        #subViewMasterKaryawan .v7-form-grid > :nth-child(5) { flex: 0 0 auto; width: 14%; }
         #subViewMasterKaryawan .v7-form-grid > :nth-child(6) { flex: 0 0 auto; width: 19%; }
     }
 
@@ -3560,6 +3560,91 @@
         .table-clean tbody td, .table-clean tbody th { box-shadow: none !important; color: #000000 !important; }
         .stagger-item { animation: none !important; }
     }
+
+    /* =========================================================================
+       [Fase 43] PRESISI LANJUTAN — tidak ada teks bertumpuk / tombol menembus kartu di lebar layar mana pun.
+       Hanya CSS — ID, onclick & logika tidak berubah.
+       ========================================================================= */
+    /* Judul isian form: selalu 1 baris (isian sejajar); teks panjang → "…" */
+    .v7-form-card .field-label { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Database Master: tombol SIMPAN DATA di baris sendiri (rata kanan) kecuali kartu sangat lebar;
+       Masuk Supplier → Liter · No. Surat Jalan · Keterangan satu baris */
+    @container v7card (min-width: 900px) and (max-width: 1299.98px) {
+        #formMasterDbWrapper .v7-form-grid > .d-flex.align-items-end:has(> .btn-brand) { width: 100%; justify-content: flex-end; margin-left: 0 !important; }
+        #formMasterDbWrapper .v7-form-grid > .d-flex.align-items-end:has(> .btn-brand) > .btn.flex-grow-1 { flex-grow: 0 !important; min-width: 160px; }
+        #formMasterDbWrapper #wrapperKeterangan { flex: 1 0 0; width: auto; }
+    }
+    @container v7card (min-width: 480px) and (max-width: 899.98px) {
+        #formMasterDbWrapper .v7-form-grid:has(> #wrapperSuratJalan:not([style*="none"])) > #wrapperKeterangan { width: 33.3333%; }
+    }
+
+    /* Kalibrasi: kartu ringkasan sempit → ikon + chip tag di baris atas, label selebar kartu di bawahnya (tidak terhimpit) */
+    #kalibrasiContainer .tier-row > [class*="col-"] { container: tiercard / inline-size; }
+    @container tiercard (min-width: 200px) and (max-width: 360px) {
+        #kalibrasiContainer .tier-card {
+            grid-template-columns: auto minmax(0, 1fr);
+            grid-template-areas: "icon tag" "label label" "value value" "bar bar" "foot foot";
+        }
+        #kalibrasiContainer .tier-card .tier-tag,
+        #kalibrasiContainer .tier-card .tier-badge { justify-self: end; }
+        #kalibrasiContainer .tier-card .kpi-label { margin-top: 4px; }
+    }
+
+    /* Profil: 3 isian kata sandi — panel sempit → "saat ini" penuh, "baru" | "ulangi" berdampingan */
+    #formUbahPassword { container: pwform / inline-size; }
+    #formUbahPassword .field-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @container pwform (max-width: 599.98px) {
+        #formUbahPassword .row > .col-xl-4 { flex: 0 0 auto; width: 50%; }
+        #formUbahPassword .row > .col-xl-4:first-child { width: 100%; }
+    }
+    @container pwform (max-width: 379.98px) {
+        #formUbahPassword .row > .col-xl-4 { width: 100%; }
+    }
+    /* Profil: 3 statistik pindah ke baris sendiri (selebar kartu) bila tidak cukup lebar di samping nama;
+       nilai boleh 2 baris (per kata) agar tidak terpotong */
+    .profil-hero-stats { flex-basis: 600px; }
+    .profil-stat-value { white-space: normal; line-height: 1.25; }
+    /* Profil: panel sempit → kolom Foto/Keluar & Kata Sandi/Sesi bertumpuk selebar penuh */
+    .profil-main-row { container: profrow / inline-size; }
+    @container profrow (max-width: 799.98px) {
+        .profil-main-row > .profil-col { flex: 0 0 auto; width: 100%; }
+    }
+    /* Profil: tombol "Keluar di perangkat ini / semua perangkat" bertumpuk saat kolom sempit (tidak terpotong) */
+    .profil-col { container: profcol / inline-size; }
+    @container profcol (max-width: 479.98px) {
+        .profil-col .profil-logout-grid { grid-template-columns: 1fr; }
+        .profil-col .profil-logout-grid .btn { white-space: normal; height: auto; min-height: 38px; text-overflow: clip; line-height: 1.25; }
+    }
+    @container profcol (min-width: 480px) { .profil-col .profil-logout-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* Dashboard: grafik & kartu tangki bertumpuk selebar penuh saat panel sempit */
+    .dash-v7 > .row:has(> .col-lg-8 > .dash-chart-card) { container: dashrow / inline-size; }
+    @container dashrow (max-width: 1079.98px) {
+        .dash-v7 .col-lg-8:has(> .dash-chart-card),
+        .dash-v7 .col-lg-4:has(> .dash-gauge-card) { flex: 0 0 auto; width: 100%; }
+    }
+    .gauge-metric-value, .gauge-metric #tankDaysLeftText { white-space: nowrap; }
+    /* Tren Konsumsi: pilihan seri selalu 1 baris (geser ke samping bila tidak muat); 4 ringkasan → 2×2 saat sempit */
+    .dash-chart-card { container: dashchart / inline-size; }
+    #trendSeriesGroup { flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    #trendSeriesGroup::-webkit-scrollbar { display: none; }
+    @container dashchart (max-width: 699.98px) {
+        .dash-chart-card .dash-card-tools { width: 100%; }
+        .dash-chart-card .dash-card-tools #trendSeriesGroup { width: 100%; }
+        .dash-chart-card .dash-card-tools #trendSeriesGroup > .btn { flex: 1 0 auto; justify-content: center; }
+    }
+    @container dashchart (max-width: 619.98px) {
+        .dash-chart-card .chart-mini-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    /* Hero Dashboard (tablet/laptop): tombol aksi pindah ke baris sendiri agar ucapan & tanggal tidak terlipat */
+    @media (min-width: 768px) and (max-width: 1399.98px) {
+        .dash-hero { grid-template-areas: "title status" "sub sub" "actions actions"; }
+        .dash-hero-actions { justify-self: start; }
+    }
+
+    /* Laporan Harian: Cetak & Kirim WA berbagi lebar; turun baris bila tidak muat (tidak menembus kartu) */
+    #laporanHarianContainer .lap-actions > .btn { flex: 1 1 0; width: auto !important; min-width: max-content; }
 </style>
 
 
@@ -4907,7 +4992,7 @@
             </select>
           </div>
 
-          <div class="col-12 col-md-4 d-flex gap-2">
+          <div class="col-12 col-md-4 d-flex flex-wrap gap-2 lap-actions">
             <button onclick="printLaporanHarian()" class="btn btn-sm btn-brand w-100 fw-bold d-flex align-items-center justify-content-center gap-1">
               <i class="fa fa-print me-1"></i> Cetak / PDF
             </button>
@@ -5213,7 +5298,7 @@
     }
     const n = String(note || '').trim();
     if (n) L.push('', '*Note*', n);
-    L.push('', '📊Report : ' + WA_REPORT_URL);
+    L.push('', '◉ Report : ' + WA_REPORT_URL);
     shareToWhatsApp(L.join('\n'));
   }
 
@@ -6295,7 +6380,7 @@
           <input type="number" step="0.1" id="dealerBerat" class="form-control form-control-sm tabular-nums" placeholder="22.0">
         </div>
         <div class="col-6 col-md-2 mt-2">
-          <label class="field-label" for="dealerRata2">ACUAN RATA-RATA (OTOMATIS)</label>
+          <label class="field-label" for="dealerRata2" title="Acuan rata-rata — dihitung otomatis dari 3 beban">ACUAN (OTOMATIS)</label>
           <!-- [Fase 18] dihitung dari rata-rata beban; di sheet disimpan sebagai rumus =AVERAGE(E:G) -->
           <input type="number" step="0.01" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="—" readonly tabindex="-1">
         </div>
@@ -10851,7 +10936,7 @@ function shareDashboardWA() {
   if (boros.length) { L.push('', '*Unit BOROS (' + boros.length + ')*'); boros.slice(0, 10).forEach(x => L.push('- ' + x.unit + ' ' + (x.deviasiText || ''))); if (boros.length > 10) L.push('… dan ' + (boros.length - 10) + ' unit lain'); }
   const cek = d.meteranRusakList || [];
   if (cek.length) { L.push('', '*Perlu cek meter (' + cek.length + ')*'); cek.slice(0, 10).forEach(x => L.push('- ' + x.unit + ': ' + (x.kondisiSingkat || x.kondisi || ''))); if (cek.length > 10) L.push('… dan ' + (cek.length - 10) + ' unit lain'); }
-  L.push('', '📊Report : ' + WA_REPORT_URL);
+  L.push('', '◉ Report : ' + WA_REPORT_URL);
   shareToWhatsApp(L.join('\n'));
 }
 
@@ -12825,6 +12910,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const el = document.getElementById(id);
                 if (el) el.disabled = isGuest;
             });
+
+            // [Fase 43] Mode tamu: tombol Kirim WA (Laporan Harian & Dashboard) disembunyikan
+            document.querySelectorAll('.btn-wa-share').forEach(b => b.classList.toggle('d-none', isGuest));
         }
 
         function handleNavClick(event, targetAction, isLockedInGuest) {
