@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=80bfbfe12a"></script>
-    <script src="./pages-offline-ui.js?v=80bfbfe12a" defer></script>
-    <script src="./pages-install.js?v=80bfbfe12a" defer></script>
+    <script src="./gas-adapter.js?v=720ed3981e"></script>
+    <script src="./pages-offline-ui.js?v=720ed3981e" defer></script>
+    <script src="./pages-install.js?v=720ed3981e" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -5493,7 +5493,7 @@
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="adminJam">JAM TRANSAKSI</label>
-          <input type="text" id="adminJam" class="form-control form-control-sm tabular-nums" placeholder="08:00">
+          <input type="text" id="adminJam" class="form-control form-control-sm tabular-nums" placeholder="08:00" inputmode="decimal" maxlength="5" autocomplete="off" title="Format jam JJ:MM, contoh 08:30 (boleh ketik 0830)">
         </div>
         <div class="col-6 col-md-2">
           <label class="field-label" for="adminJenisTx">JENIS TRANSAKSI</label>
@@ -6215,6 +6215,17 @@
   document.addEventListener('DOMContentLoaded', function() {
     initAdminDefaultDate();
     syncMasterDataRBACUI();
+    // [Fase 39] Pengaman kolom Jam: hanya angka + ":" saat mengetik ("." → ":"), dirapikan ke JJ:MM saat
+    // ditinggalkan (0830 → 08:30, 8 → 08:00); tidak valid → ditandai merah. Didaftarkan SEBELUM cek meter.
+    const elJam = document.getElementById('adminJam');
+    if (elJam) {
+      elJam.addEventListener('input', function() {
+        const bersih = elJam.value.replace(/\./g, ':').replace(/[^0-9:]/g, '').slice(0, 5);
+        if (bersih !== elJam.value) elJam.value = bersih;
+        elJam.classList.remove('is-invalid');
+      });
+      elJam.addEventListener('change', function() { validateAdminJam(false); });
+    }
     // [Fase 17] cek meter Database Master saat unit/HM/tanggal/jam/jenis berubah
     ['adminNoUnit', 'adminHmKm', 'adminTanggal', 'adminJam', 'adminJenisTx'].forEach(function(id) {
       const el = document.getElementById(id);
@@ -6594,7 +6605,8 @@
       if (p.length === 3) rawTgl = `${p[2]}-${p[0].padStart(2, '0')}-${p[1].padStart(2, '0')}`;
     }
     document.getElementById('adminTanggal').value = rawTgl;
-    document.getElementById('adminJam').value = item.jam || '';
+    document.getElementById('adminJam').value = (item.jam && item.jam !== '-') ? item.jam : '';
+    document.getElementById('adminJam').classList.remove('is-invalid');
     document.getElementById('adminJenisTx').value = item.jenisTx || 'PENGELUARAN UNIT';
     document.getElementById('adminNoUnit').value = item.noUnit || '';
     // [Fase 18] lokasi lama (nonaktif / beda huruf besar-kecil) tetap dipilih — sebelumnya dropdown kosong
@@ -6617,6 +6629,7 @@
     ADMIN_EDIT_ORIG_UNIT = ''; // [Fase 27]
     document.getElementById('adminUnitHint').classList.add('d-none');
     document.getElementById('adminJam').value = '';
+    document.getElementById('adminJam').classList.remove('is-invalid');
     document.getElementById('adminNoUnit').value = '';
     document.getElementById('adminHmKm').value = '';
     document.getElementById('adminLiter').value = '';
@@ -6713,7 +6726,38 @@
     });
   }
 
+  /* [Fase 39] Jam transaksi → "JJ:MM" | "" (kosong) | null (tidak valid). Sama dengan normJam_ di server. */
+  function normalizeJamText(v) {
+    const s = String(v == null ? '' : v).trim();
+    if (!s) return '';
+    let h, m, x;
+    if ((x = /^(\d{1,2})[:.](\d{2})$/.exec(s))) { h = +x[1]; m = +x[2]; }
+    else if (/^\d{3,4}$/.test(s)) { h = +s.slice(0, -2); m = +s.slice(-2); }
+    else if (/^\d{1,2}$/.test(s)) { h = +s; m = 0; }
+    else return null;
+    if (h > 23 || m > 59) return null;
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
+  function validateAdminJam(showMsg) {
+    const el = document.getElementById('adminJam');
+    if (!el) return true;
+    const n = normalizeJamText(el.value);
+    if (n === null) {
+      el.classList.add('is-invalid');
+      if (showMsg) {
+        showToast('Jam tidak valid: "' + el.value + '". Gunakan format JJ:MM, contoh 08:30.', 'error');
+        el.focus();
+      }
+      return false;
+    }
+    el.value = n;
+    el.classList.remove('is-invalid');
+    return true;
+  }
+
   function saveAdminForm(skipMeterCheck) {
+    if (!validateAdminJam(true)) return; // [Fase 39] jam salah ketik → tidak disimpan
     if (!checkAdminUnitCode(true)) return; // [Fase 27] kode unit tidak terdaftar → tidak disimpan
     if (skipMeterCheck !== true) {
       const mi = adminMeterInput();
