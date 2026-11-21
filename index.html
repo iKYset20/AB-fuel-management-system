@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=720ed3981e"></script>
-    <script src="./pages-offline-ui.js?v=720ed3981e" defer></script>
-    <script src="./pages-install.js?v=720ed3981e" defer></script>
+    <script src="./gas-adapter.js?v=7d7188d498"></script>
+    <script src="./pages-offline-ui.js?v=7d7188d498" defer></script>
+    <script src="./pages-install.js?v=7d7188d498" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -1684,6 +1684,16 @@
     /* Latar lebih bening → label/ikon menu tidak aktif dipertegas agar tetap terbaca di atas konten terang */
     .mobile-nav-btn:not(.active):not(.scan-center) { color: rgba(236, 245, 240, 0.80); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
     .scan-label { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+    /* [Fase 41] Tombol "Kirim ke WA" di hero Dashboard: HP → selebar baris (di bawah Filter & Audio) */
+    .btn-wa-share i { color: #25D366; }
+    @media (max-width: 767.98px) { .dash-hero-actions > .btn-wa-share { grid-column: 1 / -1; } }
+    /* [Fase 41] Tombol Cetak / PDF Kartu Stok & Kalibrasi */
+    .v7-print-btn { height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-pill) !important; white-space: nowrap; }
+    .v7-print-btn i { margin: 0 !important; }
+    @media (max-width: 767.98px) {
+        .v7-section-head > .v7-print-btn { width: 100%; }
+        #kalibrasiContainer .v7-filter-group > .v7-print-btn { grid-column: 1 / -1; width: 100%; }
+    }
     /* Perangkat tanpa backdrop-filter: tetap pakai latar pekat agar teks terbaca */
     @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
         .mobile-bottom-nav { background: var(--shell-glass-strong) !important; }
@@ -3746,6 +3756,9 @@
             <button id="btnMuteSound" class="btn-audio-mute" onclick="toggleMuteAudio()">
                 <i class="fa fa-volume-up me-1"></i> Audio Siren: ON
             </button>
+            <button type="button" class="btn btn-sm btn-ghost px-3 btn-wa-share" onclick="shareDashboardWA()" title="Kirim ringkasan Dashboard ke WhatsApp">
+                <i class="fab fa-whatsapp me-1"></i> Kirim ke WA
+            </button>
             <button type="button" class="btn btn-sm btn-brand px-3" onclick="handleNavClick(event, 'SCAN_FILL', false)">
                 <i class="fa fa-plus me-2"></i> Scan to Fill
             </button>
@@ -4260,6 +4273,10 @@
                 <h6 class="dash-card-title"><i class="fa fa-sliders-h me-2"></i>Filter Unit &amp; Periode</h6>
                 <span class="dash-card-sub">Pilih unit &amp; rentang tanggal transaksi</span>
             </div>
+            <!-- [Fase 41] Cetak / PDF kartu stok unit terpilih (semua baris periode) -->
+            <button type="button" class="btn btn-sm btn-brand fw-bold px-3 v7-print-btn" onclick="printKartuStok()">
+                <i class="fa fa-print me-1"></i> Cetak / PDF
+            </button>
         </div>
         <div class="row g-2 align-items-end">
             <div class="col-md-4">
@@ -4390,6 +4407,7 @@
 
 <script>
     let cachedKartuStokRows = [];
+    let LAST_KARTU_STOK_DATA = null; // [Fase 41] data terakhir untuk Cetak / PDF
 
     document.addEventListener('DOMContentLoaded', function() {
         initKartuStokDates();
@@ -4567,6 +4585,7 @@
 
     function renderKartuStokUI(data) {
         if (!data) return;
+        LAST_KARTU_STOK_DATA = data; // [Fase 41] untuk Cetak / PDF
 
         // 1. Populate Dropdown Unit
         const selectUnit = document.getElementById('selectKartuStokUnit');
@@ -4639,7 +4658,7 @@
             var waktuDisplay = r.waktu || r.jam || '-';
             rowHtml += `<tr class="text-center">
                 <td class="text-center tabular-nums">${escapeHtml(r.tanggal)}</td>
-                <td class="text-center tabular-nums text-muted">${waktuDisplay}</td>
+                <td class="text-center tabular-nums text-muted">${escapeHtml(waktuDisplay)}</td>
                 <td class="text-center fw-bold text-white">${escapeHtml(r.noUnit)}</td>
                 <td class="text-center tabular-nums">${escapeHtml(r.hmKm)}</td>
                 <td class="text-center fw-bold text-brand tabular-nums">${escapeHtml(r.totalLiter)}</td>
@@ -4647,6 +4666,32 @@
             </tr>`;
         });
         tbody.innerHTML = rowHtml;
+    }
+
+    /* [Fase 41] Cetak / PDF Kartu Stok — dokumen bersih A4 (semua baris, bukan hanya yang tampil) */
+    function printKartuStok() {
+        if (typeof isUserGuest === 'function' && isUserGuest()) {
+            if (typeof showAlertModal === 'function') showAlertModal("Fitur Cetak / Export PDF hanya untuk pengguna terdaftar.", "Akses Terbatas", "lock");
+            return;
+        }
+        const d = LAST_KARTU_STOK_DATA;
+        if (!d || !d.selectedUnit) {
+            if (typeof showToast === 'function') showToast('Pilih unit & terapkan filter terlebih dahulu.', 'warning');
+            return;
+        }
+        const sat = d.unitSatuan || 'HM';
+        openPrintableReport({
+            title: 'KARTU STOK BBM UNIT ' + d.selectedUnit,
+            fileName: 'Kartu_Stok_' + String(d.selectedUnit).replace(/\s+/g, '_') + '_' + (d.tglAwalStr || '') + '_' + (d.tglAkhirStr || ''),
+            subtitle: 'Riwayat pengisian & efisiensi konsumsi',
+            meta: [['Kode Unit', d.selectedUnit], ['Periode', (d.tglAwalStr || '-') + ' s/d ' + (d.tglAkhirStr || '-')], ['Satuan Meter', sat]],
+            summary: [['Total Pengisian', d.totalBbmText || '0 Liter'], ['Frekuensi', d.frekuensiText || '0 Kali'],
+                      ['Rata-rata Efisiensi', d.efisiensiText || '-'], ['Rata-rata / Pengisian', d.avgPerPengisianText || '0 Liter']],
+            columns: ['Tanggal', 'Waktu', 'Kode Unit', sat, 'Total Liter', 'Lokasi Pit'],
+            align: ['c', 'c', 'c', 'r', 'r', 'c'],
+            rows: (cachedKartuStokRows || []).map(r => [r.tanggal, r.waktu || r.jam || '-', r.noUnit, r.hmKm, r.totalLiter, r.lokasi]),
+            emptyText: 'Tidak ada riwayat transaksi pengisian solar pada periode ini.'
+        });
     }
 </script>
 
@@ -4803,9 +4848,13 @@
             </select>
           </div>
 
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-4 d-flex gap-2">
             <button onclick="printLaporanHarian()" class="btn btn-sm btn-brand w-100 fw-bold d-flex align-items-center justify-content-center gap-1">
               <i class="fa fa-print me-1"></i> Cetak / PDF
+            </button>
+            <!-- [Fase 41] Kirim ringkasan + rincian laporan ke WhatsApp (pilih grup/kontak sendiri) -->
+            <button type="button" onclick="shareLaporanHarianWA()" class="btn btn-sm btn-ghost w-100 fw-bold d-flex align-items-center justify-content-center gap-1 btn-wa-share" title="Kirim Laporan Harian ke WhatsApp">
+              <i class="fab fa-whatsapp me-1"></i> Kirim WA
             </button>
           </div>
         </div>
@@ -5021,6 +5070,45 @@
     tbody.innerHTML = html;
   }
 
+  /* [Fase 41] Laporan Harian → teks WhatsApp: stok, pemakaian per lokasi (A–Z), rincian per baris */
+  function shareLaporanHarianWA() {
+    if (typeof isUserGuest === 'function' && isUserGuest()) {
+      if (typeof showAlertModal === 'function') showAlertModal("Kirim laporan ke WhatsApp hanya untuk pengguna terdaftar.", "Akses Terbatas", "lock");
+      return;
+    }
+    const val = (id) => { const el = document.getElementById(id); return el ? (el.value !== undefined && el.tagName !== 'SPAN' ? el.value : el.innerText).trim() : ''; };
+    const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+    const rows = cachedLaporanRows || [];
+    const L = ['*LAPORAN HARIAN BBM*', 'AB-Fuel · PT Arthalaut Bumijasa',
+      'Tanggal: ' + (typeof waTanggalText === 'function' ? waTanggalText(val('filterTglLaporan'), true) : val('filterTglLaporan')),
+      'Lokasi: ' + (val('filterLokasiLaporan') || 'Semua Lokasi'), '',
+      '*Stok (Liter)*',
+      'Stok awal: ' + txt('valStokAwal'),
+      'Penerimaan: ' + txt('valPenerimaan'),
+      'Pemakaian: ' + txt('valPemakaian'),
+      'Stok akhir: ' + txt('valStokAkhir')];
+    if (!rows.length) {
+      L.push('', 'Tidak ada transaksi pengisian pada tanggal & lokasi ini.');
+    } else {
+      const num = (s) => parseFloat(String(s || '0').replace(/\./g, '').replace(',', '.')) || 0;
+      const perLok = {};
+      rows.forEach(r => { const k = r.lokasiKerja || 'Site'; perLok[k] = perLok[k] || { l: 0, n: 0 }; perLok[k].l += num(r.literBbm); perLok[k].n++; });
+      L.push('', '*Pemakaian per lokasi*');
+      Object.keys(perLok).forEach(k => L.push(k + ': ' + perLok[k].l.toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' L (' + perLok[k].n + 'x)'));
+      L.push('', '*Rincian (' + rows.length + ' transaksi)*');
+      const MAKS = 80; // batas aman panjang pesan WhatsApp
+      let lokNow = null;
+      rows.slice(0, MAKS).forEach((r, i) => {
+        const lok = r.lokasiKerja || 'Site';
+        if (lok !== lokNow) { L.push('_' + lok + '_'); lokNow = lok; }
+        L.push((i + 1) + '. ' + (r.waktu || '-') + ' ' + (r.noUnit || '-') + ' · ' + (r.literBbm || '0') + ' L · ' + (r.hmKm || '0') +
+          (r.keterangan && r.keterangan !== '-' ? ' · ' + r.keterangan : ''));
+      });
+      if (rows.length > MAKS) L.push('… dan ' + (rows.length - MAKS) + ' transaksi lain (lihat Cetak / PDF)');
+    }
+    shareToWhatsApp(L.join('\n'));
+  }
+
   /* FUNGSI CETAK LAPORAN HARIAN (FIX TANGGAL & TABEL KOSONG) */
   function printLaporanHarian() {
     if (typeof isUserGuest === 'function' && isUserGuest()) {
@@ -5218,6 +5306,13 @@
             <option value="Workshop">Workshop</option>
           </select>
         </div>
+
+        <!-- [Fase 41] Cetak / PDF hasil audit (semua unit periode & lokasi terpilih) -->
+        <div class="v7-filter-group">
+          <button type="button" class="btn btn-sm btn-brand fw-bold px-3 v7-print-btn" onclick="printKalibrasi()">
+            <i class="fa fa-print me-1"></i> Cetak / PDF
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -5318,6 +5413,36 @@
 
 <script>
   let cachedKalibrasiRows = [];
+  let LAST_KALIBRASI_DATA = null; // [Fase 41] data terakhir untuk Cetak / PDF
+
+  /* [Fase 41] Cetak / PDF Audit Kalibrasi — dokumen bersih A4 (semua unit, bukan hanya yang tampil) */
+  function printKalibrasi() {
+    if (typeof isUserGuest === 'function' && isUserGuest()) {
+      if (typeof showAlertModal === 'function') showAlertModal("Fitur Cetak / Export PDF hanya untuk pengguna terdaftar.", "Akses Terbatas", "lock");
+      return;
+    }
+    const d = LAST_KALIBRASI_DATA;
+    if (!d) { if (typeof showToast === 'function') showToast('Data audit belum termuat, coba sebentar lagi.', 'warning'); return; }
+    const v = (id, def) => { const el = document.getElementById(id); return el && el.value ? el.value : def; };
+    const awal = v('filterKalAwal', '-'), akhir = v('filterKalAkhir', '-'), lokasi = v('filterKalLokasi', 'Semua Lokasi');
+    const total = parseFloat(d.totalAudited) || 0;
+    const pct = (n) => total > 0 ? ' (' + ((parseFloat(n) || 0) / total * 100).toFixed(1).replace('.', ',') + '%)' : '';
+    openPrintableReport({
+      title: 'AUDIT KALIBRASI FLOWMETER',
+      fileName: 'Audit_Kalibrasi_' + awal + '_' + akhir + '_' + String(lokasi).replace(/\s+/g, '_'),
+      subtitle: 'Evaluasi konsumsi aktual terhadap standar dealer per unit',
+      meta: [['Periode', awal + ' s/d ' + akhir], ['Lokasi', lokasi]],
+      summary: [['Total Unit Diaudit', String(d.totalAudited || 0)], ['Akurat / Normal', String(d.normalCount || 0) + pct(d.normalCount)],
+                ['Terdeteksi Anomali', String(d.anomalyCount || 0) + pct(d.anomalyCount)]],
+      columns: ['Kode Unit', 'Tipe Unit', 'Total Liter', 'Delta HM/KM', 'Aktual Rate', 'Std Benchmark', 'Deviasi', 'Status'],
+      align: ['c', 'c', 'r', 'r', 'r', 'r', 'r', 'c'],
+      rows: (cachedKalibrasiRows || []).map(r => [r.unit || '-', r.jenis || '-', (r.totalLiter || '0') + ' L', r.deltaHM || '0',
+        (r.aktualRate || '0') + ' ' + (r.satuan || ''), r.stdRate === '-' ? '—' : (r.stdRate || '0') + ' ' + (r.satuan || ''),
+        r.deviasiText || '-', r.statusText || '-']),
+      emptyText: 'Tidak ada data unit terdeteksi pada periode & lokasi ini.',
+      note: 'Status: IRIT = di bawah standar > 5% · NORMAL = ±5% · BOROS = di atas standar > 5% · CEK METER = deviasi < -50% (dicurigai masalah meter) · STANDAR BELUM DIATUR = unit belum punya standar.'
+    });
+  }
 
   function loadKalibrasiData() {
     if (typeof isUserGuest === 'function' && isUserGuest()) return; // [Fase 32] wajib login
@@ -5360,6 +5485,7 @@
 
   function renderKalibrasi(data) {
     if (!data) return;
+    LAST_KALIBRASI_DATA = data; // [Fase 41] untuk Cetak / PDF
 
     setKalibrasiKpi('kalTotalUnit', data.totalAudited || "0");
     setKalibrasiKpi('kalNormalUnit', data.normalCount || "0");
@@ -10570,6 +10696,105 @@
    DASHBOARD TIME LOGIC & CHART RENDERER (INJEKSI BARU)
    ========================================================================= */
 
+/* =========================================================================
+   [Fase 41] BAGIKAN KE WHATSAPP (wa.me, resmi & gratis) + CETAK LAPORAN BERSIH (A4, putih)
+   ========================================================================= */
+function shareToWhatsApp(text) {
+  const url = 'https:\/\/wa.me/?text=' + encodeURIComponent(String(text || '')); // "\/\/": aman dari pembuang komentar Apps Script
+  // (tanpa 'noopener': dengan fitur itu window.open selalu mengembalikan null → terbuka dua kali)
+  const w = window.open(url, '_blank');
+  if (!w) window.location.href = url; // pop-up diblokir / mode aplikasi iOS
+}
+
+const WA_BULAN_ = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+const WA_HARI_ = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+function waTanggalText(iso, withDay) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+  const d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
+  return (withDay ? WA_HARI_[d.getDay()] + ', ' : '') + d.getDate() + ' ' + WA_BULAN_[d.getMonth()] + ' ' + d.getFullYear();
+}
+function waNowText() {
+  const d = new Date();
+  return waTanggalText('', false) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+// Ringkasan Dashboard → teks WhatsApp (memakai data terakhir yang tampil di Dashboard)
+let LAST_DASHBOARD_DATA = null;
+function shareDashboardWA() {
+  const d = LAST_DASHBOARD_DATA;
+  if (!d) { if (typeof showToast === 'function') showToast('Data Dashboard belum termuat, coba sebentar lagi.', 'warning'); return; }
+  const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+  const L = ['*RINGKASAN BBM SITE*', 'AB-Fuel · ' + waNowText() + ' WITA', ''];
+  const status = txt('tankBadgeAlert') || '-';
+  L.push('*Stok tangki: ' + status + '*');
+  L.push('Sisa stok: ' + (d.numTankVal != null ? Math.round(d.numTankVal).toLocaleString('id-ID') + ' L' : (d.kpiSisaStok || '-')) +
+    (d.tankPercentage != null ? ' (' + Number(d.tankPercentage).toFixed(1).replace('.', ',') + '%)' : ''));
+  L.push('Estimasi habis: ' + (d.daysLeftText || '-') + ' · rata-rata ' + (d.avg7DaysConsText || '-'));
+  L.push('', '*Konsumsi*');
+  L.push('Hari ini: ' + (d.kpiTodayCons || '0 L'));
+  const periode = txt('auditPeriodText');
+  L.push('Total periode' + (periode ? ' (' + periode + ')' : '') + ': ' + (d.kpiTotalCons || '0 L'));
+  if (typeof d.kpiSupplierLiter === 'number') L.push('Masuk supplier: ' + Math.round(d.kpiSupplierLiter).toLocaleString('id-ID') + ' L');
+  const top = (d.top5Cons || []).slice(0, 5);
+  if (top.length) { L.push('', '*Top konsumsi*'); top.forEach((x, i) => L.push((i + 1) + '. ' + x.unit + ' — ' + x.totalLiterText + (x.pctText ? ' (' + x.pctText + ')' : ''))); }
+  const boros = d.auditDeviasi || [];
+  if (boros.length) { L.push('', '*Unit BOROS (' + boros.length + ')*'); boros.slice(0, 10).forEach(x => L.push('- ' + x.unit + ' ' + (x.deviasiText || ''))); if (boros.length > 10) L.push('… dan ' + (boros.length - 10) + ' unit lain'); }
+  const cek = d.meteranRusakList || [];
+  if (cek.length) { L.push('', '*Perlu cek meter (' + cek.length + ')*'); cek.slice(0, 10).forEach(x => L.push('- ' + x.unit + ': ' + (x.kondisiSingkat || x.kondisi || ''))); if (cek.length > 10) L.push('… dan ' + (cek.length - 10) + ' unit lain'); }
+  shareToWhatsApp(L.join('\n'));
+}
+
+/* Dokumen cetak bersih (latar putih, teks hitam, A4) — dipakai Kartu Stok & Kalibrasi.
+   opts: { title, subtitle, meta:[[label,nilai]], summary:[[label,nilai]], columns:[judul], align:[...],
+           rows:[[sel]], emptyText, note } — semua teks di-escape. */
+function openPrintableReport(opts) {
+  const e = (v) => escapeHtml(v === undefined || v === null ? '' : String(v));
+  const cols = opts.columns || [];
+  const al = opts.align || [];
+  const meta = (opts.meta || []).map(m => `<tr><td class="k">${e(m[0])}</td><td>: ${e(m[1])}</td></tr>`).join('');
+  const sum = (opts.summary || []).map(s => `<div class="box"><div class="l">${e(s[0])}</div><div class="v">${e(s[1])}</div></div>`).join('');
+  const body = (opts.rows || []).length
+    ? opts.rows.map((r, i) => '<tr><td class="c">' + (i + 1) + '</td>' + r.map((c, j) => `<td class="${al[j] || 'c'}">${e(c)}</td>`).join('') + '</tr>').join('')
+    : `<tr><td colspan="${cols.length + 1}" class="c" style="padding:14px">${e(opts.emptyText || 'Tidak ada data.')}</td></tr>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${e(opts.fileName || opts.title)}</title>
+<style>
+  @page { size: A4 portrait; margin: 8mm; }
+  * { box-sizing: border-box; }
+  html, body { background: #ffffff; color: #000000; margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 10px; }
+  body { padding: 10px; }
+  .hd { border-bottom: 2px solid #000000; padding-bottom: 6px; margin-bottom: 8px; }
+  .hd .co { font-size: 9px; letter-spacing: .04em; }
+  .hd h1 { font-size: 15px; margin: 2px 0 0; }
+  .hd .sub { font-size: 10px; }
+  table.meta td { padding: 1px 6px 1px 0; font-size: 10px; } table.meta td.k { font-weight: bold; white-space: nowrap; }
+  .sum { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+  .box { flex: 1 1 0; min-width: 110px; border: 1px solid #999999; border-radius: 4px; padding: 5px 7px; }
+  .box .l { font-size: 8.5px; text-transform: uppercase; } .box .v { font-size: 12px; font-weight: bold; margin-top: 1px; }
+  table.data { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  table.data th, table.data td { border: 1px solid #999999; padding: 3px 5px; font-size: 9.5px; }
+  table.data th { background: #eeeeee; font-weight: bold; text-align: center; }
+  table.data tr { page-break-inside: avoid; }
+  .c { text-align: center; } .r { text-align: right; } .l { text-align: left; }
+  .note { margin-top: 8px; font-size: 8.5px; }
+  .ft { margin-top: 6px; font-size: 8.5px; display: flex; justify-content: space-between; }
+</style>
+<script>window.onload = function () { setTimeout(function () { window.print(); }, 300); };<\/script>
+</head><body>
+<div class="hd"><div class="co">PT ARTHALAUT BUMIJASA · AB-FUEL MANAGEMENT SYSTEM</div><h1>${e(opts.title)}</h1>${opts.subtitle ? `<div class="sub">${e(opts.subtitle)}</div>` : ''}</div>
+${meta ? `<table class="meta">${meta}</table>` : ''}
+${sum ? `<div class="sum">${sum}</div>` : ''}
+<table class="data"><thead><tr><th>No</th>${cols.map(c => `<th>${e(c)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>
+${opts.note ? `<div class="note">${e(opts.note)}</div>` : ''}
+<div class="ft"><span>Dicetak: ${e(waNowText())} WITA</span><span>${e((opts.rows || []).length)} baris</span></div>
+</body></html>`;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank', 'width=950,height=850,scrollbars=yes,resizable=yes');
+  if (!w && typeof showAlertModal === 'function') {
+    showAlertModal("Pop-up terblokir oleh browser! Mohon izinkan pop-up di browser Anda agar pratinjau cetak dapat terbuka.", "Peringatan Browser", "warning");
+  }
+}
+
 let isAudioMuted = false;
 let audioCtx = null;
 let supplyChart = null;
@@ -10793,6 +11018,7 @@ function loadLiveDashboardData() {
 // 4. MAIN DASHBOARD RENDERER & CHART.JS
 function renderDashboardUI(data) {
   if (!data) return;
+  LAST_DASHBOARD_DATA = data; // [Fase 41] untuk tombol Kirim ke WA
   // [Fase 12] Peta lokasi: konsumsi per lokasi periode filter (data yang sama dengan donut lokasi)
   if (typeof updateDashMapConsumption === 'function') updateDashMapConsumption(data);
   // [Fase 14] Keterangan periode & lokasi pada kartu Audit Deviasi
