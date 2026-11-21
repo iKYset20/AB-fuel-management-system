@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=aabe665273"></script>
-    <script src="./pages-offline-ui.js?v=aabe665273" defer></script>
-    <script src="./pages-install.js?v=aabe665273" defer></script>
+    <script src="./gas-adapter.js?v=6ea3627dfe"></script>
+    <script src="./pages-offline-ui.js?v=6ea3627dfe" defer></script>
+    <script src="./pages-install.js?v=6ea3627dfe" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -1609,12 +1609,13 @@
         bottom: calc(12px + env(safe-area-inset-bottom)) !important;
         left: 12px !important; right: 12px !important;
         height: 68px;
-        background: var(--shell-glass-strong) !important;
-        -webkit-backdrop-filter: blur(22px) saturate(1.15);
-        backdrop-filter: blur(22px) saturate(1.15);
-        border: 1px solid var(--shell-border);
+        /* [Fase 36] Lebih bening (efek kaca): latar 0,80 → 0,50 + blur & saturasi dinaikkan agar ikon tetap terbaca */
+        background: rgba(12, 26, 20, 0.50) !important;
+        -webkit-backdrop-filter: blur(26px) saturate(1.7);
+        backdrop-filter: blur(26px) saturate(1.7);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 24px !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 20px 40px -18px rgba(0, 0, 0, 0.8);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.04), 0 18px 36px -18px rgba(0, 0, 0, 0.65);
         z-index: 1040 !important;
         justify-content: space-around; align-items: center;
         padding: 4px 6px;
@@ -1677,6 +1678,17 @@
     }
     .sub-bubble-btn i { color: var(--brand-text); }
     .sub-bubble-btn.active, .sub-bubble-btn:active { background: var(--brand-soft); color: var(--brand-text) !important; }
+    /* [Fase 36] Sub-menu HP ikut bening: gelembung & tombolnya semi-transparan di atas blur */
+    .laporan-sub-bubble { -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); }
+    .sub-bubble-btn { background: color-mix(in srgb, var(--bg-surface-solid) 55%, transparent); }
+    /* Latar lebih bening → label/ikon menu tidak aktif dipertegas agar tetap terbaca di atas konten terang */
+    .mobile-nav-btn:not(.active):not(.scan-center) { color: rgba(236, 245, 240, 0.80); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+    .scan-label { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+    /* Perangkat tanpa backdrop-filter: tetap pakai latar pekat agar teks terbaca */
+    @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+        .mobile-bottom-nav { background: var(--shell-glass-strong) !important; }
+        .sub-bubble-btn { background: var(--bg-surface-solid); }
+    }
 
     /* =========================================================
        11. BACK TO TOP & TOAST
