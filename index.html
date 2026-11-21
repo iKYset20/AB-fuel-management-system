@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=6ea3627dfe"></script>
-    <script src="./pages-offline-ui.js?v=6ea3627dfe" defer></script>
-    <script src="./pages-install.js?v=6ea3627dfe" defer></script>
+    <script src="./gas-adapter.js?v=80bfbfe12a"></script>
+    <script src="./pages-offline-ui.js?v=80bfbfe12a" defer></script>
+    <script src="./pages-install.js?v=80bfbfe12a" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -10476,6 +10476,10 @@
         async syncNow() {
             const queue = await getPendingQueue();
             if (queue.length === 0 || this.isSyncing) return;
+            // [Fase 38] IndexedDB mengembalikan antrean terurut transaction_id (UUID acak) → kirim
+            // menurut urutan input (created_at_local), cadangan tanggal + jam. Isi antrean tidak berubah.
+            const waktuKey = (t) => String(t.created_at_local || '') + '|' + String(t.tanggal || '') + '|' + String(t.jam || '');
+            queue.sort((a, b) => waktuKey(a).localeCompare(waktuKey(b)));
 
             // Server mewajibkan sesi login. Tanpa token, antrean tetap aman di Local Vault
             // dan otomatis terkirim setelah Fuelman login kembali.
