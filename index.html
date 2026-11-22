@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=86dfee42c5"></script>
-    <script src="./pages-offline-ui.js?v=86dfee42c5" defer></script>
-    <script src="./pages-install.js?v=86dfee42c5" defer></script>
+    <script src="./gas-adapter.js?v=749e135881"></script>
+    <script src="./pages-offline-ui.js?v=749e135881" defer></script>
+    <script src="./pages-install.js?v=749e135881" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -6111,15 +6111,8 @@
       L.push('', '*Pemakaian per lokasi*');
       d.lokasiRows.forEach(r => L.push(r.lokasi + ': ' + lpFmt(r.liter) + ' L (' + lpFmt(r.pct, 1) + '%)' + (b ? ' · ' + lpDeltaText(r.deltaPct) : '')));
     }
-    const ph = d.perhatian, MAKS = 10;
-    L.push('', '*Perlu perhatian*');
-    L.push('Boros: ' + (ph.boros.length ? ph.boros.slice(0, MAKS).map(x => x.unit + ' (+' + lpFmt(x.deviasi, 1) + '%)').join(', ') + (ph.boros.length > MAKS ? ' +' + (ph.boros.length - MAKS) + ' lain' : '') : 'tidak ada'));
-    L.push('Cek meter: ' + (ph.cekMeter.length ? ph.cekMeter.slice(0, MAKS).map(x => x.unit).join(', ') + (ph.cekMeter.length > MAKS ? ' +' + (ph.cekMeter.length - MAKS) + ' lain' : '') : 'tidak ada'));
-    if (ph.terbesar.length) {
-      L.push('Pemakaian terbesar:');
-      ph.terbesar.forEach((x, i) => L.push((i + 1) + '. ' + x.unit + ' · ' + lpFmt(x.liter) + ' L (' + lpFmt(x.pct, 1) + '%)'));
-    }
-    L.push('', 'Rincian per unit: lihat Cetak / PDF', '◉ Report : ' + WA_REPORT_URL);
+    // [Fase 45d] Bagian "Perlu perhatian" tidak dikirim lewat WA (permintaan pengguna) — tetap ada di aplikasi & PDF
+    L.push('', 'Rincian pemakaian setiap unit dapat dilihat pada laporan lengkap melalui tautan berikut. Terima kasih.', '◉ Report : ' + WA_REPORT_URL);
     shareToWhatsApp(L.join('\n'));
   }
 
