@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=ca28fb35a9"></script>
-    <script src="./pages-offline-ui.js?v=ca28fb35a9" defer></script>
-    <script src="./pages-install.js?v=ca28fb35a9" defer></script>
+    <script src="./gas-adapter.js?v=45a3c7d85f"></script>
+    <script src="./pages-offline-ui.js?v=45a3c7d85f" defer></script>
+    <script src="./pages-install.js?v=45a3c7d85f" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3622,7 +3622,8 @@
     .dash-v7 > .row:has(> .col-lg-8 > .dash-chart-card) { container: dashrow / inline-size; }
     @container dashrow (max-width: 1079.98px) {
         .dash-v7 .col-lg-8:has(> .dash-chart-card),
-        .dash-v7 .col-lg-4:has(> .dash-gauge-card) { flex: 0 0 auto; width: 100%; }
+        .dash-v7 .col-lg-4:has(> .dash-gauge-card),
+        .dash-v7 .col-lg-4:has(> .dash-chart-card) { flex: 0 0 auto; width: 100%; } /* [F44] + kartu Konsumsi per Lokasi */
     }
     .gauge-metric-value, .gauge-metric #tankDaysLeftText { white-space: nowrap; }
     /* Tren Konsumsi: pilihan seri selalu 1 baris (geser ke samping bila tidak muat); 4 ringkasan → 2×2 saat sempit */
@@ -5563,7 +5564,7 @@
         <span class="badge bg-success">IRIT</span>
         <span class="badge bg-warning">NORMAL</span>
         <span class="badge bg-danger">BOROS</span>
-        <span class="badge bg-info" title="Deviasi di bawah -50%: dicurigai masalah meter">CEK METER</span>
+        <span class="badge bg-info" title="Deviasi di bawah -50% (dicurigai masalah meter) atau meter ditandai tidak andal">CEK METER</span>
         <span class="badge bg-secondary" title="Unit belum punya standar konsumsi">TANPA STANDAR</span>
       </span>
     </div>
@@ -5633,7 +5634,7 @@
         (r.aktualRate || '0') + ' ' + (r.satuan || ''), r.stdRate === '-' ? '—' : (r.stdRate || '0') + ' ' + (r.satuan || ''),
         r.deviasiText || '-', r.statusText || '-']),
       emptyText: 'Tidak ada data unit terdeteksi pada periode & lokasi ini.',
-      note: 'Status: IRIT = di bawah standar > 5% · NORMAL = ±5% · BOROS = di atas standar > 5% · CEK METER = deviasi < -50% (dicurigai masalah meter) · STANDAR BELUM DIATUR = unit belum punya standar.'
+      note: 'Status: IRIT = di bawah standar > 5% · NORMAL = ±5% · BOROS = di atas standar > 5% · CEK METER = deviasi < -50% (dicurigai masalah meter) atau meter ditandai tidak andal · STANDAR BELUM DIATUR = unit belum punya standar.'
     });
   }
 
@@ -5735,7 +5736,7 @@
           <td class="text-center text-brand fw-bold tabular-nums">${escapeHtml(r.aktualRate || '0')} ${escapeHtml(r.satuan || '')}</td>
           <td class="text-center text-muted tabular-nums">${r.stdRate === '-' ? '—' : escapeHtml(r.stdRate || '0') + ' ' + escapeHtml(r.satuan || '')}</td>
           <td class="text-center fw-bold tabular-nums ${devClass}">${escapeHtml(r.deviasiText || '0%')}</td>
-          <td class="text-center"><span class="badge ${badge} px-2 py-1">${escapeHtml(r.statusText || '-')}</span></td>
+          <td class="text-center"><span class="badge ${badge} px-2 py-1"${r.meterTidakAndal ? ' title="' + escapeHtml(r.meterTidakAndal) + '"' : ''}>${escapeHtml(r.statusText || '-')}${r.meterTidakAndal ? ' <i class="fa fa-flag ms-1" aria-hidden="true"></i>' : ''}</span></td>
         </tr>
       `;
     });
@@ -11649,6 +11650,7 @@ function cekMeterTag(jenis) {
     case 'MUNDUR':      return { label: 'Mundur', cls: 'bg-danger' };
     case 'DEVIASI':     return { label: 'Deviasi ekstrem', cls: 'bg-info' };
     case 'SATUAN':      return { label: 'Cek satuan', cls: 'bg-warning' }; // [Fase 22] HM yang ternyata odometer
+    case 'DITANDAI':    return { label: 'Meter tidak andal', cls: 'bg-secondary' }; // [Fase 44] ditandai pengguna
     default:            return { label: 'Cek meter', cls: 'bg-warning' };
   }
 }
@@ -12166,14 +12168,21 @@ function applyV7ChartTheme() {
     ds.hoverBorderColor = t.surfaceSolid;
     ds.hoverOffset = 8;
     ds.borderRadius = 6;
+    // [Fase 44] kartu lebar (bertumpuk selebar panel) → keterangan lokasi di kanan donat; sempit → di bawah
+    const pieLegendPos = (w) => (w >= 520 ? 'right' : 'bottom');
+    const pieBox = pieChart.canvas && pieChart.canvas.parentElement;
     pieChart.options = {
       responsive: true,
       maintainAspectRatio: false,
       cutout: '78%',
       layout: { padding: 8 },
       animation: { duration: 900, easing: 'easeOutQuart' },
+      onResize: (ch, size) => {
+        const pos = pieLegendPos(size.width);
+        if (ch.options.plugins.legend.position !== pos) { ch.options.plugins.legend.position = pos; ch.update('none'); }
+      },
       plugins: {
-        legend: Object.assign(v7LegendStyle(t), { position: 'bottom', align: 'center' }),
+        legend: Object.assign(v7LegendStyle(t), { position: pieLegendPos(pieBox ? pieBox.clientWidth : 0), align: 'center' }),
         tooltip: v7TooltipStyle(t)
       }
     };
