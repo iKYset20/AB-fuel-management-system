@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=749e135881"></script>
-    <script src="./pages-offline-ui.js?v=749e135881" defer></script>
-    <script src="./pages-install.js?v=749e135881" defer></script>
+    <script src="./gas-adapter.js?v=b4026104a3"></script>
+    <script src="./pages-offline-ui.js?v=b4026104a3" defer></script>
+    <script src="./pages-install.js?v=b4026104a3" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -5552,9 +5552,10 @@
     } else {
       const num = (s) => parseFloat(String(s || '0').replace(/\./g, '').replace(',', '.')) || 0;
       const perLok = {};
-      rows.forEach(r => { const k = r.lokasiKerja || 'Site'; perLok[k] = perLok[k] || { l: 0, n: 0 }; perLok[k].l += num(r.literBbm); perLok[k].n++; });
+      // [Fase 45e] "(11 Unit)" = jumlah unit berbeda yang diisi di lokasi itu (unit yang diisi 2× dihitung 1)
+      rows.forEach(r => { const k = r.lokasiKerja || 'Site'; perLok[k] = perLok[k] || { l: 0, u: {} }; perLok[k].l += num(r.literBbm); perLok[k].u[String(r.noUnit || '-').trim().toUpperCase()] = 1; });
       L.push('', '*Pemakaian per lokasi*');
-      Object.keys(perLok).forEach(k => L.push(k + ': ' + perLok[k].l.toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' L (' + perLok[k].n + 'x)'));
+      Object.keys(perLok).forEach(k => L.push(k + ': ' + perLok[k].l.toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' L (' + Object.keys(perLok[k].u).length + ' Unit)'));
       L.push('', '*Rincian (' + rows.length + ' transaksi)*');
       const MAKS = 80; // batas aman panjang pesan WhatsApp
       let lokNow = null;
