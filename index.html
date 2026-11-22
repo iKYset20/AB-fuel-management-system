@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=703895b02c"></script>
-    <script src="./pages-offline-ui.js?v=703895b02c" defer></script>
-    <script src="./pages-install.js?v=703895b02c" defer></script>
+    <script src="./gas-adapter.js?v=86dfee42c5"></script>
+    <script src="./pages-offline-ui.js?v=86dfee42c5" defer></script>
+    <script src="./pages-install.js?v=86dfee42c5" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -787,7 +787,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--sidebar-divider);
     }
-    .sidebar-progress-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .sidebar-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; min-height: 18px; }
     .sidebar-progress-title { color: var(--sidebar-text-strong); font-size: 0.78rem; font-weight: 600; }
     .sidebar-progress-meta { color: var(--sidebar-text-muted); font-size: 0.66rem; font-variant-numeric: tabular-nums; }
     .sidebar-progress-track { height: 4px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.12); overflow: hidden; }
@@ -3689,6 +3689,38 @@
 
     /* [Fase 45b] Angka "perlu perhatian minggu ini" di menu Laporan (sidebar) & titik di bottom-nav HP */
     .nav-count.nav-count--alert { background: var(--status-error, #DC2626); border-color: transparent; color: #FFFFFF; }
+    /* [Fase 45c] Kartu "Tangki Utama" (sidebar selalu gelap → warna terang tetap): AMAN / SIAGA / KRITIS */
+    #sidebarTankCard { cursor: pointer; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+    #sidebarTankCard:hover { background: rgba(255, 255, 255, 0.08); }
+    #sidebarTankCard:focus-visible { outline: 2px solid #6EE7BE; outline-offset: 2px; }
+    #sidebarTankCard .sidebar-progress-title { display: inline-flex; align-items: center; gap: 7px; }
+    .sidebar-tank-dot { display: none; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+    .sidebar-tank-chip { font-size: 0.56rem; font-weight: 800; letter-spacing: 0.06em; padding: 2px 7px; border-radius: var(--radius-pill); }
+    .sidebar-tank-foot { display: flex; justify-content: space-between; gap: 6px; margin-top: 8px; }
+    .sidebar-tank-foot:has(#sidebarTankDays:empty) { justify-content: flex-start; }
+    #sidebarTankCard[data-level] .sidebar-tank-dot { display: inline-block; }
+    #sidebarTankCard[data-level=""] .sidebar-tank-dot { display: none; }
+    #sidebarTankCard[data-level="safe"] .sidebar-tank-dot, #sidebarTankCard[data-level="safe"] .sidebar-progress-bar { background: #34D3A1; }
+    #sidebarTankCard[data-level="safe"] .sidebar-tank-chip { background: rgba(52, 211, 161, 0.16); color: #34D3A1; }
+    #sidebarTankCard[data-level="warning"] { border-color: rgba(242, 193, 78, 0.45); background: rgba(242, 193, 78, 0.07); }
+    #sidebarTankCard[data-level="warning"] .sidebar-tank-dot, #sidebarTankCard[data-level="warning"] .sidebar-progress-bar { background: #F2C14E; }
+    #sidebarTankCard[data-level="warning"] .sidebar-tank-chip { background: rgba(242, 193, 78, 0.16); color: #F2C14E; }
+    #sidebarTankCard[data-level="critical"] { border-color: rgba(240, 133, 125, 0.6); background: rgba(240, 133, 125, 0.10); animation: sidebarTankPulse 2.4s ease-in-out infinite; }
+    #sidebarTankCard[data-level="critical"] .sidebar-tank-dot, #sidebarTankCard[data-level="critical"] .sidebar-progress-bar { background: #F0857D; }
+    #sidebarTankCard[data-level="critical"] .sidebar-tank-dot { animation: sidebarTankDot 1.6s ease-in-out infinite; }
+    #sidebarTankCard[data-level="critical"] .sidebar-tank-chip { background: rgba(240, 133, 125, 0.18); color: #F0857D; }
+    @keyframes sidebarTankPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(240, 133, 125, 0.10), 0 0 10px rgba(240, 133, 125, 0.12); }
+        50%      { box-shadow: 0 0 0 3px rgba(240, 133, 125, 0.16), 0 0 20px rgba(240, 133, 125, 0.30); }
+    }
+    @keyframes sidebarTankDot {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(240, 133, 125, 0.45); }
+        50%      { box-shadow: 0 0 0 4px rgba(240, 133, 125, 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        #sidebarTankCard[data-level="critical"], #sidebarTankCard[data-level="critical"] .sidebar-tank-dot { animation: none; }
+    }
+
     .nav-alert-dot { position: absolute; top: 6px; left: calc(50% + 7px); width: 9px; height: 9px; border-radius: 50%; background: var(--status-error, #DC2626); box-shadow: 0 0 0 2px var(--bg-surface-solid); }
     .lp-nav:disabled { opacity: 0.35; }
     .lp-loading { padding: 0 4px; margin: -6px 0; }
@@ -3858,12 +3890,18 @@
                 <!-- Footer Sidebar: Scan to Fill + Profil Singkat -->
                 <div class="sidebar-footer">
                     <!-- Kartu progres tangki (diisi animateTankRadialGauge — presentasi saja) -->
-                    <div class="sidebar-progress-card">
+                    <!-- [Fase 45c] Warna mengikuti status gauge Dashboard (AMAN / SIAGA / KRITIS) — setSidebarTankStatus; klik → Dashboard -->
+                    <div class="sidebar-progress-card" id="sidebarTankCard" data-level="" role="button" tabindex="0"
+                         title="Buka Dashboard (gauge tangki)" onclick="openDashboardFromTank()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDashboardFromTank();}">
                         <div class="sidebar-progress-head">
-                            <span class="sidebar-progress-title">Tangki Utama</span>
-                            <span class="sidebar-progress-meta" id="sidebarTankMeta">0% dari 16.000 L</span>
+                            <span class="sidebar-progress-title"><i class="sidebar-tank-dot" aria-hidden="true"></i>Tangki Utama</span>
+                            <span class="sidebar-tank-chip d-none" id="sidebarTankChip"></span>
                         </div>
                         <div class="sidebar-progress-track"><span class="sidebar-progress-bar" id="sidebarTankBar"></span></div>
+                        <div class="sidebar-tank-foot">
+                            <span class="sidebar-progress-meta" id="sidebarTankMeta">0% dari 16.000 L</span>
+                            <span class="sidebar-progress-meta" id="sidebarTankDays"></span>
+                        </div>
                     </div>
 
                     <button type="button" class="sidebar-scan-btn" onclick="handleNavClick(event, 'SCAN_FILL', false)">
@@ -12015,18 +12053,23 @@ function renderDashboardUI(data) {
   const cardSisaStok = document.getElementById('cardSisaStok');
   const tankDaysElem = document.getElementById('tankDaysLeftText');
 
+  // [Fase 45c] kartu Tangki Utama di sidebar ikut status yang sama
+  const sidebarTank = (level) => { if (typeof setSidebarTankStatus === 'function') setSidebarTankStatus(level, { liter: data.numTankVal, persen: perc, hari: daysLeftNum }); };
   if (daysLeftNum < 2 || perc < 15 || (data.numTankVal && data.numTankVal < 2000)) {
+    sidebarTank('critical');
     if (tankBadge) { tankBadge.className = 'badge bg-danger glow-alert'; tankBadge.innerText = 'KRITIS'; }
     if (tankDaysElem) tankDaysElem.className = 'mb-0 fw-bold text-danger glow-alert';
     if (tankContainer) { tankContainer.classList.add('glow-alert'); tankContainer.dataset.level = 'critical'; }
     if (cardSisaStok) cardSisaStok.classList.add('glow-alert');
     playWebAudioAlert('critical_stock');
   } else if (daysLeftNum <= 4) {
+    sidebarTank('warning');
     if (tankBadge) { tankBadge.className = 'badge bg-warning text-dark'; tankBadge.innerText = 'SIAGA'; }
     if (tankDaysElem) tankDaysElem.className = 'mb-0 fw-bold text-warning';
     if (tankContainer) { tankContainer.classList.remove('glow-alert'); tankContainer.dataset.level = 'warning'; }
     if (cardSisaStok) cardSisaStok.classList.remove('glow-alert');
   } else {
+    sidebarTank('safe');
     if (tankBadge) { tankBadge.className = 'badge bg-success'; tankBadge.innerText = 'AMAN'; }
     if (tankDaysElem) tankDaysElem.className = 'mb-0 fw-bold text-success';
     if (tankContainer) { tankContainer.classList.remove('glow-alert'); tankContainer.dataset.level = 'safe'; }
@@ -13119,7 +13162,32 @@ function animateTankRadialGauge(percent) {
   const bar = document.getElementById('sidebarTankBar');
   if (bar) requestAnimationFrame(() => { bar.style.width = p.toFixed(1) + '%'; });
   const meta = document.getElementById('sidebarTankMeta');
-  if (meta) meta.textContent = Math.round(p) + '% dari 16.000 L';
+  const tankCard = document.getElementById('sidebarTankCard');
+  if (meta && !(tankCard && tankCard.dataset.level)) meta.textContent = Math.round(p) + '% dari 16.000 L';
+}
+
+/* [Fase 45c] Kartu "Tangki Utama" di sidebar: warna = status gauge Dashboard
+   (safe = AMAN, warning = SIAGA, critical = KRITIS) + "liter · persen" & "cukup ±n hari". Klik → Dashboard. */
+const SIDEBAR_TANK_LABEL = { safe: 'AMAN', warning: 'SIAGA', critical: 'KRITIS' };
+function setSidebarTankStatus(level, info) {
+  const card = document.getElementById('sidebarTankCard');
+  if (!card || !SIDEBAR_TANK_LABEL[level]) return;
+  info = info || {};
+  card.dataset.level = level;
+  const chip = document.getElementById('sidebarTankChip');
+  if (chip) { chip.textContent = SIDEBAR_TANK_LABEL[level]; chip.classList.remove('d-none'); }
+  const persen = Math.max(0, Math.min(100, parseFloat(info.persen) || 0));
+  const liter = parseFloat(info.liter);
+  const meta = document.getElementById('sidebarTankMeta');
+  if (meta) meta.textContent = (isFinite(liter) ? Math.round(liter).toLocaleString('id-ID') + ' L · ' : '') + Math.round(persen) + '%';
+  const hari = parseFloat(info.hari);
+  const daysEl = document.getElementById('sidebarTankDays');
+  if (daysEl) daysEl.textContent = isFinite(hari) && hari > 0 ? 'cukup ±' + hari.toLocaleString('id-ID', { maximumFractionDigits: hari < 10 ? 1 : 0 }) + ' hari' : '';
+  card.title = 'Stok tangki ' + SIDEBAR_TANK_LABEL[level] + (meta ? ' · ' + meta.textContent : '') + (daysEl && daysEl.textContent ? ' · ' + daysEl.textContent : '') + ' — klik untuk membuka Dashboard';
+}
+function openDashboardFromTank() {
+  const btn = document.querySelector('.sidebar .btn-tab-nav[onclick*="\'DASHBOARD\'"]');
+  if (typeof switchTab === 'function') switchTab('DASHBOARD', btn);
 }
 
 // --- 5. Greeting Hero dinamis (WITA / Asia/Makassar) ---
