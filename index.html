@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=5b31856e30"></script>
-    <script src="./pages-offline-ui.js?v=5b31856e30" defer></script>
-    <script src="./pages-install.js?v=5b31856e30" defer></script>
+    <script src="./gas-adapter.js?v=703895b02c"></script>
+    <script src="./pages-offline-ui.js?v=703895b02c" defer></script>
+    <script src="./pages-install.js?v=703895b02c" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3652,13 +3652,44 @@
        ===================================================================== */
     .lap-mode-switch > .btn { padding: 7px 16px; font-size: 0.78rem; font-weight: 700; }
     #laporanPeriodeContainer { container: lpwrap / inline-size; }
-    .lp-filter { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; }
-    .lp-filter-period { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .lp-filter-lokasi { flex: 0 1 200px; min-width: 150px; }
-    .lp-filter-actions { flex: 0 0 auto; display: flex; gap: 8px; }
+    /* [Fase 45b] Filter: baris label · baris isian (tinggi 36px, satu garis) · keterangan periode selebar kartu */
+    .lp-filter {
+        display: grid; column-gap: 14px; row-gap: 6px; align-items: center;
+        grid-template-columns: minmax(0, 1fr) minmax(160px, 220px) auto;
+        grid-template-areas: "lp lk ." "pd lo ac" "rg rg rg";
+    }
+    .lp-filter .field-label { margin: 0; }
+    .lp-f-lbl-period { grid-area: lp; } .lp-f-lbl-lokasi { grid-area: lk; }
+    .lp-f-period { grid-area: pd; min-width: 0; } .lp-f-lokasi { grid-area: lo; min-width: 0; }
+    .lp-f-actions { grid-area: ac; } .lp-f-range { grid-area: rg; margin-top: 2px; }
+    .lp-filter .form-control, .lp-filter .form-select, .lp-filter .lp-f-actions > .btn { height: 36px; }
+    .lp-filter .lp-f-actions > .btn { display: inline-flex; align-items: center; justify-content: center; padding-top: 0; padding-bottom: 0; }
+    .lp-filter-actions { display: flex; gap: 8px; }
     .lp-period-nav { display: flex; align-items: center; gap: 6px; }
     .lp-period-nav input { flex: 1 1 auto; min-width: 0; text-align: center; }
-    .lp-nav { width: 34px; height: 34px; padding: 0 !important; border-radius: 50% !important; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+    .lp-nav { width: 36px; height: 36px; padding: 0 !important; border-radius: 50% !important; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+    @container v7card (max-width: 759.98px) {
+        .lp-filter { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lp lp" "pd pd" "rg rg" "lk ." "lo ac"; }
+        .lp-f-range { margin-bottom: 6px; }
+    }
+    @container v7card (max-width: 479.98px) {
+        .lp-filter { grid-template-columns: minmax(0, 1fr); grid-template-areas: "lp" "pd" "rg" "lk" "lo" "ac"; }
+        .lp-f-actions > .btn { flex: 1 1 0; }
+    }
+
+    /* [Fase 45b] Warna status Rekap per Unit = tab Kalibrasi (menimpa label netral Laporan Harian) */
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-status { border: 0 !important; font-weight: 800; letter-spacing: 0.02em; padding: 4px 9px; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-boros  { background-color: var(--status-error-bg) !important;   color: var(--status-error) !important; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-irit   { background-color: var(--status-success-bg) !important; color: var(--status-success) !important; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-normal { background-color: var(--status-warning-bg) !important; color: var(--status-warning) !important; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-cek    { background-color: var(--brand-soft) !important;        color: var(--brand-text) !important; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-tanpa  { background-color: var(--bg-inset) !important;          color: var(--text-muted) !important; border: 1px solid var(--border-subtle) !important; }
+    #viewLaporan #laporanPeriodeContainer span.badge.lp-st-kurang { background-color: var(--tone-blue-bg) !important;      color: var(--tone-blue) !important; }
+    #viewLaporan #laporanPeriodeContainer .lp-col-cek span.badge  { background-color: var(--brand-soft) !important; color: var(--brand-text) !important; border: 0 !important; }
+
+    /* [Fase 45b] Angka "perlu perhatian minggu ini" di menu Laporan (sidebar) & titik di bottom-nav HP */
+    .nav-count.nav-count--alert { background: var(--status-error, #DC2626); border-color: transparent; color: #FFFFFF; }
+    .nav-alert-dot { position: absolute; top: 6px; left: calc(50% + 7px); width: 9px; height: 9px; border-radius: 50%; background: var(--status-error, #DC2626); box-shadow: 0 0 0 2px var(--bg-surface-solid); }
     .lp-nav:disabled { opacity: 0.35; }
     .lp-loading { padding: 0 4px; margin: -6px 0; }
     .lp-section-title { margin: 0 2px -6px; font-size: 0.86rem; font-weight: 700; color: var(--text-on-panel); display: flex; align-items: center; }
@@ -3732,9 +3763,6 @@
         .lp-unit-table tbody td.lp-c-status::before { content: none; }
     }
     @container lpwrap (max-width: 559.98px) {
-        .lp-filter-period, .lp-filter-lokasi { flex: 1 1 100%; }
-        .lp-filter-actions { flex: 1 1 100%; }
-        .lp-filter-actions > .btn { flex: 1 1 0; }
         .lp-lokasi-body { flex-direction: column; }
         .lp-stat { padding: 12px; }
         .lp-stat-value { font-size: 1.15rem; }
@@ -3787,7 +3815,8 @@
                                 <span>Laporan</span>
                             </div>
                             <span class="d-flex align-items-center gap-2">
-                                <span class="nav-count">3</span>
+                                <!-- [Fase 45b] jumlah unit perlu perhatian minggu ini (Boros + Cek Meter); kosong → disembunyikan -->
+                                <span class="nav-count nav-count--alert d-none" id="navLaporanAlert" role="status"></span>
                                 <i class="fa fa-chevron-down me-1 small transition-icon"></i>
                             </span>
                         </button>
@@ -3796,11 +3825,12 @@
                         <div class="collapse" id="desktopSubLaporan">
                             <div class="sub-menu-container mt-1 mb-2">
                                 <!-- btn-tab-nav dipertahankan agar JS switchTab berfungsi mereset status aktif -->
+                                <!-- [Fase 45b] "Laporan BBM" (Harian / Mingguan / Bulanan) di urutan teratas -->
+                                <button class="nav-link btn-tab-nav btn-sub-nav border-0 w-100 text-start" onclick="switchTab('LAPORAN', this)">
+                                    <i class="fa fa-list-alt me-2 sub-icon"></i>Laporan BBM
+                                </button>
                                 <button class="nav-link btn-tab-nav btn-sub-nav border-0 w-100 text-start" onclick="switchTab('KARTU_STOK', this)">
                                     <i class="fa fa-boxes me-2 sub-icon"></i>Kartu Stok
-                                </button>
-                                <button class="nav-link btn-tab-nav btn-sub-nav border-0 w-100 text-start" onclick="switchTab('LAPORAN', this)">
-                                    <i class="fa fa-list-alt me-2 sub-icon"></i>Laporan Harian
                                 </button>
                                 <button class="nav-link btn-tab-nav btn-sub-nav border-0 w-100 text-start" onclick="switchTab('KALIBRASI', this)">
                                     <i class="fa fa-balance-scale me-2 sub-icon"></i>Kalibrasi
@@ -5204,18 +5234,16 @@
 <div class="content-tv-container v7-tab d-none" id="laporanPeriodeContainer">
 
   <section class="glass-card no-lift v7-filter-card stagger-item" style="--stagger-idx: 0;">
+    <!-- [Fase 45b] Baris label · baris isian (tinggi sama, satu garis) · keterangan periode selebar kartu -->
     <div class="lp-filter">
-      <div class="lp-filter-period">
-        <label class="field-label d-block" for="lpPeriodeInput" id="lpPeriodeLabel">MINGGU (SENIN–MINGGU)</label>
-        <div class="lp-period-nav">
-          <button type="button" class="btn btn-sm btn-ghost lp-nav" onclick="lpGeserPeriode(-1)" aria-label="Periode sebelumnya" title="Periode sebelumnya"><i class="fa fa-chevron-left"></i></button>
-          <input type="date" id="lpPeriodeInput" class="form-control form-control-sm form-pill fw-bold tabular-nums" onchange="lpPeriodeChanged()" onclick="try{this.showPicker()}catch(e){}">
-          <button type="button" class="btn btn-sm btn-ghost lp-nav" id="lpNextBtn" onclick="lpGeserPeriode(1)" aria-label="Periode berikutnya" title="Periode berikutnya"><i class="fa fa-chevron-right"></i></button>
-        </div>
-        <span class="dash-card-sub tabular-nums" id="lpPeriodeText">-</span>
+      <label class="field-label lp-f-lbl-period" for="lpPeriodeInput" id="lpPeriodeLabel">MINGGU (SENIN–MINGGU)</label>
+      <label class="field-label lp-f-lbl-lokasi" for="filterLokasiPeriode">LOKASI</label>
+      <div class="lp-period-nav lp-f-period">
+        <button type="button" class="btn btn-sm btn-ghost lp-nav" onclick="lpGeserPeriode(-1)" aria-label="Periode sebelumnya" title="Periode sebelumnya"><i class="fa fa-chevron-left"></i></button>
+        <input type="date" id="lpPeriodeInput" class="form-control form-control-sm form-pill fw-bold tabular-nums" onchange="lpPeriodeChanged()" onclick="try{this.showPicker()}catch(e){}">
+        <button type="button" class="btn btn-sm btn-ghost lp-nav" id="lpNextBtn" onclick="lpGeserPeriode(1)" aria-label="Periode berikutnya" title="Periode berikutnya"><i class="fa fa-chevron-right"></i></button>
       </div>
-      <div class="lp-filter-lokasi">
-        <label class="field-label d-block" for="filterLokasiPeriode">LOKASI</label>
+      <div class="lp-f-lokasi">
         <select id="filterLokasiPeriode" class="form-select form-select-sm form-pill fw-bold w-100" onchange="loadLaporanPeriode()">
           <option value="Semua Lokasi" selected>Semua Lokasi</option>
           <option value="Legislatif">Legislatif</option>
@@ -5223,34 +5251,35 @@
           <option value="Workshop">Workshop</option>
         </select>
       </div>
-      <div class="lp-filter-actions">
+      <div class="lp-filter-actions lp-f-actions">
         <button type="button" onclick="printLaporanPeriode()" class="btn btn-sm btn-brand fw-bold"><i class="fa fa-print me-1"></i> Cetak / PDF</button>
         <button type="button" onclick="shareLaporanPeriodeWA()" class="btn btn-sm btn-ghost fw-bold btn-wa-share" title="Kirim ringkasan laporan ke WhatsApp"><i class="fab fa-whatsapp me-1"></i> Kirim WA</button>
       </div>
+      <span class="dash-card-sub tabular-nums lp-f-range" id="lpPeriodeText">-</span>
     </div>
   </section>
 
   <div class="lp-loading dash-card-sub d-none" id="lpLoading"><i class="fa fa-circle-notch fa-spin me-1"></i> Menghitung laporan…</div>
 
   <!-- 1. Ringkasan stok periode -->
-  <h6 class="lp-section-title"><i class="fa fa-calculator me-2"></i>Ringkasan Stok Periode <span class="lp-section-note">(Liter · seluruh tangki)</span></h6>
+  <h6 class="lp-section-title stagger-item"><i class="fa fa-calculator me-2"></i>Ringkasan Stok Periode <span class="lp-section-note">(Liter · seluruh tangki)</span></h6>
   <div class="lp-stats">
-    <div class="glass-card lp-stat"><span class="lap-stat-label"><i class="fa fa-flag me-1"></i>STOK AWAL</span><span class="lp-stat-value" id="lpStokAwal">-</span><span class="lp-stat-note" id="lpStokAwalNote"></span></div>
-    <div class="glass-card lp-stat"><span class="lap-stat-label"><i class="fa fa-arrow-down me-1"></i>PENERIMAAN SUPPLIER</span><span class="lp-stat-value" id="lpPenerimaan">-</span><span class="lp-stat-note" id="lpPenerimaanNote"></span></div>
-    <div class="glass-card lp-stat"><span class="lap-stat-label"><i class="fa fa-arrow-up me-1"></i>PEMAKAIAN</span><span class="lp-stat-value" id="lpPemakaian">-</span><span class="lp-stat-note" id="lpPemakaianNote"></span></div>
-    <div class="glass-card lp-stat lp-stat--final"><span class="lap-stat-label"><i class="fa fa-check-circle me-1"></i>STOK AKHIR</span><span class="lp-stat-value" id="lpStokAkhir">-</span><span class="lp-stat-note" id="lpStokAkhirNote"></span></div>
+    <div class="glass-card lp-stat stagger-item"><span class="lap-stat-label"><i class="fa fa-flag me-1"></i>STOK AWAL</span><span class="lp-stat-value" id="lpStokAwal">-</span><span class="lp-stat-note" id="lpStokAwalNote"></span></div>
+    <div class="glass-card lp-stat stagger-item"><span class="lap-stat-label"><i class="fa fa-arrow-down me-1"></i>PENERIMAAN SUPPLIER</span><span class="lp-stat-value" id="lpPenerimaan">-</span><span class="lp-stat-note" id="lpPenerimaanNote"></span></div>
+    <div class="glass-card lp-stat stagger-item"><span class="lap-stat-label"><i class="fa fa-arrow-up me-1"></i>PEMAKAIAN</span><span class="lp-stat-value" id="lpPemakaian">-</span><span class="lp-stat-note" id="lpPemakaianNote"></span></div>
+    <div class="glass-card lp-stat lp-stat--final stagger-item"><span class="lap-stat-label"><i class="fa fa-check-circle me-1"></i>STOK AKHIR</span><span class="lp-stat-value" id="lpStokAkhir">-</span><span class="lp-stat-note" id="lpStokAkhirNote"></span></div>
   </div>
 
   <!-- 2. Tren harian + rekap lokasi -->
   <div class="lp-row2">
-    <section class="glass-card dash-chart-card lp-trend-card">
+    <section class="glass-card dash-chart-card lp-trend-card stagger-item">
       <div class="dash-card-head"><div>
         <h6 class="dash-card-title"><i class="fa fa-chart-bar me-2"></i>Tren Pemakaian Harian</h6>
         <span class="dash-card-sub" id="lpTrendSub">-</span>
       </div></div>
       <div class="chart-box lp-chart-box"><canvas id="lpTrendCanvas"></canvas></div>
     </section>
-    <section class="glass-card dash-chart-card lp-lokasi-card">
+    <section class="glass-card dash-chart-card lp-lokasi-card stagger-item">
       <div class="dash-card-head"><div>
         <h6 class="dash-card-title"><i class="fa fa-map-marker-alt me-2"></i>Rekap per Lokasi</h6>
         <span class="dash-card-sub">Pembagian pemakaian menurut lokasi kerja</span>
@@ -5263,7 +5292,7 @@
   </div>
 
   <!-- 3. Daftar perhatian -->
-  <section class="glass-card no-lift dash-table-card lp-perhatian-card">
+  <section class="glass-card no-lift dash-table-card lp-perhatian-card stagger-item">
     <div class="dash-card-head"><div>
       <h6 class="dash-card-title"><i class="fa fa-exclamation-circle me-2"></i>Daftar Perhatian</h6>
       <span class="dash-card-sub">Unit boros, meter yang perlu dicek, dan pemakaian terbesar di periode ini</span>
@@ -5272,13 +5301,25 @@
   </section>
 
   <!-- 4. Rekap per unit -->
-  <section class="glass-card no-lift v7-table-card lp-unit-card">
+  <section class="glass-card no-lift v7-table-card lp-unit-card stagger-item">
     <div class="dash-card-head"><div>
       <h6 class="dash-card-title"><i class="fa fa-truck-monster me-2"></i>Rekap per Unit</h6>
       <span class="dash-card-sub">Konsumsi = liter ÷ jam kerja (HM) atau jarak (KM) · standar dari Master Data · status sama dengan tab Kalibrasi</span>
     </div></div>
     <div class="lp-unit-wrap"><table class="table table-clean table-hover align-middle mb-0 lp-table lp-unit-table" id="lpUnitTable"></table></div>
-    <div class="v7-table-foot"><span class="dash-card-sub" id="lpUnitInfo">-</span></div>
+    <!-- [Fase 45b] Nomor halaman (komponen sama dengan Master Data); Cetak/PDF & WA tetap memuat semua unit -->
+    <div class="v7-table-foot">
+      <span class="dash-card-sub tabular-nums" id="lpUnitInfo">-</span>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <nav id="lpUnitPager" class="v7-pager" aria-label="Halaman Rekap per Unit"></nav>
+        <label class="field-label mb-0" for="lpUnitLimit">BARIS</label>
+        <select id="lpUnitLimit" class="form-select form-select-sm form-pill v7-limit-select" onchange="lpChangeUnitLimit()">
+          <option value="15" selected>15 Baris</option>
+          <option value="30">30 Baris</option>
+          <option value="ALL">Semua Baris</option>
+        </select>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -5738,6 +5779,8 @@
       const lbl = document.getElementById('lpPeriodeLabel');
       if (lbl) lbl.textContent = mode === 'M' ? 'BULAN' : 'MINGGU (SENIN–MINGGU) · PILIH TANGGAL MANA SAJA';
     }
+    // [Fase 45b] kartu muncul berurutan setiap pindah Harian / Mingguan / Bulanan (sama dengan buka tab)
+    if (!noLoad && typeof triggerStaggerEntrance === 'function') triggerStaggerEntrance(harian ? ch : cp);
     if (!noLoad) loadLaporanAktif();
   }
 
@@ -5809,16 +5852,18 @@
     const nb = document.getElementById('lpNextBtn');
     if (nb) nb.disabled = !!p.berjalan;
 
-    set('lpStokAwal', lpFmt(s.awal));
+    // [Fase 45b] angka ringkasan naik dari 0 (sama dengan KPI Dashboard)
+    const angka = (id, v) => { const el = document.getElementById(id); if (!el) return; if (typeof animateCountUp === 'function') animateCountUp(el, lpFmt(v), 900); else el.textContent = lpFmt(v); };
+    angka('lpStokAwal', s.awal);
+    angka('lpPenerimaan', s.penerimaan);
+    angka('lpPemakaian', s.pemakaian);
+    angka('lpStokAkhir', s.akhir);
     set('lpStokAwalNote', escapeHtml((M ? '1 ' : 'Senin ') + lpTgl(p.awal, true)) + ' · awal hari');
-    set('lpPenerimaan', lpFmt(s.penerimaan));
     set('lpPenerimaanNote', s.nKiriman + '× kiriman' + (b ? ' · ' + lpDelta(b.penerimaanPct, false) + vs : ''));
-    set('lpPemakaian', lpFmt(s.pemakaian));
     let pk = 'rata-rata ' + lpFmt(s.rataHarian) + ' L/hari';
     if (b) pk += ' · ' + lpDelta(b.pemakaianPct, true) + vs;
     if (data.lokasi !== 'Semua Lokasi') pk += '<br>' + escapeHtml(data.lokasi) + ': ' + lpFmt(s.pemakaianLokasi) + ' L';
     set('lpPemakaianNote', pk);
-    set('lpStokAkhir', lpFmt(s.akhir));
     set('lpStokAkhirNote', (p.berjalan ? 'posisi hari ini' : escapeHtml('akhir ' + lpTgl(p.akhir, true))) +
       (s.cukupHari !== null && s.cukupHari !== undefined ? ' · cukup ±' + lpFmt(s.cukupHari, 1) + ' hari' : ''));
 
@@ -5856,32 +5901,83 @@
         x.meterTidakAndal ? 'Meter ditandai tidak andal' : 'Tercatat jauh di bawah standar — cek meter/pencatatan')), 'Semua meter wajar') +
       kol('Pemakaian Terbesar', 'fa-gas-pump', 'lp-col-top', ph.terbesar.map(x => unitLine(x, lpFmt(x.liter) + ' L', (x.kodeTipe || '-') + ' · ' + lpFmt(x.pct, 1) + '%')), 'Belum ada pengisian'));
 
-    // Rekap per unit
-    const us = data.units || [];
+    // Rekap per unit (per halaman)
+    LP_UNIT_PAGE = 1;
+    lpRenderUnitPage();
+
+    // [Fase 45b] Minggu ini, seluruh lokasi → angka di menu Laporan ikut diperbarui (sumber sama)
+    if (!M && p.berjalan && data.lokasi === 'Semua Lokasi' && typeof setNavPerhatian === 'function') {
+      setNavPerhatian({ boros: ph.boros.length, cekMeter: ph.cekMeter.length, total: ph.boros.length + ph.cekMeter.length });
+    }
+  }
+
+  /* [Fase 45b] Warna status = tab Kalibrasi (+ Tanpa Meter abu-abu, Data Kurang biru) */
+  const LP_STATUS_CLS = { 'BOROS': 'lp-st-boros', 'IRIT': 'lp-st-irit', 'NORMAL': 'lp-st-normal', 'CEK METER': 'lp-st-cek',
+    'TANPA METER': 'lp-st-tanpa', 'DATA KURANG': 'lp-st-kurang', 'STANDAR BELUM DIATUR': 'lp-st-tanpa' };
+  let LP_UNIT_PAGE = 1;
+
+  function lpUnitPageSize() {
+    const v = (document.getElementById('lpUnitLimit') || {}).value || '15';
+    return v === 'ALL' ? Infinity : (parseInt(v, 10) || 15);
+  }
+  function lpChangeUnitLimit() { LP_UNIT_PAGE = 1; lpRenderUnitPage(true); }
+  function lpGoUnitPage(p) { LP_UNIT_PAGE = p; lpRenderUnitPage(true); }
+
+  function lpRenderUnitPage(animate) {
+    const d = LP_DATA;
+    const tbl = document.getElementById('lpUnitTable');
+    if (!d || !tbl) return;
+    const M = d.mode === 'M', b = d.banding;
+    const us = d.units || [];
+    const size = lpUnitPageSize();
+    const pages = size === Infinity ? 1 : Math.max(1, Math.ceil(us.length / size));
+    if (LP_UNIT_PAGE > pages) LP_UNIT_PAGE = pages;
+    if (LP_UNIT_PAGE < 1) LP_UNIT_PAGE = 1;
+    const start = size === Infinity ? 0 : (LP_UNIT_PAGE - 1) * size;
+    const rows = size === Infinity ? us : us.slice(start, start + size);
     const cols = M ? 12 : 11;
-    let ut = '<thead><tr><th class="text-start">NO</th><th class="text-start">UNIT</th><th class="text-start">KODE TIPE</th><th class="text-start">LOKASI UTAMA</th><th class="text-end">PENGISIAN</th><th class="text-end">LITER</th><th class="text-end">% TOTAL</th><th class="text-end">JAM / JARAK KERJA</th><th class="text-end">KONSUMSI</th><th class="text-end">STANDAR</th><th class="text-start">STATUS</th>' +
-      (M ? '<th class="text-end">LITER VS ' + escapeHtml(lpBulanLalu(b).toUpperCase()) + '</th>' : '') + '</tr></thead><tbody>';
+    const C = 'text-center';
+    let ut = '<thead><tr><th class="text-start">NO</th><th class="text-start">UNIT</th><th class="text-start">KODE TIPE</th><th class="' + C + '">LOKASI UTAMA</th><th class="' + C + '">PENGISIAN</th><th class="' + C + '">LITER</th><th class="' + C + '">% TOTAL</th><th class="' + C + '">JAM / JARAK KERJA</th><th class="' + C + '">KONSUMSI</th><th class="' + C + '">STANDAR</th><th class="' + C + '">STATUS</th>' +
+      (M ? '<th class="' + C + '">LITER VS ' + escapeHtml(lpBulanLalu(b).toUpperCase()) + '</th>' : '') + '</tr></thead><tbody>';
     if (!us.length) ut += '<tr class="lp-empty-row"><td colspan="' + cols + '" class="text-center text-muted py-4">Tidak ada pengisian pada periode &amp; lokasi ini</td></tr>';
-    us.forEach((x, i) => {
+    rows.forEach((x, i) => {
       const sat = lpSat(x), dk = sat === 'KM' ? 2 : 1;
       ut += '<tr>' +
-        '<td class="text-start text-muted tabular-nums lp-c-no" data-label="No">' + (i + 1) + '</td>' +
+        '<td class="text-start text-muted tabular-nums lp-c-no" data-label="No">' + (start + i + 1) + '</td>' +
         '<td class="text-start fw-bold lp-c-unit" data-label="Unit">' + escapeHtml(x.unit) + '</td>' +
         '<td class="text-start lp-c-tipe" data-label="Kode Tipe">' + escapeHtml(x.kodeTipe || '-') + '</td>' +
-        '<td class="text-start" data-label="Lokasi Utama">' + escapeHtml(x.lokasi || '-') + '</td>' +
-        '<td class="text-end tabular-nums" data-label="Pengisian">' + x.n + '×</td>' +
-        '<td class="text-end tabular-nums fw-bold lp-c-liter" data-label="Liter">' + lpFmt(x.liter) + ' L</td>' +
-        '<td class="text-end tabular-nums" data-label="% Total">' + lpFmt(x.pct, 1) + '%</td>' +
-        '<td class="text-end tabular-nums" data-label="Jam / Jarak">' + (x.kerja !== null && x.kerja !== undefined ? lpFmt(x.kerja, sat === 'KM' ? 0 : 1) + ' ' + sat : '–') + '</td>' +
-        '<td class="text-end tabular-nums fw-bold" data-label="Konsumsi">' + (x.rate !== null && x.rate !== undefined ? lpFmt(x.rate, dk) + ' L/' + sat : '–') + '</td>' +
-        '<td class="text-end tabular-nums" data-label="Standar">' + (x.std !== null && x.std !== undefined ? lpFmt(x.std, dk) : '–') + '</td>' +
-        '<td class="text-start lp-c-status" data-label="Status"><span class="badge ' + escapeHtml(x.badge || 'bg-secondary') + '"' + (x.meterTidakAndal ? ' title="' + escapeHtml(x.meterTidakAndal) + '"' : '') + '>' + escapeHtml(x.status) + '</span></td>' +
-        (M ? '<td class="text-end" data-label="Vs bulan lalu">' + lpDelta(x.deltaPct, true) + '</td>' : '') +
+        '<td class="' + C + '" data-label="Lokasi Utama">' + escapeHtml(x.lokasi || '-') + '</td>' +
+        '<td class="' + C + ' tabular-nums" data-label="Pengisian">' + x.n + '×</td>' +
+        '<td class="' + C + ' tabular-nums fw-bold lp-c-liter" data-label="Liter">' + lpFmt(x.liter) + ' L</td>' +
+        '<td class="' + C + ' tabular-nums" data-label="% Total">' + lpFmt(x.pct, 1) + '%</td>' +
+        '<td class="' + C + ' tabular-nums" data-label="Jam / Jarak">' + (x.kerja !== null && x.kerja !== undefined ? lpFmt(x.kerja, sat === 'KM' ? 0 : 1) + ' ' + sat : '–') + '</td>' +
+        '<td class="' + C + ' tabular-nums fw-bold" data-label="Konsumsi">' + (x.rate !== null && x.rate !== undefined ? lpFmt(x.rate, dk) + ' L/' + sat : '–') + '</td>' +
+        '<td class="' + C + ' tabular-nums" data-label="Standar">' + (x.std !== null && x.std !== undefined ? lpFmt(x.std, dk) : '–') + '</td>' +
+        '<td class="' + C + ' lp-c-status" data-label="Status"><span class="badge lp-status ' + (LP_STATUS_CLS[x.status] || 'lp-st-tanpa') + '"' + (x.meterTidakAndal ? ' title="' + escapeHtml(x.meterTidakAndal) + '"' : '') + '>' + escapeHtml(x.status) + (x.meterTidakAndal ? ' <i class="fa fa-flag ms-1" aria-hidden="true"></i>' : '') + '</span></td>' +
+        (M ? '<td class="' + C + '" data-label="Vs bulan lalu">' + lpDelta(x.deltaPct, true) + '</td>' : '') +
         '</tr>';
     });
     ut += '</tbody>';
-    set('lpUnitTable', ut);
-    set('lpUnitInfo', escapeHtml(us.length + ' unit · total ' + lpFmt(s.pemakaianLokasi) + ' L · urut dari pemakaian terbesar'));
+    tbl.innerHTML = ut;
+
+    // Info & nomor halaman (komponen bersama Master Data bila tersedia)
+    const fmt = (n) => Number(n).toLocaleString('id-ID');
+    const info = document.getElementById('lpUnitInfo');
+    const to = size === Infinity ? us.length : Math.min(us.length, start + size);
+    if (info) info.textContent = 'Menampilkan ' + fmt(us.length ? start + 1 : 0) + '–' + fmt(to) + ' dari ' + fmt(us.length) + ' unit · total ' + lpFmt(d.stok.pemakaianLokasi) + ' L';
+    const nav = document.getElementById('lpUnitPager');
+    if (nav) {
+      if (typeof renderV7Pager === 'function') {
+        renderV7Pager({ navId: 'lpUnitPager', infoId: '', noun: 'unit', total: us.length, pages: us.length ? pages : 0, page: LP_UNIT_PAGE, size: size,
+          go: (page) => 'onclick="lpGoUnitPage(' + page + ')"' });
+      } else nav.innerHTML = '';
+    }
+    if (animate) {
+      const tb = tbl.querySelector('tbody');
+      if (tb) { tb.classList.remove('v7-page-in'); void tb.offsetWidth; tb.classList.add('v7-page-in'); }
+      const card = tbl.closest('.lp-unit-card');
+      if (card && card.getBoundingClientRect().top < 0) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function lpLokasiPalette(n) {
@@ -10495,11 +10591,11 @@
 
         <!-- GLASS BUBBLE SUB-MENU LAPORAN (MOBILE) -->
         <div id="laporanSubBubble" class="laporan-sub-bubble">
+          <button class="sub-bubble-btn" onclick="switchTab('LAPORAN'); closeSubBubble();">
+            <i class="fa fa-file-alt"></i> Laporan BBM
+          </button>
           <button class="sub-bubble-btn" onclick="switchTab('KARTU_STOK'); closeSubBubble();">
             <i class="fa fa-id-card"></i> Kartu Stok
-          </button>
-          <button class="sub-bubble-btn" onclick="switchTab('LAPORAN'); closeSubBubble();">
-            <i class="fa fa-file-alt"></i> Harian
           </button>
           <button class="sub-bubble-btn" onclick="switchTab('KALIBRASI'); closeSubBubble();">
             <i class="fa fa-balance-scale"></i> Kalibrasi
@@ -10515,6 +10611,7 @@
 
           <button class="mobile-nav-btn m-nav-item" onclick="handleNavClick(event, 'laporan_toggle', false)">
             <i class="fa fa-file-alt"></i>
+            <span class="nav-alert-dot d-none" id="mobileLaporanAlert" aria-hidden="true"></span>
             <span>Laporan</span>
           </button>
 
@@ -10812,7 +10909,28 @@
        NAVIGASI TAB & SINKRONISASI TAMPILAN RBAC
        ------------------------------------------------------------------------- */
     // [Fase 32] Kartu Stok, Laporan Harian & Kalibrasi berisi rincian per unit → wajib login
-    const LOGIN_ONLY_TABS = { KARTU_STOK: 'Kartu Stok', LAPORAN: 'Laporan Harian', KALIBRASI: 'Audit Kalibrasi' };
+    const LOGIN_ONLY_TABS = { KARTU_STOK: 'Kartu Stok', LAPORAN: 'Laporan BBM', KALIBRASI: 'Audit Kalibrasi' };
+
+    /* [Fase 45b] Angka di menu Laporan = unit perlu perhatian MINGGU INI (Boros + Cek Meter, seluruh lokasi).
+       Sumber sama dengan Laporan Mingguan (getPerhatianMingguIni, di-cache server). Tamu / 0 unit → disembunyikan. */
+    let NAV_PERHATIAN_AT = 0;
+    function setNavPerhatian(info) {
+        const el = document.getElementById('navLaporanAlert'), dot = document.getElementById('mobileLaporanAlert');
+        const n = info && !(typeof isUserGuest === 'function' && isUserGuest()) ? (Number(info.total) || 0) : 0;
+        const judul = n ? n + ' unit perlu perhatian minggu ini (Boros ' + (info.boros || 0) + ', Cek Meter ' + (info.cekMeter || 0) + ') — lihat Laporan BBM › Mingguan' : '';
+        if (el) { el.textContent = n > 99 ? '99+' : String(n); el.classList.toggle('d-none', !n); el.title = judul; el.setAttribute('aria-label', judul); }
+        if (dot) { dot.classList.toggle('d-none', !n); }
+    }
+    function refreshNavPerhatian(force) {
+        if (typeof isUserGuest === 'function' && isUserGuest()) { NAV_PERHATIAN_AT = 0; setNavPerhatian(null); return; }
+        if (!force && Date.now() - NAV_PERHATIAN_AT < 5 * 60 * 1000) return; // paling sering 5 menit sekali
+        NAV_PERHATIAN_AT = Date.now();
+        if (typeof google === 'undefined' || !google.script || !google.script.run || typeof getAuthToken !== 'function') return;
+        google.script.run
+            .withSuccessHandler(function (r) { if (r && r.authError) { setNavPerhatian(null); return; } if (r && r.success) setNavPerhatian(r); })
+            .withFailureHandler(function () { NAV_PERHATIAN_AT = 0; })
+            .getPerhatianMingguIni(getAuthToken());
+    }
 
     function switchTab(tabKey, el) {
         if (LOGIN_ONLY_TABS[tabKey] && typeof isUserGuest === 'function' && isUserGuest()) {
@@ -13550,6 +13668,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // [Fase 43] Mode tamu: tombol Kirim WA (Laporan Harian & Dashboard) disembunyikan
             document.querySelectorAll('.btn-wa-share').forEach(b => b.classList.toggle('d-none', isGuest));
+
+            // [Fase 45b] angka "perlu perhatian minggu ini" di menu Laporan (tamu: disembunyikan)
+            if (typeof refreshNavPerhatian === 'function') refreshNavPerhatian();
         }
 
         function handleNavClick(event, targetAction, isLockedInGuest) {
