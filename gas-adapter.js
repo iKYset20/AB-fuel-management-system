@@ -40,6 +40,7 @@
     var CACHEABLE = {
         getDashboardNativeData: { auth: false, latest: true },
         getLaporanHarianData:   { auth: true,  latest: true },  // Fase 32: wajib login → dihapus saat logout
+        getLaporanPeriodeData:  { auth: true,  latest: false }, // Fase 45: per minggu/bulan (argumen menentukan isi)
         getMasterLokasiList:    { auth: false, latest: true },
         getMasterKaryawanList:  { auth: true,  latest: true },
         getMasterQRData:        { auth: true,  latest: false },
