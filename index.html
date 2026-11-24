@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=137348bcb3"></script>
-    <script src="./pages-offline-ui.js?v=137348bcb3" defer></script>
-    <script src="./pages-install.js?v=137348bcb3" defer></script>
+    <script src="./gas-adapter.js?v=4099154a7c"></script>
+    <script src="./pages-offline-ui.js?v=4099154a7c" defer></script>
+    <script src="./pages-install.js?v=4099154a7c" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3721,6 +3721,27 @@
         #sidebarTankCard[data-level="critical"], #sidebarTankCard[data-level="critical"] .sidebar-tank-dot { animation: none; }
     }
 
+    /* [Fase 47] Database Master: pilihan urutan + tanda baris "BARU" (diinput di sesi ini) */
+    .db-sort-switch { flex: none; flex-wrap: nowrap; }
+    .db-sort-switch > .btn { padding: 5px 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+    /* kotak pencarian punya lebar minimum; tombol urutan & Reload turun ke baris berikut bila tidak muat */
+    .v7-section-head:has(#dbMasterSortGroup) > .d-flex { flex: 1 1 auto; justify-content: flex-end; }
+    .v7-section-head:has(#dbMasterSortGroup) .v7-search { flex: 1 1 220px; min-width: 200px; max-width: 100%; }
+    @media (max-width: 767.98px) {
+        /* HP: pencarian + Reload satu baris (seperti sebelumnya), pilihan urutan selebar penuh di baris kedua */
+        #masterDataContainer .v7-section-head:has(#dbMasterSortGroup) > .d-flex { flex-wrap: wrap !important; }
+        #masterDataContainer .v7-section-head:has(#dbMasterSortGroup) > .d-flex > .v7-search { flex: 1 1 0 !important; min-width: 0; }
+        #masterDataContainer .db-sort-switch { order: 3; flex: 1 1 100%; }
+        #masterDataContainer .db-sort-switch > .btn { flex: 1 1 0; }
+    }
+    #tbodyAdminMaster tr.db-row-baru > td { background-color: var(--brand-soft) !important; }
+    #tbodyAdminMaster tr.db-row-baru > td:first-child { box-shadow: inset 3px 0 0 var(--brand-primary); }
+    .db-baru-tag {
+        display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: var(--radius-pill);
+        font-size: 0.56rem; font-weight: 800; letter-spacing: 0.05em; vertical-align: 1px;
+        background: var(--bg-surface-solid); color: var(--brand-text); border: 1px solid var(--brand-primary);
+    }
+
     .nav-alert-dot { position: absolute; top: 6px; left: calc(50% + 7px); width: 9px; height: 9px; border-radius: 50%; background: var(--status-error, #DC2626); box-shadow: 0 0 0 2px var(--bg-surface-solid); }
     .lp-nav:disabled { opacity: 0.35; }
     .lp-loading { padding: 0 4px; margin: -6px 0; }
@@ -6636,6 +6657,11 @@
             <span class="input-group-text"><i class="fa fa-search"></i></span>
             <input type="text" id="searchDbMaster" class="form-control" placeholder="Cari Kode Unit, Lokasi, Teks..." onkeyup="filterAdminMasterTable()">
           </div>
+          <!-- [Fase 47] Urutan tabel: terakhir diinput (bawaan) | waktu transaksi -->
+          <div class="segmented-pill db-sort-switch" role="group" aria-label="Urutan data" id="dbMasterSortGroup">
+            <button type="button" class="btn active" data-sort="INPUT" onclick="setDbMasterSort('INPUT')" title="Data yang paling akhir diinput di paling atas">Terakhir diinput</button>
+            <button type="button" class="btn" data-sort="WAKTU" onclick="setDbMasterSort('WAKTU')" title="Tanggal &amp; jam transaksi terbaru di paling atas">Waktu transaksi</button>
+          </div>
           <button onclick="loadAdminMasterTable()" class="btn btn-sm btn-ghost px-3">
             <i class="fa fa-sync-alt me-1"></i> Reload
           </button>
@@ -7470,14 +7496,62 @@
   function adminFilteredRows() {
     const keyword = (document.getElementById('searchDbMaster').value || '').toLowerCase();
     if (!ADMIN_CACHE_ROWS) return [];
-    if (!keyword) return ADMIN_CACHE_ROWS;
-    return ADMIN_CACHE_ROWS.filter(r => {
+    const rows = !keyword ? ADMIN_CACHE_ROWS : ADMIN_CACHE_ROWS.filter(r => {
       return String(r.noUnit || '').toLowerCase().includes(keyword) ||
              String(r.lokasi || '').toLowerCase().includes(keyword) ||
              String(r.noSuratJalan || '').toLowerCase().includes(keyword) ||
              String(r.keterangan || '').toLowerCase().includes(keyword);
     });
+    return sortDbMasterRows(rows);
   }
+
+  /* [Fase 47] Urutan tabel Database Master (pilihan diingat di perangkat):
+     INPUT = terakhir diinput di atas (urutan baris sheet — data baru selalu ditambahkan di baris paling bawah),
+     WAKTU = tanggal + jam transaksi terbaru di atas (aturan sama dengan server, Fase 38).
+     Baris yang baru disimpan (belum punya nomor baris) selalu dihitung paling baru → tidak melompat. */
+  const DB_SORT_KEY = 'ab_dbmaster_sort';
+  let DB_MASTER_SORT = (function () { try { return localStorage.getItem(DB_SORT_KEY) === 'WAKTU' ? 'WAKTU' : 'INPUT'; } catch (e) { return 'INPUT'; } })();
+  const DB_MASTER_BARU = new Set(); // rowKey baris yang diinput di sesi ini → tanda "BARU"
+
+  function dbRowIdx(r) { const n = Number(r && r.rowIndex) || 0; return n > 0 ? n : Infinity; }
+  function dbRowTimeKey(r) {
+    const t = String(r.tanggal || '').trim();
+    let iso = '';
+    let m;
+    if ((m = /^(\d{4})-(\d{2})-(\d{2})/.exec(t))) iso = m[1] + '-' + m[2] + '-' + m[3];
+    else if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(t))) iso = m[3] + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0');
+    if (!iso) return '';
+    let jam = String(r.jam || '').trim();
+    if (!/^\d{1,2}:\d{2}/.test(jam)) jam = dbRowIdx(r) === Infinity ? new Date().toTimeString().slice(0, 5) : '';
+    else jam = jam.padStart(5, '0').slice(0, 5);
+    return iso + '|' + jam;
+  }
+  function sortDbMasterRows(rows) {
+    const out = rows.slice();
+    if (DB_MASTER_SORT === 'WAKTU') {
+      out.sort((a, b) => { const ka = dbRowTimeKey(a), kb = dbRowTimeKey(b); return ka < kb ? 1 : ka > kb ? -1 : dbRowIdx(b) - dbRowIdx(a) || 0; });
+    } else {
+      out.sort((a, b) => (dbRowIdx(b) - dbRowIdx(a)) || 0);
+    }
+    return out;
+  }
+  function syncDbMasterSortUI() {
+    document.querySelectorAll('#dbMasterSortGroup > .btn').forEach(b => {
+      const on = b.dataset.sort === DB_MASTER_SORT;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  function setDbMasterSort(mode) {
+    DB_MASTER_SORT = mode === 'WAKTU' ? 'WAKTU' : 'INPUT';
+    try { localStorage.setItem(DB_SORT_KEY, DB_MASTER_SORT); } catch (e) {}
+    syncDbMasterSortUI();
+    DB_MASTER_PAGE = 1;
+    renderAdminTableFromCache(adminFilteredRows());
+    const tb = document.getElementById('tbodyAdminMaster');
+    if (tb && typeof animatePageIn === 'function') animatePageIn(tb);
+  }
+  document.addEventListener('DOMContentLoaded', syncDbMasterSortUI);
 
   function filterAdminMasterTable() {
     DB_MASTER_PAGE = 1; // pencarian baru → kembali ke halaman 1
@@ -7619,9 +7693,11 @@
         ? `<button onclick="deleteAdminRow(${Number(r.rowIndex) || 0})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Hapus</button>`;
 
+      // [Fase 47] baris yang diinput di sesi ini ditandai "BARU" (warna lembut) di urutan & pencarian mana pun
+      const baru = !!r._baru || (r.rowKey && DB_MASTER_BARU.has(r.rowKey));
       html += `
-        <tr class="text-center align-middle">
-          <td class="tabular-nums text-muted">${escapeHtml(r.noBaris || '-')}</td>
+        <tr class="text-center align-middle${baru ? ' db-row-baru' : ''}">
+          <td class="tabular-nums text-muted">${escapeHtml(r.noBaris || '-')}${baru ? '<span class="db-baru-tag">BARU</span>' : ''}</td>
           <td class="tabular-nums">${escapeHtml(r.tanggal || '-')}</td>
           <td class="tabular-nums fw-bold text-muted">${escapeHtml(r.jam || '-')}</td>
           <td><span class="badge ${isSupplier ? 'bg-success' : 'bg-warning'}">${escapeHtml(r.jenisTx || '-')}</span></td>
@@ -7909,6 +7985,7 @@
       if (isNewInsert) {
           const optimisticRow = { ...dataObj };
           optimisticRow.noBaris = "Tunggu..."; // Indikator data sedang proses di server
+          optimisticRow._baru = true; // [Fase 47] tanda BARU + dihitung paling baru (tidak melompat)
           
           ADMIN_CACHE_ROWS.unshift(optimisticRow); // Masukkan paksa ke baris pertama layar lokal
           filterAdminMasterTable(); // Tampilkan seketika di tabel (0 detik)
@@ -7928,6 +8005,7 @@
           }
           // Refresh tabel asli di belakang layar (tanpa animasi loading) — juga membuang baris optimis bila gagal
           clearAdminMeterCache(); // [Fase 46] baris baru sudah ada di server
+          if (isNewInsert && res && res.success && res.rowKey) DB_MASTER_BARU.add(res.rowKey); // [Fase 47]
           loadAdminMasterTable(true);
           if (masterSessionGuard(res)) return;
 
