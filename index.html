@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=b4026104a3"></script>
-    <script src="./pages-offline-ui.js?v=b4026104a3" defer></script>
-    <script src="./pages-install.js?v=b4026104a3" defer></script>
+    <script src="./gas-adapter.js?v=137348bcb3"></script>
+    <script src="./pages-offline-ui.js?v=137348bcb3" defer></script>
+    <script src="./pages-install.js?v=137348bcb3" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -7777,12 +7777,33 @@
     box.classList.remove('d-none');
   }
 
+  /* [Fase 46] Konteks meter (pengisian sebelum & sesudah) bergantung pada unit + tanggal + jam (+ baris yang
+     diedit), BUKAN pada angka HM. Hasilnya disimpan sementara (2 menit) dan dipakai ulang: saat kolom diisi,
+     pemeriksaan sudah berjalan di belakang layar, jadi tombol SIMPAN tidak perlu bertanya ke server lagi.
+     Bila SIMPAN ditekan saat pemeriksaan masih berjalan, cukup menunggu sisanya (tidak mengulang). */
+  const ADMIN_METER_CTX = {};
+  const ADMIN_METER_TTL_MS = 2 * 60 * 1000;
+  function adminMeterKey(i) { return [i.unit, i.tgl, i.jam, i.rowKey].join('|'); }
+  function adminMeterCanFetch(i) { return i.jenis === 'PENGELUARAN UNIT' && i.unit && /^\d{4}-\d{2}-\d{2}$/.test(i.tgl); }
+  function clearAdminMeterCache() { Object.keys(ADMIN_METER_CTX).forEach(k => { if (ADMIN_METER_CTX[k].done) delete ADMIN_METER_CTX[k]; }); }
+
   // cb(ctx|null) — null bila tidak perlu dicek / server tidak terjangkau (penyimpanan tidak dihalangi)
   function fetchAdminMeterContext(i, cb) {
-    if (!adminMeterApplies(i) || !(typeof google !== 'undefined' && google.script && google.script.run)) { cb(null); return; }
+    if (!adminMeterCanFetch(i) || !(typeof google !== 'undefined' && google.script && google.script.run)) { cb(null); return; }
+    const k = adminMeterKey(i);
+    let e = ADMIN_METER_CTX[k];
+    if (e && e.done && Date.now() - e.at < ADMIN_METER_TTL_MS) { cb(e.ctx); return; }
+    if (e && !e.done) { e.waiters.push(cb); return; }
+    e = ADMIN_METER_CTX[k] = { done: false, at: 0, ctx: null, waiters: [cb] };
+    const finish = (ctx, gagal) => {
+      e.done = true; e.at = Date.now(); e.ctx = ctx;
+      if (gagal && ADMIN_METER_CTX[k] === e) delete ADMIN_METER_CTX[k]; // gagal → dicoba lagi lain kali
+      const w = e.waiters; e.waiters = [];
+      w.forEach(f => { try { f(ctx); } catch (err) { console.error(err); } });
+    };
     google.script.run
-      .withSuccessHandler(function(ctx) { cb(ctx && ctx.success ? ctx : null); })
-      .withFailureHandler(function() { cb(null); })
+      .withSuccessHandler(function(ctx) { finish(ctx && ctx.success ? ctx : null, !(ctx && ctx.success)); })
+      .withFailureHandler(function() { finish(null, true); })
       .getMeterContextForAdmin(i.unit, i.tgl, i.jam, i.rowKey, getAuthToken());
   }
 
@@ -7792,7 +7813,7 @@
     if (adminMeterConfirmedFor !== adminMeterSignature(i)) adminMeterConfirmedFor = '';
     fetchAdminMeterContext(i, function(ctx) {
       if (seq !== adminMeterSeq) return; // sudah ada isian yang lebih baru
-      const w = adminMeterWarnings(ctx, i.hm);
+      const w = adminMeterApplies(i) ? adminMeterWarnings(ctx, i.hm) : [];
       const box = document.getElementById('adminMeterWarningBox');
       if (w.length) showAdminMeterWarning(w, false);
       else if (box) box.classList.add('d-none');
@@ -7881,7 +7902,8 @@
       const isNewInsert = (rowIdxVal == 0 || rowIdxVal === "0");
       
       btn.innerHTML = `<i class="fa fa-spinner fa-spin me-1"></i> MENYIMPAN...`;
-      
+      clearAdminMeterCache(); // [Fase 46] riwayat meter berubah → pemeriksaan berikutnya bertanya ulang
+
       // === OPTIMISTIC UI UPDATE UNTUK INPUT BARU ===
       // UI langsung merespons sukses agar Anda bisa lanjut mengetik secepat kilat
       if (isNewInsert) {
@@ -7905,6 +7927,7 @@
               btn.disabled = false;
           }
           // Refresh tabel asli di belakang layar (tanpa animasi loading) — juga membuang baris optimis bila gagal
+          clearAdminMeterCache(); // [Fase 46] baris baru sudah ada di server
           loadAdminMasterTable(true);
           if (masterSessionGuard(res)) return;
 
@@ -7937,6 +7960,7 @@
         .withSuccessHandler(function(res) {
           if (masterSessionGuard(res)) return;
           showToast(res.message || "Data berhasil dihapus!", res.success ? "success" : "error");
+          clearAdminMeterCache(); // [Fase 46]
           loadAdminMasterTable();
         })
         .deleteMasterData(rowIdx, clientToken, rowKey);
