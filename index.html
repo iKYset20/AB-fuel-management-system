@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=84fe3657e1"></script>
-    <script src="./pages-offline-ui.js?v=84fe3657e1" defer></script>
-    <script src="./pages-install.js?v=84fe3657e1" defer></script>
+    <script src="./gas-adapter.js?v=67fa0ba86a"></script>
+    <script src="./pages-offline-ui.js?v=67fa0ba86a" defer></script>
+    <script src="./pages-install.js?v=67fa0ba86a" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3830,6 +3830,17 @@
         .lp-chart-box { height: 220px; }
         .lp-unit-table tbody tr:not(.lp-empty-row) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+
+    /* ============ [Fase 50] Pilihan bahasa (Indonesia / English) ============ */
+    .bahasa-pilih { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); }
+    .bahasa-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .bahasa-seg { display: inline-flex; gap: 4px; padding: 3px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle); background: rgba(127, 127, 127, 0.06); }
+    .bahasa-seg--full { display: flex; width: 100%; }
+    .bahasa-seg--full .bahasa-btn { flex: 1 1 0; }
+    .bahasa-btn { border: 0; background: transparent; color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-pill); cursor: pointer; transition: background-color .18s ease, color .18s ease; }
+    .bahasa-btn:hover { color: var(--brand-primary); }
+    .bahasa-btn.active { background: var(--brand-primary); color: var(--on-brand-primary); }
+    .bahasa-btn:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
 </style>
 
 
@@ -5607,8 +5618,8 @@
   /* [Fase 41] Laporan Harian → teks WhatsApp: stok, pemakaian per lokasi (A–Z), rincian per baris
      [Fase 42] + Note (manual) & tautan Report di bagian paling bawah */
   function sendLaporanHarianWA(note) {
-    const val = (id) => { const el = document.getElementById(id); return el ? (el.value !== undefined && el.tagName !== 'SPAN' ? el.value : el.innerText).trim() : ''; };
-    const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+    const val = (id) => { const el = document.getElementById(id); return el ? (el.value !== undefined && el.tagName !== 'SPAN' ? el.value : (window.I18N ? I18N.asli(el) : el.innerText)).trim() : ''; }; // [Fase 50] teks asli
+    const txt = (id) => { const el = document.getElementById(id); return el ? (window.I18N ? I18N.asli(el) : el.innerText).trim() : ''; }; // [Fase 50] teks asli
     const rows = cachedLaporanRows || [];
     const L = ['*LAPORAN HARIAN BBM*', 'AB-Fuel · PT Arthalaut Bumijasa',
       'Tanggal: ' + (typeof waTanggalText === 'function' ? waTanggalText(val('filterTglLaporan'), true) : val('filterTglLaporan')),
@@ -5655,7 +5666,7 @@
       return;
     }
     const e = (v) => escapeHtml(v === undefined || v === null ? '' : String(v));
-    const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+    const txt = (id) => { const el = document.getElementById(id); return el ? (window.I18N ? I18N.asli(el) : el.innerText).trim() : ''; }; // [Fase 50] teks asli
     const tglInput = document.getElementById('filterTglLaporan');
     const tglStr = tglInput && tglInput.value ? tglInput.value : '';
     const lokasiInput = document.getElementById('filterLokasiLaporan');
@@ -9259,6 +9270,15 @@
                         <span class="login-secure"><i class="fa fa-shield-alt" aria-hidden="true"></i> Sesi berakhir otomatis setelah 15 menit tanpa aktivitas</span>
                     </div>
                 </form>
+
+                <!-- [Fase 50] Pilihan bahasa (juga untuk tamu) -->
+                <div class="bahasa-pilih" id="bahasaPilihLogin">
+                    <span class="bahasa-label"><i class="fa fa-globe me-1" aria-hidden="true"></i>Bahasa</span>
+                    <div class="bahasa-seg" role="group" aria-label="Bahasa">
+                        <button type="button" class="bahasa-btn" data-bahasa="id" onclick="setBahasa('id')">Indonesia</button>
+                        <button type="button" class="bahasa-btn" data-bahasa="en" onclick="setBahasa('en')">English</button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -9368,6 +9388,22 @@
                             <i class="fa fa-save me-1"></i> Simpan Foto
                         </button>
                     </div>
+                </div>
+
+                <!-- [Fase 50] Bahasa tampilan (Indonesia / English) — berlaku di perangkat ini -->
+                <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 2;" id="cardBahasa">
+                    <div class="profil-card-head">
+                        <span class="profil-card-icon"><i class="fa fa-globe" aria-hidden="true"></i></span>
+                        <div>
+                            <h6 class="dash-card-title mb-0">Bahasa</h6>
+                            <span class="dash-card-sub">Bahasa tampilan aplikasi, cetakan, dan pesan WA</span>
+                        </div>
+                    </div>
+                    <div class="bahasa-seg bahasa-seg--full" role="group" aria-label="Bahasa">
+                        <button type="button" class="bahasa-btn" data-bahasa="id" onclick="setBahasa('id')">Indonesia</button>
+                        <button type="button" class="bahasa-btn" data-bahasa="en" onclick="setBahasa('en')">English</button>
+                    </div>
+                    <p class="profil-note mb-0 mt-2">Berlaku di perangkat ini. Email otomatis (Laporan Sore &amp; Pengingat STNK) mengikuti pilihan terakhir Master Admin.</p>
                 </div>
 
                 <!-- [Fase 28] Keluar: satu tempat untuk kedua cara keluar (HP: paling bawah) -->
@@ -10966,6 +11002,698 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha384-VCGDSwGwLWkVOK5vAWSaY38KZ4oKJ0whHjpJQhjqrMlWadpf2dUVKLgOLBdEaLvZ" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous"></script>
 
+    <!-- [Fase 50] Dua bahasa (Indonesia / English) — dimuat sebelum Javascript -->
+    <!-- [Fase 50] DUA BAHASA (Indonesia / English)
+     Cara kerja: teks Indonesia di kode TETAP menjadi sumber. Saat bahasa English dipilih, mesin ini
+     menerjemahkan teks di layar (termasuk yang muncul belakangan lewat MutationObserver), atribut
+     placeholder/title/aria-label/data-label, isi grafik, dokumen Cetak/PDF dan pesan WhatsApp.
+     Angka (9.556 / 3,7 → 9,556 / 3.7) dan tanggal (Agu/Mei/Senin → Aug/May/Monday) ikut gaya bahasa.
+     id/name/onclick TIDAK diubah. Teks asli disimpan → kembali ke Indonesia seketika.
+     Pilihan disimpan per perangkat (localStorage "ab_bahasa"). Elemen ber-atribut data-no-i18n dilewati. -->
+<script>
+(function () {
+  'use strict';
+  var KEY = 'ab_bahasa';
+  var LANG = 'id';
+  try { LANG = localStorage.getItem(KEY) === 'en' ? 'en' : 'id'; } catch (e) { LANG = 'id'; }
+
+  var D = Object.create(null);
+  function norm(s) { return String(s).replace(/\s+/g, ' ').trim(); }
+  function kamus(o) { for (var k in o) D[norm(k)] = o[k]; }
+
+  /* ===================== 1. KAMUS (Indonesia → English) ===================== */
+  kamus({
+    // --- Umum, menu & kerangka ---
+    'Dashboard': 'Dashboard', 'Laporan': 'Reports', 'Laporan BBM': 'Fuel Reports', 'Kartu Stok': 'Stock Card', 'Kalibrasi': 'Calibration',
+    'Master': 'Master', 'Master Data': 'Master Data', 'Profil': 'Profile', 'Profil Saya': 'My Profile', 'Scan': 'Scan', 'SCAN FILL': 'SCAN FILL',
+    'Scan to Fill': 'Scan to Fill', 'Operasional': 'Operations', 'Administrasi': 'Administration', 'Laporan & Audit': 'Reports & Audit',
+    'Menu': 'Menu', 'Masuk': 'Sign in', 'Keluar': 'Sign out', 'Tutup': 'Close', 'Close': 'Close', 'Batal': 'Cancel', 'Simpan': 'Save',
+    'Mengerti': 'Got it', 'Ya, Lanjutkan': 'Yes, continue', 'Konfirmasi Tindakan': 'Confirm Action', 'Lihat': 'View', 'Ubah': 'Edit', 'Hapus': 'Delete',
+    'Terapkan': 'Apply', 'Reset Filter': 'Reset Filter', 'Filter': 'Filter', 'Filter Tanggal': 'Date Filter', 'Semua': 'All', 'Semua Lokasi': 'All Locations',
+    'Memuat…': 'Loading…', 'Memuat data…': 'Loading data…', 'Memuat data...': 'Loading data…', 'Memperbarui…': 'Updating…', 'Tunggu...': 'Please wait…',
+    'Mode Tamu': 'Guest Mode', 'MODE TAMU': 'GUEST MODE', 'Tamu': 'Guest', 'Pengawas Site': 'Site Supervisor', 'Akses Terbatas': 'Restricted Access',
+    'Mode Gelap': 'Dark Mode', 'Mode gelap': 'Dark mode', 'Mode Terang': 'Light Mode', 'Ganti Tema': 'Change Theme', 'Ganti tampilan tema': 'Change theme',
+    'Mode Gelap Aktif — Klik untuk Mode Terang': 'Dark Mode on — click for Light Mode', 'Mode Terang Aktif — Klik untuk Mode Gelap': 'Light Mode on — click for Dark Mode',
+    'Pencarian cepat': 'Quick search', 'Cari unit, operator, atau transaksi...': 'Search unit, operator, or transaction...', 'Kembali ke atas': 'Back to top',
+    'Menu profil': 'Profile menu', 'Tampilkan / Sembunyikan Sidebar': 'Show / Hide Sidebar', 'Status Jaringan & Antrean Offline Vault': 'Network Status & Offline Vault Queue',
+    'Transaksi di antrean offline': 'Transactions in offline queue', 'Admin yang sedang online': 'Admins online now', 'Admin online': 'Admins online',
+    'Belum ada admin lain yang online.': 'No other admin is online.', 'Anda': 'You', 'aktif sekarang': 'active now', 'mnt lalu': 'min ago', 'jam lalu': 'hr ago',
+    'Aktif dalam ±6 menit terakhir': 'Active in the last ±6 minutes', 'Online': 'Online', 'Offline': 'Offline', 'Audio Sirene': 'Siren Audio',
+    'Audio Siren: ON': 'Siren Audio: ON', 'Audio Siren: OFF': 'Siren Audio: OFF', 'Peringatan stok & anomali': 'Stock & anomaly alerts',
+    'Akun, avatar & kata sandi': 'Account, avatar & password', 'Akses Admin Site': 'Site Admin Access', 'Login Admin': 'Admin Login',
+    'Master Admin': 'Master Admin', 'Sub Admin': 'Sub Admin', 'Admin': 'Admin', 'Master Admin Site': 'Site Master Admin', 'Sub Admin Site BBM': 'Site Fuel Sub Admin',
+    'Admin Site': 'Site Admin', 'Fuelman Site': 'Site Fuelman', 'Keluar ke Mode Tamu': 'Sign out to Guest Mode', 'Logout ke Guest': 'Sign out to Guest Mode',
+    'Sesi Berakhir': 'Session Ended', 'Sesi tidak berlaku.': 'Session is no longer valid.', 'Silakan login kembali.': 'Please sign in again.',
+    'Sesi Admin telah berakhir karena tidak ada aktivitas selama 15 menit. Anda telah dikembalikan ke Mode Tamu.': 'The admin session ended after 15 minutes of inactivity. You are now in Guest Mode.',
+    'Silakan Login dengan Username & Password Admin terlebih dahulu untuk mengakses menu Master Data.': 'Please sign in with an admin username & password to open Master Data.',
+    'Login PIN sudah tidak digunakan. Silakan login dengan Username & Password di menu Profil.': 'PIN login is no longer used. Please sign in with your username & password in Profile.',
+    'Fitur Scan to Fill hanya dapat digunakan oleh Sub Admin / Master Admin. Silakan Login terlebih dahulu.': 'Scan to Fill is only available to Sub Admin / Master Admin. Please sign in first.',
+    'Fitur Scan to Fill hanya dapat diakses oleh Sub Admin / Master Admin. Silakan Login terlebih dahulu.': 'Scan to Fill is only available to Sub Admin / Master Admin. Please sign in first.',
+    'Demi keamanan, silakan ganti kata sandi Anda terlebih dahulu.': 'For your security, please change your password first.',
+    'Ganti Kata Sandi': 'Change Password', 'Buka Dashboard (gauge tangki)': 'Open Dashboard (tank gauge)', 'perlu perhatian minggu ini': 'need attention this week',
+    'Tangki Utama': 'Main Tank', 'Offline Vault': 'Offline Vault', 'Pengisian rutin site': 'Routine site refuelling', 'AB - Fuel Management System': 'AB - Fuel Management System',
+    'Terkunci': 'Locked', 'Pesan Toast': 'Notification', 'Masukkan 4-Digit PIN otentikasi': 'Enter the 4-digit authentication PIN', 'PIN Salah!': 'Wrong PIN!',
+    'Peringatan Browser': 'Browser Warning', 'Sync Error!': 'Sync error!', 'Akses Ditolak: Anda belum login!': 'Access denied: you are not signed in!',
+    'Bahasa': 'Language', 'Bahasa tampilan aplikasi, cetakan, dan pesan WA': 'Language for the app, printouts and WhatsApp messages',
+    'Berlaku di perangkat ini': 'Applies on this device',
+    'Berlaku di perangkat ini. Email otomatis (Laporan Sore & Pengingat STNK) mengikuti pilihan terakhir Master Admin.': 'Applies on this device. Automatic emails (Evening Report & Vehicle Registration Reminder) follow the Master Admin’s latest choice.',
+
+    // --- Scan to Fill ---
+    'Pengisian BBM - Scan to Fill': 'Fuel Refill - Scan to Fill', 'KODE UNIT / QR STICKER': 'UNIT CODE / QR STICKER', 'Scan QR atau Ketik Kode Unit': 'Scan QR or type the unit code',
+    'HM / KM SAAT INI': 'CURRENT HM / KM', 'LITER PENGISIAN': 'LITRES FILLED', 'LOKASI KERJA': 'WORK LOCATION', 'NAMA OPERATOR / DRIVER': 'OPERATOR / DRIVER NAME',
+    'KETERANGAN (OPSIONAL)': 'NOTES (OPTIONAL)', 'Simpan Transaksi': 'Save Transaction', '-- Pilih Operator --': '-- Select Operator --', '-- Pilih Lokasi --': '-- Select Location --',
+    "*Tekan 'Scan' untuk memfoto stiker QR secara langsung.": "*Press 'Scan' to photograph the QR sticker directly.", 'Ketik / pilih nama operator': 'Type / pick the operator name',
+    'Memuat daftar operator…': 'Loading operator list…', 'Harap lengkapi semua field yang wajib diisi.': 'Please complete all required fields.',
+    'Memproses foto QR...': 'Processing QR photo...', 'QR Berhasil dipindai!': 'QR scanned successfully!', 'Gagal membaca QR. Pastikan foto QR terang, fokus, dan tidak kabur.': 'Could not read the QR. Make sure the photo is bright, in focus and not blurry.',
+    'Daftar unit belum termuat (offline) — pastikan kode unit sudah benar.': 'Unit list not loaded (offline) — make sure the unit code is correct.',
+    'Transaksi berhasil disimpan ke Local Vault!': 'Transaction saved to the Local Vault!', 'Gagal menyimpan transaksi ke Local Vault.': 'Could not save the transaction to the Local Vault.',
+    'Koneksi vault terputus. Silakan coba tekan Simpan sekali lagi.': 'Vault connection lost. Please press Save once more.',
+    'Tidak ada transaksi offline yang menunggu': 'No offline transactions waiting', 'transaksi offline menunggu sinkron ke server': 'offline transactions waiting to sync',
+    'Daftarkan dulu di Master Unit bila unit ini memang baru.': 'Register it in Master Unit first if this is a new unit.', 'Bila angka sudah benar, tekan': 'If the number is correct, press',
+    'sekali lagi.': 'once more.', 'Transaksi berhasil disimpan!': 'Transaction saved!', 'Data transaksi baru tersimpan di server!': 'New transaction saved on the server!',
+    'Daftar belum termuat': 'List not loaded yet', 'Tidak ditemukan': 'Not found', 'Unit tidak ditemukan': 'Unit not found', 'Nama tidak ditemukan:': 'Name not found:',
+
+    // --- Dashboard ---
+    'Selamat Datang': 'Welcome', 'Selamat Pagi': 'Good Morning', 'Selamat Siang': 'Good Afternoon', 'Selamat Sore': 'Good Afternoon', 'Selamat Malam': 'Good Evening',
+    'Langsung · tiap 30 detik': 'Live · every 30 seconds', 'Memuat waktu WITA...': 'Loading WITA time...', 'ADA ANOMALI': 'ANOMALY FOUND', 'SISTEM NORMAL': 'SYSTEM NORMAL',
+    'Diperbarui:': 'Updated:', 'Tren Konsumsi BBM Site': 'Site Fuel Consumption Trend',
+    'Liter per periode filter · area hijau = total site, garis = tiap kelompok unit': 'Litres per filter period · green area = site total, lines = each unit group',
+    'Pilih seri grafik': 'Choose chart series', 'Total Site': 'Site Total', 'Alat Berat': 'Heavy Equipment', 'Dump Truck': 'Dump Truck', 'Dumptruck': 'Dump Truck',
+    'LV / Support': 'LV / Support', 'LV/Support': 'LV/Support', 'Total periode': 'Period total', 'Rata-rata / hari': 'Average / day', 'Puncak': 'Peak', 'Terendah': 'Lowest',
+    'Daily': 'Daily', 'Weekly': 'Weekly', 'Monthly': 'Monthly', 'Yearly': 'Yearly', 'Storage Tank Utama': 'Main Storage Tank', 'Stok terhadap kapasitas 16.000 L': 'Stock vs 16,000 L capacity',
+    'Min kritis': 'Critical min', 'Kapasitas max': 'Max capacity', 'Estimasi habis': 'Runs out in', 'Rata-rata pemakaian 7 hari:': '7-day average usage:',
+    'AMAN': 'SAFE', 'SIAGA': 'ALERT', 'KRITIS': 'CRITICAL', 'PANTAU': 'MONITOR', 'Konsumsi Hari Ini': "Today's Consumption", 'Pengeluaran unit hari ini (WITA)': 'Unit fuel issued today (WITA)',
+    'Total Konsumsi Periode': 'Period Total Consumption', 'Supplier masuk periode:': 'Supplier delivery this period:', 'Rata-Rata Efisiensi': 'Average Efficiency',
+    'Rata-rata Efisiensi': 'Average Efficiency', 'Unit KM:': 'KM units:', 'Sisa Stok Tangki': 'Tank Stock Left',
+    'Total BBM masuk dari supplier pada periode yang sama (seluruh site)': 'Total fuel delivered by suppliers in the same period (whole site)',
+    'Top Unit Ter-Irit': 'Most Efficient Units', 'KODE UNIT': 'UNIT CODE', 'Kode Unit': 'Unit Code', 'VS STANDAR': 'VS STANDARD', 'Selisih rata-rata aktual terhadap standar unit': 'Average actual difference vs the unit standard',
+    'Top Konsumsi': 'Top Consumption', 'TOTAL LITER': 'TOTAL LITRES', 'Total Liter · Porsi Site': 'Total Litres · Site Share', 'Audit Deviasi': 'Deviation Audit',
+    'Unit dengan deviasi terbesar': 'Units with the largest deviation', 'Periode & lokasi yang dipakai perhitungan audit': 'Period & location used for the audit',
+    'unit di luar toleransi': 'units out of tolerance', 'Cek Meteran': 'Meter Check', 'KETERANGAN': 'NOTES', 'Keterangan': 'Notes',
+    'Supplier Supply vs Site Consumption': 'Supplier Supply vs Site Consumption', 'Tangki utama, seluruh site — pita di antara garis kuning & hijau = sisa BBM di tangki': 'Main tank, whole site — the band between the yellow & green lines = fuel left in the tank',
+    '+ BBM Masuk': '+ Fuel In', '− BBM Keluar': '− Fuel Out', '= Stok Akhir': '= Closing Stock', 'Stok Awal': 'Opening Stock', 'Konsumsi BBM per Lokasi': 'Fuel Consumption by Location',
+    'Distribusi periode filter': 'Filter period distribution', 'Total BBM': 'Total Fuel', 'Peta Lokasi Site': 'Site Location Map', 'Peta lokasi site': 'Site location map',
+    'Sebaran lokasi site aktif · makin besar titik, makin tinggi konsumsi BBM pada periode terpilih': 'Active site locations · the bigger the dot, the higher the fuel consumption in the selected period',
+    'Kirim ke WA': 'Send to WA', 'Kirim ringkasan Dashboard ke WhatsApp': 'Send the Dashboard summary to WhatsApp', 'Cari kode unit...': 'Search unit code...',
+    'Daftar Unit Ter-Irit terhadap Standar': 'Most Efficient Units vs Standard', 'Daftar Lengkap Konsumsi BBM Unit Terbesar': 'Full List of Highest Unit Fuel Consumption',
+    'Daftar Unit Anomali / Boros': 'Anomaly / Overuse Units', 'Daftar Unit Perlu Cek Meteran': 'Units Needing a Meter Check', 'Deviasi': 'Deviation',
+    'Aktual · Standar · Deviasi': 'Actual · Standard · Deviation', 'Belum ada data untuk periode ini': 'No data for this period yet', 'Belum ada data untuk periode ini.': 'No data for this period yet.',
+    'Semua unit dalam toleransi': 'All units within tolerance', 'Semua Meteran Normal': 'All meters normal', 'Tanpa angka': 'No reading', 'Lonjakan': 'Spike', 'Mundur': 'Backwards',
+    'Deviasi ekstrem': 'Extreme deviation', 'Cek satuan': 'Check unit', 'Meter tidak andal': 'Unreliable meter', 'Cek meter': 'Check meter', 'METERAN RUSAK / 0': 'METER BROKEN / 0',
+    'Porsi dari total konsumsi site': 'Share of total site consumption', 'Titik lokasi tidak tersedia.': 'Location points not available.', 'Satelit': 'Satellite', 'Jalan': 'Streets',
+    'Muat ulang & tampilkan semua lokasi aktif': 'Reload & show all active locations', 'Muat ulang dan tampilkan semua lokasi aktif': 'Reload and show all active locations',
+    'Belum ada koordinat. Isi Latitude/Longitude di': 'No coordinates yet. Fill in Latitude/Longitude in', 'Master Data → Master Lokasi': 'Master Data → Master Location',
+    'Keluar (Pemakaian)': 'Out (Usage)', 'Stok Awal + BBM Masuk': 'Opening Stock + Fuel In', 'BBM Keluar (Pemakaian)': 'Fuel Out (Usage)',
+    'stok awal + masuk': 'opening stock + in', 'total keluar': 'total out', 'Tidak berubah': 'No change',
+    'Selisih terhadap Stok Awal periode ini. Angka Stok Akhir di atas sudah mencakup selisih tersebut.': 'Difference vs this period’s opening stock. The closing stock above already includes it.',
+    'Data Dashboard belum termuat, coba sebentar lagi.': 'Dashboard data has not loaded yet, try again shortly.',
+    'Fitur Filter Dashboard hanya dapat diakses oleh Sub Admin / Master Admin.': 'The Dashboard filter is only available to Sub Admin / Master Admin.',
+    'Anda tidak memiliki hak akses untuk mengubah rentang tanggal dashboard.': 'You do not have permission to change the dashboard date range.',
+    'Tanggal Awal tidak boleh mendahului Tanggal Akhir!': 'The start date must not be after the end date!', 'Rentang tanggal disesuaikan.': 'Date range adjusted.',
+    'Rentang tanggal maksimal 3 tahun — tanggal awal disesuaikan.': 'The maximum range is 3 years — the start date was adjusted.',
+    'Stok tangki': 'Tank stock', '— klik untuk membuka Dashboard': '— click to open the Dashboard', 'Hari ini:': 'Today:',
+
+    // --- Kalibrasi ---
+    'Audit Kalibrasi Konsumsi BBM': 'Fuel Consumption Calibration Audit', 'Audit Kalibrasi & Deviasi': 'Calibration & Deviation Audit', 'Audit Kalibrasi': 'Calibration Audit',
+    'Evaluasi akurasi pengisian solar berdasar benchmark standar dealer': 'Evaluates diesel consumption against the dealer standard benchmark',
+    'Pilih periode & lokasi audit': 'Choose the audit period & location', 'PERIODE': 'PERIOD', 'LOKASI': 'LOCATION', 'Cakupan Audit': 'Audit Coverage', 'Total Unit Diaudit': 'Total Units Audited',
+    'Seluruh unit dengan data pengisian & meter valid': 'All units with valid refuelling & meter data', 'Unit Akurat / Normal': 'Accurate / Normal Units', 'Standar Optimal': 'Optimal Standard',
+    'dari total unit · deviasi dalam toleransi': 'of all units · deviation within tolerance', 'Terdeteksi Anomali': 'Anomalies Detected', 'Deviasi Tinggi': 'High Deviation',
+    'dari total unit · deviasi di luar toleransi': 'of all units · deviation out of tolerance', 'Detail Audit per Unit': 'Audit Detail per Unit', 'Kode Tipe': 'Type Code',
+    'Total Liter': 'Total Litres', 'Jam / Jarak Kerja': 'Work Hours / Distance', 'Konsumsi Aktual': 'Actual Consumption', 'Standar': 'Standard', 'Selisih': 'Difference', 'Status': 'Status',
+    'TAMPILKAN BARIS': 'SHOW ROWS', '15 Baris': '15 Rows', '25 Baris': '25 Rows', '30 Baris': '30 Rows', '50 Baris': '50 Rows', '100 Baris': '100 Rows', 'Semua Baris': 'All Rows',
+    'Cetak / PDF': 'Print / PDF', 'IRIT': 'EFFICIENT', 'NORMAL': 'NORMAL', 'BOROS': 'OVERUSE', 'CEK METER': 'CHECK METER', 'STANDAR BELUM DIATUR': 'NO STANDARD SET',
+    'TANPA STANDAR': 'NO STANDARD', 'TANPA METER': 'NO METER', 'DATA KURANG': 'INSUFFICIENT DATA', 'Boros': 'Overuse', 'Irit': 'Efficient', 'CEK': 'CHECK',
+    'Deviasi di bawah -50% (dicurigai masalah meter) atau meter ditandai tidak andal': 'Deviation below -50% (suspected meter problem) or meter marked unreliable',
+    'Unit belum punya standar konsumsi': 'Unit has no consumption standard yet', '(meter ditandai)': '(meter flagged)', 'Arti status:': 'Status meaning:', 'Catatan:': 'Notes:',
+    'AUDIT KALIBRASI KONSUMSI BBM': 'FUEL CONSUMPTION CALIBRATION AUDIT', 'Perbandingan konsumsi aktual setiap unit terhadap standar': 'Actual consumption of each unit compared with its standard',
+    'Normal / Irit': 'Normal / Efficient', 'Perlu Perhatian': 'Need Attention', 'Boros + Cek Meter': 'Overuse + Check Meter',
+    'IRIT — pemakaian lebih hemat dari standar (lebih dari 5%).': 'EFFICIENT — usage is more economical than the standard (by more than 5%).',
+    'NORMAL — pemakaian sesuai standar (selisih tidak lebih dari 5%).': 'NORMAL — usage matches the standard (difference no more than 5%).',
+    'BOROS — pemakaian lebih dari 5% di atas standar, perlu ditinjau.': 'OVERUSE — usage is more than 5% above the standard and should be reviewed.',
+    'CEK METER — pemakaian tercatat jauh di bawah standar (kurang dari separuhnya), kemungkinan ada kendala pada meter atau pencatatan, atau meter unit sedang ditandai tidak andal.': 'CHECK METER — recorded usage is far below the standard (less than half), possibly a meter or recording issue, or the unit meter is flagged unreliable.',
+    'STANDAR BELUM DIATUR — unit belum memiliki standar konsumsi.': 'NO STANDARD SET — the unit has no consumption standard yet.',
+    'Konsumsi aktual adalah pemakaian solar dibagi jam kerja (HM) atau jarak tempuh (KM) selama periode.': 'Actual consumption is diesel used divided by working hours (HM) or distance (KM) over the period.',
+    'Data audit belum termuat, coba sebentar lagi.': 'Audit data has not loaded yet, try again shortly.', 'Fitur Cetak / Export PDF hanya untuk pengguna terdaftar.': 'Print / PDF export is only for registered users.',
+    'Periode': 'Period', 'Lokasi': 'Location', 'Tanggal': 'Date', 'Jam': 'Time', 'Liter': 'Litres', 'Total': 'Total', 'Unit': 'Unit', 'Isi': 'Fills',
+
+    // --- Kartu Stok ---
+    'Filter Unit & Periode': 'Unit & Period Filter', 'Pilih unit & rentang tanggal transaksi': 'Choose a unit & transaction date range', 'PILIH UNIT': 'SELECT UNIT',
+    'TANGGAL AWAL': 'START DATE', 'TANGGAL AKHIR': 'END DATE', 'Ketik / pilih kode unit': 'Type / pick a unit code', 'Memuat Daftar Unit...': 'Loading unit list...',
+    'Total Pengisian': 'Total Refuelled', 'Akumulasi liter pada periode filter': 'Accumulated litres in the filter period', 'Frekuensi Pengisian': 'Refuelling Frequency', 'Frekuensi': 'Frequency',
+    'Jumlah transaksi pengisian unit': 'Number of refuelling transactions', 'Aktual rate (L/HM atau L/KM)': 'Actual rate (L/HM or L/KM)', 'Rata-Rata / Pengisian': 'Average / Refuel',
+    'Rata-rata / Pengisian': 'Average / Refuel', 'Liter rata-rata tiap transaksi': 'Average litres per transaction', 'Riwayat pengisian & efisiensi konsumsi per unit (HM / KM)': 'Refuelling history & consumption efficiency per unit (HM / KM)',
+    'Riwayat pengisian & efisiensi konsumsi': 'Refuelling history & consumption efficiency', 'Periode: -': 'Period: -', 'Menampilkan 0 transaksi': 'Showing 0 transactions',
+    'Selisih HM': 'HM Difference', 'Selisih KM': 'KM Difference', 'Konsumsi (L/HM)': 'Consumption (L/HM)', 'Konsumsi (L/KM)': 'Consumption (L/KM)', 'Meter (HM)': 'Meter (HM)', 'Meter (KM)': 'Meter (KM)',
+    'Satuan Meter': 'Meter Unit', 'Lainnya (Jenis belum diisi)': 'Other (type not set)', 'Tonly (HDT)': 'Tonly (HDT)', 'KARTU STOK BBM UNIT': 'UNIT FUEL STOCK CARD',
+    'Pilih unit & terapkan filter terlebih dahulu.': 'Choose a unit & apply the filter first.', 'Lama unit bekerja sejak pengisian sebelumnya': 'How long the unit worked since the previous refuel',
+    'Jarak tempuh unit sejak pengisian sebelumnya': 'Distance travelled since the previous refuel',
+    'Angka meter pengisian ini dikurangi angka meter pengisian sebelumnya = jam kerja (HM) / jarak (KM) yang ditempuh': 'This refuel’s meter reading minus the previous one = working hours (HM) / distance (KM)',
+    'Pemakaian solar per jam kerja sejak pengisian sebelumnya: liter pengisian sebelumnya dibagi selisih HM (cara hitung sama dengan Rata-rata Efisiensi)': 'Diesel used per working hour since the previous refuel: previous refuel litres divided by the HM difference (same method as Average Efficiency)',
+    'Pemakaian solar per kilometer sejak pengisian sebelumnya: liter pengisian sebelumnya dibagi selisih KM (cara hitung sama dengan Rata-rata Efisiensi)': 'Diesel used per kilometre since the previous refuel: previous refuel litres divided by the KM difference (same method as Average Efficiency)',
+    'Tanda "–" pada Selisih dan Konsumsi berarti nilainya belum dapat dihitung, misalnya pada pengisian pertama dalam periode atau saat angka meter tidak berubah.': 'A "–" in Difference and Consumption means the value cannot be calculated yet, for example on the first refuel in the period or when the meter reading did not change.',
+    'Tanda "–" berarti nilainya belum dapat dihitung, misalnya pada pengisian pertama dalam periode atau saat angka meter tidak berubah.': 'A "–" means the value cannot be calculated yet, for example on the first refuel in the period or when the meter reading did not change.',
+    'Riwayat diurutkan dari pengisian paling awal sampai paling akhir.': 'History is sorted from the earliest to the latest refuel.',
+    'Selisih HM adalah lama unit bekerja sejak pengisian sebelumnya.': 'HM Difference is how long the unit worked since the previous refuel.',
+    'Selisih KM adalah jarak tempuh unit sejak pengisian sebelumnya.': 'KM Difference is the distance travelled since the previous refuel.',
+    'Konsumsi adalah pemakaian solar per jam kerja sejak pengisian sebelumnya, yaitu liter pengisian sebelumnya dibagi selisih HM. Cara hitungnya sama dengan Rata-rata Efisiensi.': 'Consumption is diesel used per working hour since the previous refuel, i.e. the previous refuel litres divided by the HM difference. It uses the same method as Average Efficiency.',
+    'Konsumsi adalah pemakaian solar per kilometer sejak pengisian sebelumnya, yaitu liter pengisian sebelumnya dibagi selisih KM. Cara hitungnya sama dengan Rata-rata Efisiensi.': 'Consumption is diesel used per kilometre since the previous refuel, i.e. the previous refuel litres divided by the KM difference. It uses the same method as Average Efficiency.',
+    'Pengisian pertama dalam periode — belum ada pengisian sebelumnya untuk dibandingkan': 'First refuel in the period — no previous refuel to compare with',
+    'Angka meter tidak berubah dari pengisian sebelumnya — liternya dihitung pada selisih berikutnya': 'Meter reading did not change since the previous refuel — its litres count toward the next difference',
+    'Angka meter tidak terbaca / kosong': 'Meter reading unreadable / empty', 'Angka meter lebih kecil dari sebelumnya (meter diganti/direset)': 'Meter reading lower than before (meter replaced/reset)',
+
+    // --- Laporan ---
+    'Report Harian BBM Site': 'Site Daily Fuel Report', 'Monitoring pemakaian BBM & kontrol stok harian tangki': 'Fuel usage monitoring & daily tank stock control',
+    'Harian': 'Daily', 'Mingguan': 'Weekly', 'Bulanan': 'Monthly', 'Kontrol stok tangki & detail transaksi BBM per hari': 'Tank stock control & daily fuel transaction detail',
+    'Kontrol stok tangki & rincian pengisian BBM': 'Tank stock control & refuelling detail', 'Ringkasan Stok BBM Harian (Liter)': 'Daily Fuel Stock Summary (Litres)',
+    'Informasi Tangki & Shift': 'Tank & Shift Information', 'Detail Transaksi Harian': 'Daily Transaction Detail', 'Waktu': 'Time', 'HM / KM': 'HM / KM', 'HM/KM': 'HM/KM',
+    'PENERIMAAN': 'RECEIVED', 'PEMAKAIAN': 'USAGE', 'Pemakaian': 'Usage', 'Main Fuel Station': 'Main Fuel Station', 'BARIS': 'ROWS', 'TANGGAL': 'DATE',
+    'MINGGU (SENIN–MINGGU)': 'WEEK (MON–SUN)', 'MINGGU (SENIN–MINGGU) · PILIH TANGGAL MANA SAJA': 'WEEK (MON–SUN) · PICK ANY DATE', 'Bulan:': 'Month:',
+    'Rekap BBM Senin–Minggu untuk manajemen': 'Monday–Sunday fuel recap for management', 'Rekap BBM satu bulan kalender untuk manajemen': 'Calendar-month fuel recap for management',
+    'Rekap BBM satu bulan kalender + perbandingan bulan lalu': 'Calendar-month fuel recap + comparison with last month', 'Menghitung laporan…': 'Calculating report…',
+    'Ringkasan Stok Periode': 'Period Stock Summary', '(Liter · seluruh tangki)': '(Litres · whole tank)', 'Tren Pemakaian Harian': 'Daily Usage Trend', 'Rekap per Lokasi': 'Recap by Location',
+    'Pembagian pemakaian menurut lokasi kerja': 'Usage split by work location', 'Rekap per Unit': 'Recap by Unit', 'Daftar Perhatian': 'Attention List',
+    'Unit boros, meter yang perlu dicek, dan pemakaian terbesar di periode ini': 'Overuse units, meters to check, and the largest usage in this period',
+    'Konsumsi = liter ÷ jam kerja (HM) atau jarak (KM) · standar dari Master Data · status sama dengan tab Kalibrasi': 'Consumption = litres ÷ working hours (HM) or distance (KM) · standard from Master Data · same status as the Calibration tab',
+    'Halaman Rekap per Unit': 'Recap by Unit page', 'Pemakaian Terbesar': 'Largest Usage', 'Unit Boros': 'Overuse Units', 'Perlu Cek Meter': 'Need Meter Check',
+    'Belum ada pengisian': 'No refuelling yet', 'Tidak ada unit boros': 'No overuse units', 'Semua meter wajar': 'All meters look fine', 'Tidak ada pemakaian': 'No usage',
+    'Tidak ada data': 'No data', 'Tidak ada pengisian pada periode & lokasi ini': 'No refuelling in this period & location', 'Belum ada data untuk tanggal ini': 'No data for this date yet',
+    'Belum ada data untuk tanggal ini.': 'No data for this date yet.', 'posisi hari ini': "today's position", 'Kiriman supplier (angka = liter diterima)': 'Supplier deliveries (number = litres received)',
+    'Stok Akhir': 'Closing Stock', 'Penerimaan': 'Received', 'Konsumsi': 'Consumption', 'KONSUMSI': 'CONSUMPTION', 'STANDAR': 'STANDARD', 'LITER': 'LITRES', 'NO': 'NO', 'UNIT': 'UNIT',
+    'PENGISIAN': 'REFUELS', 'JAM / JARAK KERJA': 'HOURS / DISTANCE', 'Jam/Jarak': 'Hours/Distance', 'Lokasi Utama': 'Main Location', 'Vs bulan lalu': 'Vs last month', 'Meter ditandai tidak andal': 'Meter flagged unreliable',
+    'Tercatat jauh di bawah standar — cek meter/pencatatan': 'Recorded far below the standard — check the meter/recording', '(ditandai)': '(flagged)',
+    'LAPORAN HARIAN BBM SITE': 'SITE DAILY FUEL REPORT', 'LAPORAN MINGGUAN BBM SITE': 'SITE WEEKLY FUEL REPORT', 'LAPORAN BULANAN BBM SITE': 'SITE MONTHLY FUEL REPORT',
+    '1. Ringkasan Stok Tangki (Liter)': '1. Tank Stock Summary (Litres)', '2. Rincian Pengisian per Lokasi': '2. Refuelling Detail by Location', '1. Ringkasan Stok Periode (Liter · seluruh tangki)': '1. Period Stock Summary (Litres · whole tank)',
+    '2. Tren Pemakaian Harian': '2. Daily Usage Trend', '3. Rekap per Lokasi': '3. Recap by Location', '4. Daftar Perhatian': '4. Attention List', '5. Rekap per Unit': '5. Recap by Unit',
+    'TOTAL PEMAKAIAN': 'TOTAL USAGE', 'Subtotal': 'Subtotal', '% TOTAL': '% TOTAL',
+    'Ringkasan stok adalah posisi tangki utama secara keseluruhan.': 'The stock summary is the overall position of the main tank.',
+    'Stok awal, penerimaan, dan stok akhir adalah posisi tangki utama secara keseluruhan.': 'Opening stock, received and closing stock are the overall position of the main tank.',
+    'Rincian pengisian dikelompokkan per lokasi dan diurutkan menurut jam pengisian.': 'Refuelling detail is grouped by location and sorted by refuelling time.',
+    'Konsumsi setiap unit adalah pemakaian solar dibagi jam kerja (HM) atau jarak tempuh (KM) selama periode ini, lalu dibandingkan dengan standar unit tersebut.': 'Each unit’s consumption is diesel used divided by working hours (HM) or distance (KM) in this period, then compared with that unit’s standard.',
+    'Unit dinilai boros bila pemakaiannya lebih dari 5% di atas standar.': 'A unit is rated overuse when its usage is more than 5% above the standard.',
+    'Laporan belum bisa dimuat. Periksa koneksi lalu coba lagi.': 'The report could not be loaded. Check the connection and try again.', 'Laporan belum termuat, coba sebentar lagi.': 'The report has not loaded yet, try again shortly.',
+    'Fitur Cetak / Export PDF laporan hanya untuk pengguna terdaftar.': 'Report print / PDF export is only for registered users.',
+    'Fitur Cetak / Export PDF Laporan Harian hanya dapat digunakan oleh Admin Site.': 'Daily Report print / PDF export is only available to Site Admins.',
+    'Kirim laporan ke WhatsApp hanya untuk pengguna terdaftar.': 'Sending reports to WhatsApp is only for registered users.',
+    'Pengubahan filter tanggal dan lokasi laporan memerlukan akses Admin.': 'Changing the report date and location filter requires Admin access.',
+    'Kirim Laporan ke WhatsApp': 'Send Report to WhatsApp', 'Kirim Laporan Harian ke WhatsApp': 'Send Daily Report to WhatsApp', 'Kirim ringkasan laporan ke WhatsApp': 'Send a report summary to WhatsApp',
+    'CATATAN / NOTE (OPSIONAL)': 'NOTE (OPTIONAL)', 'Ditaruh di bagian bawah pesan, di atas tautan Report. Tersimpan di perangkat ini untuk laporan berikutnya — kosongkan bila tidak perlu.': 'Placed at the bottom of the message, above the Report link. Saved on this device for the next report — leave empty if not needed.',
+    'Rincian pemakaian setiap unit dapat dilihat pada laporan lengkap melalui tautan berikut. Terima kasih.': 'Usage details for each unit are available in the full report at the link below. Thank you.',
+    'transaksi lain (lihat Cetak / PDF)': 'other transactions (see Print / PDF)', 'Tidak ada transaksi pengisian pada tanggal & lokasi ini.': 'No refuelling transactions on this date & location.',
+    'Stok tangki (Liter)': 'Tank stock (Litres)', 'Stok (Liter)': 'Stock (Litres)', 'Pemakaian per lokasi': 'Usage by location', 'Kiriman supplier:': 'Supplier deliveries:',
+
+    // --- Cetak / PDF (kerangka bersama) ---
+    'Dicetak oleh': 'Printed by', 'Dicetak': 'Printed', 'Halaman': 'Page', 'Dibuat oleh,': 'Prepared by,', 'Diperiksa oleh,': 'Checked by,', 'Disetujui oleh,': 'Approved by,',
+    'Nama & Jabatan': 'Name & Position', 'PDF Laporan': 'PDF Report', 'Bagikan / Kirim': 'Share / Send', 'Menyiapkan file PDF…': 'Preparing PDF file…',
+    'PDF belum bisa dibuat. Periksa koneksi internet lalu coba lagi.': 'The PDF could not be created. Check the internet connection and try again.',
+    'Pembuatan PDF terlalu lama. Periksa koneksi internet lalu coba lagi.': 'Creating the PDF took too long. Check the internet connection and try again.',
+    'Pop-up terblokir oleh browser! Mohon izinkan pop-up di browser Anda agar pratinjau cetak dapat terbuka.': 'Pop-ups are blocked by the browser! Please allow pop-ups so the print preview can open.',
+    'PT ARTHALAUT BUMIJASA · AB-FUEL MANAGEMENT SYSTEM': 'PT ARTHALAUT BUMIJASA · AB-FUEL MANAGEMENT SYSTEM',
+
+    // --- Database Master ---
+    'Transaksi BBM, unit, stiker QR, karyawan & standar dealer': 'Fuel transactions, units, QR stickers, employees & dealer standards',
+    'Database Master': 'Master Database', 'Master Unit': 'Master Unit', 'Master QR': 'Master QR', 'Master Karyawan': 'Master Employee', 'Standar Dealer': 'Dealer Standard', 'Master Lokasi': 'Master Location',
+    'Input Transaksi BBM Baru': 'New Fuel Transaction', 'Input Data Unit Baru': 'New Unit', 'Input Lokasi Baru': 'New Location', 'Input Data Stiker QR Baru': 'New QR Sticker',
+    'Input Data Karyawan / Operator Baru': 'New Employee / Operator', 'Input Data Standar Dealer Baru': 'New Dealer Standard',
+    'TANGGAL TRANSAKSI': 'TRANSACTION DATE', 'JAM': 'TIME', 'JENIS TRANSAKSI': 'TRANSACTION TYPE', 'KODE UNIT / TANGKI': 'UNIT / TANK CODE', 'LOKASI PIT / SITE': 'PIT / SITE LOCATION',
+    'HM / KM UNIT': 'UNIT HM / KM', 'LITER': 'LITRES', 'NO. SURAT JALAN SUPPLIER': 'SUPPLIER DELIVERY NOTE NO.', 'KETERANGAN / CATATAN ADMIN': 'NOTES / ADMIN REMARKS',
+    'SIMPAN DATA': 'SAVE DATA', 'Simpan Data': 'Save Data', 'RESET': 'RESET', 'Reset': 'Reset', 'Reload': 'Reload', 'Aksi': 'Action', 'AKSI': 'ACTION', 'No': 'No',
+    'PENGELUARAN UNIT': 'UNIT ISSUE', 'MASUK SUPPLIER': 'SUPPLIER IN', 'PENERIMAAN TANGKI': 'TANK RECEIPT', 'Jenis': 'Type', 'Jenis Transaksi': 'Transaction Type',
+    'Surat Jalan': 'Delivery Note', 'No. Surat Jalan': 'Delivery Note No.', 'Terakhir diinput': 'Last entered', 'Waktu transaksi': 'Transaction time', 'Urutkan': 'Sort', 'URUTAN': 'ORDER',
+    'Tanggal & jam transaksi terbaru di paling atas': 'Newest transaction date & time on top', 'Data terakhir diinput di paling atas': 'Last entered data on top', 'BARU': 'NEW',
+    'Cari Kode Unit, Lokasi, Teks...': 'Search unit code, location, text...', 'Cari ID/Unit...': 'Search ID/Unit...', 'Cari Kode/Merek...': 'Search code/brand...', 'Cari Lokasi...': 'Search location...',
+    'Cari Nama/NIK...': 'Search name/NIK...', 'Cari Unit...': 'Search unit...', 'Catatan pengisian / voucher...': 'Refuel note / voucher...', 'Ketik / pilih unit': 'Type / pick a unit',
+    'Belum ada data yang cocok': 'No matching data yet', 'Hapus baris ini dari Database Master?': 'Delete this row from the Master Database?', 'Data berhasil dihapus!': 'Data deleted!',
+    'Perubahan data berhasil disimpan!': 'Changes saved!', 'Gagal menyimpan data ke server.': 'Could not save data to the server.', 'Tidak dapat terhubung ke server.': 'Cannot connect to the server.',
+    'Tidak dapat terhubung ke server. Silakan coba lagi.': 'Cannot connect to the server. Please try again.', 'Mohon periksa kembali angkanya.': 'Please check the number again.',
+    'Akses: Master Admin (Penuh)': 'Access: Master Admin (Full)', 'Akses: Sub Admin (Read-Only)': 'Access: Sub Admin (Read-Only)', 'Akses: Mode Tamu (Terkunci)': 'Access: Guest Mode (Locked)',
+    'Hanya Master Admin': 'Master Admin only', 'Format jam JJ:MM, contoh 08:30 (boleh ketik 0830)': 'Time format HH:MM, e.g. 08:30 (0830 is fine)',
+    'KODE UNIT': 'UNIT CODE', 'KATEGORI': 'CATEGORY', 'Kategori': 'Category', 'SATUAN METER': 'METER UNIT', 'Satuan': 'Unit', 'STATUS': 'STATUS', 'KODE / TIPE': 'CODE / TYPE', 'JENIS UNIT': 'UNIT TYPE',
+    'Std Berlaku': 'Applied Std', 'STD BERLAKU': 'APPLIED STD', 'Serial No': 'Serial No', 'Thn': 'Year', 'Tahun': 'Year', 'STNK / NO KEND': 'REG. / PLATE NO', 'STNK BERLAKU S/D': 'REGISTRATION VALID UNTIL',
+    'Active': 'Active', 'Standby': 'Standby', 'Breakdown': 'Breakdown', 'Aktif': 'Active', 'Nonaktif': 'Inactive', 'Otomatis': 'Automatic', 'Otomatis:': 'Automatic:',
+    'Standar konsumsi mengikuti Kode Tipe (sub-tab Standar Dealer).': 'The consumption standard follows the Type Code (Dealer Standard sub-tab).',
+    'Standar: — (tanpa meter)': 'Standard: — (no meter)', 'Standar: — (pilih Kode Tipe)': 'Standard: — (choose a Type Code)', 'Standar: — (belum diisi di Standar Dealer)': 'Standard: — (not set in Dealer Standard)',
+    'Isi Jenis & Kategori Otomatis': 'Fill Type & Category Automatically', 'Terapkan Jenis & Kategori ini ke sheet MASTER_UNIT?': 'Apply this Type & Category to the MASTER_UNIT sheet?',
+    'Kode Unit wajib diisi!': 'Unit Code is required!', 'Kode / Tipe Unit wajib diisi!': 'Unit Code / Type is required!', 'Nama Karyawan wajib diisi!': 'Employee name is required!',
+    'Nama lokasi wajib diisi!': 'Location name is required!', 'QR ID dan Kode Unit wajib diisi!': 'QR ID and Unit Code are required!', 'Gagal membuat pratinjau.': 'Could not create the preview.',
+    'Gagal menerapkan pemetaan.': 'Could not apply the mapping.', 'Gagal memuat data karyawan.': 'Could not load employee data.', 'Sheet tidak ditemukan!': 'Sheet not found!',
+    'Apakah Anda yakin ingin menghapus baris QR ini?': 'Are you sure you want to delete this QR row?', 'Apakah Anda yakin ingin menghapus baris Karyawan ini?': 'Are you sure you want to delete this employee row?',
+    'Database Operator / Driver Site': 'Site Operator / Driver Database', 'NIK': 'NIK', 'NAMA LENGKAP': 'FULL NAME', 'Nama Lengkap': 'Full Name', 'JABATAN': 'POSITION', 'Jabatan': 'Position',
+    'DEPARTEMEN': 'DEPARTMENT', 'Departemen': 'Department', 'Operator': 'Operator', 'Driver': 'Driver', 'Mesin': 'Engine', 'Menampilkan 0 dari 0 karyawan': 'Showing 0 of 0 employees',
+    'Menampilkan 0 dari 0 stiker': 'Showing 0 of 0 stickers', 'Menampilkan 0 dari 0 tipe': 'Showing 0 of 0 types', 'Menampilkan 0 dari 0 unit': 'Showing 0 of 0 units',
+    'Menampilkan 0 dari 0 transaksi': 'Showing 0 of 0 transactions', 'Menampilkan 0 dari 0 lokasi': 'Showing 0 of 0 locations',
+    'Merek / Brand': 'Brand', 'MEREK / BRAND': 'BRAND', 'Kapasitas': 'Capacity', 'KAPASITAS TANGKI (L)': 'TANK CAPACITY (L)', 'Toleransi': 'Tolerance', 'TOLERANSI (%)': 'TOLERANCE (%)',
+    'Beban Ringan': 'Light Load', 'Beban Sedang': 'Medium Load', 'Beban Berat': 'Heavy Load', 'BEBAN RINGAN': 'LIGHT LOAD', 'BEBAN SEDANG': 'MEDIUM LOAD', 'BEBAN BERAT': 'HEAVY LOAD',
+    'Acuan Rata2': 'Average Reference', 'ACUAN (OTOMATIS)': 'REFERENCE (AUTO)', 'Acuan rata-rata — dihitung otomatis dari 3 beban': 'Average reference — calculated automatically from the 3 loads',
+    'Catatan saja · audit memakai ±5%': 'Note only · the audit uses ±5%', 'Catatan saja — status audit saat ini memakai ±5% untuk semua tipe': 'Note only — the audit status currently uses ±5% for all types',
+    'Kosong = dari Kode Tipe': 'Empty = from Type Code', 'Kosongkan untuk memakai kapasitas tangki dari Kode Tipe unit (Standar Dealer)': 'Leave empty to use the tank capacity from the unit Type Code (Dealer Standard)',
+    'Dasar': 'Base', 'Koordinat': 'Coordinates', 'LATITUDE': 'LATITUDE', 'LONGITUDE': 'LONGITUDE', 'Nama Lokasi': 'Location Name', 'NAMA LOKASI': 'LOCATION NAME',
+    'Klik peta untuk menentukan titik, atau tempel koordinat dari Google Maps (contoh': 'Click the map to set the point, or paste coordinates from Google Maps (example',
+    'Isi Latitude & Longitude, atau kosongkan keduanya.': 'Fill in Latitude & Longitude, or leave both empty.', 'Izin lokasi ditolak. Aktifkan izin lokasi browser, atau klik titik di peta.': 'Location permission denied. Allow browser location, or click a point on the map.',
+    'Lokasi tidak bisa didapat. Klik titik di peta sebagai gantinya.': 'Could not get the location. Click a point on the map instead.', 'Perangkat ini tidak mendukung GPS/lokasi.': 'This device does not support GPS/location.',
+    'Login diperlukan untuk melihat Master Lokasi.': 'Sign-in is required to view Master Location.', '— Belum ada —': '— None yet —', '— Pilih —': '— Select —', '— Tidak diubah —': '— Unchanged —',
+    'Gunakan Lokasi Saya': 'Use My Location', 'Lokasi Saya': 'My Location', 'Tampilkan semua': 'Show all',
+
+    // --- Profil & login ---
+    'Selamat datang kembali': 'Welcome back', 'Masuk sebagai Sub Admin atau Master Admin site': 'Sign in as a site Sub Admin or Master Admin', 'Username': 'Username', 'Kata sandi': 'Password',
+    'Tampilkan kata sandi': 'Show password', 'Sembunyikan kata sandi': 'Hide password', 'Caps Lock sedang aktif': 'Caps Lock is on', 'Ingat username': 'Remember username', 'Lupa kata sandi?': 'Forgot password?',
+    'Sisa percobaan:': 'Attempts left:', 'Sesi berakhir otomatis setelah 15 menit tanpa aktivitas': 'The session ends automatically after 15 minutes of inactivity', 'Memverifikasi…': 'Verifying…',
+    'Profil Akun': 'Account Profile', 'Edit Nama Lengkap': 'Edit Full Name', 'Edit nama lengkap': 'Edit full name', 'Edit Nama Profil': 'Edit Profile Name', 'Login sebelumnya': 'Previous sign-in',
+    'Sesi berlaku s.d. (WITA)': 'Session valid until (WITA)', 'Status keamanan': 'Security status', 'Terlindungi': 'Protected', 'Perlu ditinjau': 'Needs review', 'Sesi aktif': 'Active session',
+    'Ganti kata sandi Anda untuk melanjutkan.': 'Change your password to continue.', 'Akun ini memakai kata sandi sementara atau kata sandi yang terlalu umum. Menu lain akan terbuka kembali setelah kata sandi diganti.': 'This account uses a temporary or too-common password. Other menus will open again after the password is changed.',
+    'Foto Profil': 'Profile Photo', 'Foto profil': 'Profile photo', 'Unggah foto atau pilih avatar siap pakai': 'Upload a photo or choose a ready-made avatar', 'Pilih foto dari galeri': 'Choose a photo from the gallery',
+    'JPG / PNG — otomatis dikompres agar ringan': 'JPG / PNG — compressed automatically', 'ATAU PILIH AVATAR': 'OR CHOOSE AN AVATAR', 'Inisial nama (bawaan)': 'Name initials (default)',
+    'Pilih foto atau avatar, lalu simpan.': 'Choose a photo or avatar, then save.', 'Pilihan baru belum disimpan.': 'The new choice is not saved yet.', 'Simpan Foto': 'Save Photo',
+    'Keluar Akun': 'Sign Out', 'Akhiri sesi di perangkat ini atau di semua perangkat': 'End the session on this device or on all devices', 'Keluar di perangkat ini': 'Sign out on this device',
+    'Keluar di semua perangkat': 'Sign out on all devices', 'Curiga akun dipakai orang lain? Pilih': 'Suspect someone else is using the account? Choose', ', lalu ganti kata sandi Anda.': ', then change your password.',
+    'Keamanan & Ubah Kata Sandi': 'Security & Change Password', 'Setelah diganti, sesi di perangkat lain otomatis diakhiri': 'After changing it, sessions on other devices end automatically',
+    'KATA SANDI SAAT INI': 'CURRENT PASSWORD', 'KATA SANDI BARU': 'NEW PASSWORD', 'ULANGI KATA SANDI BARU': 'REPEAT NEW PASSWORD', 'Kekuatan kata sandi': 'Password strength',
+    'Minimal 8 karakter': 'At least 8 characters', 'Mengandung huruf dan angka': 'Contains letters and numbers', 'Konfirmasi sama persis': 'Confirmation matches exactly',
+    'Hindari kata sandi umum, tanggal lahir, atau username.': 'Avoid common passwords, birth dates or your username.', 'Simpan Kata Sandi Baru': 'Save New Password',
+    'Lemah': 'Weak', 'Cukup': 'Fair', 'Kuat': 'Strong', 'Sangat kuat': 'Very strong', 'Sesi & Perangkat': 'Sessions & Devices', 'Kendalikan di mana akun Anda sedang masuk': 'Control where your account is signed in',
+    'Memuat perangkat…': 'Loading devices…', 'Muat ulang daftar perangkat': 'Reload device list', 'Perangkat ini': 'This device', 'Perangkat': 'Device', 'perangkat sedang masuk': 'devices signed in',
+    'Daftar perangkat tidak tersedia': 'Device list not available', 'Daftar perangkat tidak tersedia (offline)': 'Device list not available (offline)', 'Sesi berlaku': 'Session valid', '(Aplikasi)': '(App)',
+    'Keluar dari Semua Perangkat': 'Sign Out of All Devices', 'Akhiri sesi akun Anda di SEMUA perangkat, termasuk perangkat ini? Anda perlu login kembali.': 'End your account session on ALL devices, including this one? You will need to sign in again.',
+    'Semua sesi telah diakhiri. Silakan login kembali.': 'All sessions have ended. Please sign in again.', 'Panel Kelola User': 'User Management Panel', 'Khusus Master Admin': 'Master Admin only',
+    'Tambah User': 'Add User', 'Tambah User Baru': 'Add New User', 'Buat User': 'Create User', 'Total user': 'Total users', 'Semua akun terdaftar': 'All registered accounts', 'akun terdaftar': 'registered accounts',
+    'Aktif': 'Active', 'Dijeda / nonaktif': 'Paused / inactive', 'Wajib ganti sandi': 'Must change password', 'wajib ganti kata sandi': 'must change password', 'Perlu ganti kata sandi': 'Needs a password change',
+    'Ringkasan & saring user': 'User summary & filter', 'Cari user': 'Search users', 'Cari username atau nama operator…': 'Search username or operator name…', 'USER': 'USER', 'ROLE': 'ROLE',
+    'Belum ada user.': 'No users yet.', 'Tidak ada user pada kategori ini.': 'No users in this category.', 'Tidak ada user yang cocok dengan pencarian.': 'No users match the search.',
+    'Aktifkan': 'Activate', 'Aktifkan User': 'Activate User', 'Nonaktifkan': 'Deactivate', 'Nonaktifkan User': 'Deactivate User', 'Hapus user': 'Delete user', 'Hapus User': 'Delete User',
+    'Reset kata sandi': 'Reset password', 'Reset sandi': 'Reset password', 'Reset ke kata sandi sementara (acak)': 'Reset to a temporary (random) password', 'Buka jeda & aktifkan': 'Unpause & activate',
+    'Dijeda otomatis setelah percobaan login gagal': 'Paused automatically after failed sign-in attempts', 'Login pertama': 'First sign-in', 'belum pernah': 'never', 'Minta reset': 'Reset requested',
+    'Tidak ada permintaan': 'No requests', 'Password Di-reset': 'Password Reset', 'NAMA OPERATOR / LENGKAP': 'OPERATOR / FULL NAME', 'USERNAME AKUN': 'ACCOUNT USERNAME', 'USERNAME': 'USERNAME',
+    'PASSWORD': 'PASSWORD', 'HAK AKSES / ROLE': 'ACCESS / ROLE', 'Sub Admin (Fuelman Site)': 'Sub Admin (Site Fuelman)', 'Min. 8 karakter, huruf & angka': 'Min. 8 characters, letters & numbers',
+    'User akan diminta mengganti kata sandi ini saat login pertama.': 'The user will be asked to change this password on first sign-in.', 'Contoh: Ahmad Subagyo (Fuelman)': 'Example: Ahmad Subagyo (Fuelman)',
+    'Contoh: subadmin': 'Example: subadmin', 'Contoh: subadmin2': 'Example: subadmin2', 'Masukkan nama lengkap': 'Enter the full name', 'NAMA LENGKAP BARU': 'NEW FULL NAME', 'Simpan Nama': 'Save Name',
+    'Lupa Password': 'Forgot Password', 'Kirim Permintaan': 'Send Request', 'Masukkan Username Anda. Permintaan reset password akan dikirimkan ke Master Admin Site untuk di-reset ke': 'Enter your username. The password reset request will be sent to the Site Master Admin to be reset to a',
+    'password sementara': 'temporary password', 'yang akan diberikan oleh Master Admin.': 'that the Master Admin will give you.', 'Ketuk untuk melihat': 'Tap to view',
+    'Login Berhasil': 'Signed In', 'Foto profil tersimpan.': 'Profile photo saved.', 'Foto profil berhasil diperbarui!': 'Profile photo updated!', 'Nama berhasil diperbarui!': 'Name updated!',
+    'Nama tidak boleh kosong!': 'Name cannot be empty!', 'Harap pilih file gambar yang valid!': 'Please choose a valid image file!', 'Pilih foto atau preset avatar terlebih dahulu!': 'Choose a photo or avatar first!',
+    'Mohon isi username Anda terlebih dahulu.': 'Please enter your username first.', 'Mohon isi kata sandi Anda terlebih dahulu.': 'Please enter your password first.',
+    'Mohon isi kata sandi saat ini dan kata sandi baru.': 'Please enter your current and new password.', 'Kata sandi baru minimal 8 karakter dan mengandung huruf serta angka.': 'The new password needs at least 8 characters with letters and numbers.',
+    'Konfirmasi kata sandi belum sama.': 'The password confirmation does not match.', 'Semua kolom wajib diisi!': 'All fields are required!', 'User baru berhasil ditambahkan!': 'New user added!',
+    'Permintaan reset password berhasil dikirim.': 'Password reset request sent.', 'Username atau kata sandi belum sesuai. Silakan periksa kembali.': 'The username or password is not correct. Please check again.',
+    'Akun ini sedang dinonaktifkan. Silakan hubungi Master Admin.': 'This account is deactivated. Please contact the Master Admin.', 'Server tidak tersedia.': 'Server not available.',
+    'Server tidak tersedia. Login hanya dapat dilakukan melalui aplikasi web.': 'Server not available. Sign-in only works through the web app.', 'Sesi login tidak ditemukan!': 'Sign-in session not found!',
+    'Sesi login tidak valid. Silakan login kembali!': 'The sign-in session is not valid. Please sign in again!', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda, lalu coba lagi.': 'Cannot connect to the server. Check your internet connection, then try again.',
+    'Selesai.': 'Done.', 'Gagal menyimpan foto profil:': 'Could not save the profile photo:', 'Perangkat tidak dikenal': 'Unknown device', 'Browser': 'Browser',
+    'Demi keamanan, akses akun ini dijeda sementara setelah beberapa percobaan yang belum berhasil. Anda dapat mencoba lagi dalam': 'For security, access to this account is paused after several unsuccessful attempts. You can try again in',
+    'Site Area: Pit Legislatif & Yudikatif': 'Site Area: Legislatif & Yudikatif Pits',
+
+    // --- Pesan server (res.message) ---
+    'Akses Ditolak: Akun Anda terkunci atau nonaktif.': 'Access denied: your account is locked or inactive.', 'Akses Ditolak: Akun tidak lagi terdaftar.': 'Access denied: the account is no longer registered.',
+    'Akses Ditolak: Anda hanya dapat mengganti kata sandi akun Anda sendiri.': 'Access denied: you can only change your own password.', 'Akses Ditolak: Anda hanya dapat mengubah akun Anda sendiri.': 'Access denied: you can only change your own account.',
+    'Akses Ditolak: Format Token tidak valid! Silakan login kembali.': 'Access denied: invalid token format! Please sign in again.', 'Akses Ditolak: Sesi login tidak ditemukan. Silakan login kembali.': 'Access denied: sign-in session not found. Please sign in again.',
+    'Akses Ditolak: Sesi tidak valid atau sudah kedaluwarsa. Silakan login kembali.': 'Access denied: the session is invalid or expired. Please sign in again.', 'Akses Ditolak: Token tidak dapat dibaca. Silakan login kembali.': 'Access denied: the token could not be read. Please sign in again.',
+    'Akun ini sedang dinonaktifkan. Silakan hubungi Master Admin untuk mengaktifkannya kembali.': 'This account is deactivated. Please contact the Master Admin to reactivate it.',
+    'Anda tidak dapat menghapus akun Anda sendiri.': 'You cannot delete your own account.', 'Anda tidak dapat menonaktifkan akun Anda sendiri.': 'You cannot deactivate your own account.',
+    'Baris Master Karyawan berhasil dihapus!': 'Master Employee row deleted!', 'Baris Master QR berhasil dihapus!': 'Master QR row deleted!', 'Baris Master Unit berhasil dihapus!': 'Master Unit row deleted!',
+    'Data Dealer ditambahkan!': 'Dealer data added!', 'Data Dealer diupdate!': 'Dealer data updated!', 'Data Standar Dealer berhasil dihapus!': 'Dealer Standard deleted!',
+    'Data yang dipilih sudah berubah atau dihapus oleh pengguna lain. Muat ulang tabel lalu coba lagi.': 'The selected data was changed or deleted by another user. Reload the table and try again.',
+    'Demi keamanan, fitur ubah kata sandi dijeda 15 menit setelah 3 kali kata sandi lama belum sesuai.': 'For security, password change is paused for 15 minutes after 3 incorrect old passwords.',
+    'Format antrean tidak valid.': 'Invalid queue format.', 'Format foto profil tidak valid.': 'Invalid profile photo format.', 'Fungsi tidak dikenal.': 'Unknown function.',
+    'Gagal me-reset password.': 'Could not reset the password.', 'Gagal membaca Master Lokasi.': 'Could not read Master Location.', 'Gagal membaca Master QR.': 'Could not read Master QR.',
+    'Gagal memperbarui nama.': 'Could not update the name.', 'Gagal memuat daftar user.': 'Could not load the user list.', 'Gagal menambahkan user.': 'Could not add the user.',
+    'Gagal menghapus user.': 'Could not delete the user.', 'Gagal mengubah kata sandi.': 'Could not change the password.', 'Gagal mengubah status user.': 'Could not change the user status.',
+    'Gagal menyimpan foto profil.': 'Could not save the profile photo.', 'Gunakan tombol Keluar untuk perangkat ini.': 'Use the Sign out button for this device.', 'ID QR kosong.': 'QR ID is empty.',
+    'ID QR tidak terdaftar di Master_QR.': 'QR ID is not registered in Master_QR.', 'Isi Latitude dan Longitude sekaligus (atau kosongkan keduanya).': 'Fill in Latitude and Longitude together (or leave both empty).',
+    'Isi minimal satu nilai beban (Ringan / Sedang / Berat).': 'Fill in at least one load value (Light / Medium / Heavy).', 'Jenis pemeriksaan tidak dikenal.': 'Unknown check type.',
+    'Jika username terdaftar, permintaan reset password telah diteruskan ke Master Admin.': 'If the username is registered, the password reset request has been forwarded to the Master Admin.',
+    'Kata sandi baru harus berbeda dari kata sandi lama.': 'The new password must differ from the old one.', 'Kata sandi baru harus mengandung huruf dan angka.': 'The new password must contain letters and numbers.',
+    'Kata sandi baru maksimal 128 karakter.': 'The new password can be at most 128 characters.', 'Kata sandi baru minimal 8 karakter.': 'The new password needs at least 8 characters.',
+    'Kata sandi baru saja berubah di perangkat lain. Silakan muat ulang lalu coba lagi.': 'The password just changed on another device. Please reload and try again.',
+    'Kata sandi berhasil diperbarui. Sesi di perangkat lain telah diakhiri.': 'Password updated. Sessions on other devices have ended.', 'Kata sandi ini terlalu umum. Gunakan kombinasi lain.': 'This password is too common. Use another combination.',
+    'Kata sandi tidak boleh memuat username.': 'The password must not contain the username.', 'Kode Unit tidak bisa diubah. Tambahkan unit baru, lalu ubah status unit lama menjadi Standby.': 'The Unit Code cannot be changed. Add a new unit, then set the old unit to Standby.',
+    'Kode unit wajib diisi.': 'Unit code is required.', 'Latitude tidak valid (−90 s.d. 90).': 'Invalid latitude (−90 to 90).', 'Longitude tidak valid (−180 s.d. 180).': 'Invalid longitude (−180 to 180).',
+    'Login berhasil!': 'Signed in!', 'Lokasi baru berhasil ditambahkan!': 'New location added!', 'Lokasi berhasil dihapus!': 'Location deleted!', 'Lokasi berhasil diperbarui!': 'Location updated!',
+    'Master Karyawan baru berhasil ditambahkan!': 'New employee added!', 'Master Karyawan berhasil diperbarui!': 'Employee updated!', 'Master QR baru berhasil ditambahkan!': 'New QR sticker added!',
+    'Master QR berhasil diperbarui!': 'QR sticker updated!', 'Master Unit baru berhasil ditambahkan!': 'New unit added!', 'Master Unit berhasil diperbarui!': 'Unit updated!',
+    'Mohon isi username dan kata sandi terlebih dahulu.': 'Please enter the username and password first.', 'Nama lengkap wajib diisi (maks. 100 karakter).': 'Full name is required (max. 100 characters).',
+    'Nama lokasi maksimal 60 karakter.': 'Location name can be at most 60 characters.', 'Nama maksimal 100 karakter.': 'Name can be at most 100 characters.', 'Nama profil berhasil diperbarui!': 'Profile name updated!',
+    'Perangkat tersebut telah dikeluarkan.': 'That device has been signed out.', 'Permintaan terlalu besar.': 'Request too large.', 'Permintaan tidak valid.': 'Invalid request.', 'Role tidak valid.': 'Invalid role.',
+    'Satuan standar wajib Liter/HM atau Liter/KM.': 'The standard unit must be Liter/HM or Liter/KM.', 'Semua sesi akun Anda telah diakhiri. Silakan login kembali.': 'All your account sessions have ended. Please sign in again.',
+    'Semua unit sudah sesuai. Tidak ada yang diubah.': 'All units are already correct. Nothing changed.', 'Server sedang sibuk. Silakan coba beberapa saat lagi.': 'The server is busy. Please try again shortly.',
+    'Server sibuk. Silakan coba beberapa saat lagi.': 'Server busy. Please try again shortly.', 'Sesi berakhir karena tidak ada aktivitas. Silakan login kembali.': 'The session ended due to inactivity. Please sign in again.',
+    'Sesi ini sudah diakhiri. Silakan login kembali.': 'This session has ended. Please sign in again.', 'Sesi telah berakhir (Expired). Silakan login kembali.': 'The session has expired. Please sign in again.',
+    'Sesi tidak ditemukan atau sudah berakhir.': 'Session not found or already ended.', 'Sistem sedang sibuk. Silakan coba beberapa saat lagi.': 'The system is busy. Please try again shortly.',
+    'Tab DATABASE_MASTER tidak ditemukan.': 'DATABASE_MASTER tab not found.', 'Tab Master_QR tidak ditemukan.': 'Master_QR tab not found.', 'Tanggal akhir tidak valid — memakai bawaan.': 'Invalid end date — using the default.',
+    'Tanggal awal & akhir tertukar — dibalik otomatis.': 'Start & end dates were swapped — reversed automatically.', 'Tanggal awal tidak valid — memakai bawaan.': 'Invalid start date — using the default.',
+    'Terjadi kesalahan di server.': 'A server error occurred.', 'Tidak ada unit untuk dipetakan.': 'No units to map.', 'User tidak ditemukan!': 'User not found!', 'Username target tidak ditemukan.': 'Target username not found.',
+    'Username tidak ditemukan!': 'Username not found!', 'Username 3–30 karakter, hanya huruf, angka, titik, garis bawah, atau strip.': 'Username must be 3–30 characters: letters, numbers, dot, underscore or dash only.',
+    'Ukuran foto masih terlalu besar (> 50.000 karakter). Silakan gunakan foto lain atau pilih preset avatar.': 'The photo is still too large (> 50,000 characters). Please use another photo or choose an avatar.',
+    'Argumen tidak valid.': 'Invalid argument.', 'Aksi tidak dikenal.': 'Unknown action.', 'Kunci kosong.': 'Empty key.', 'Belum ada pengisian hari ini.': 'No refuelling today yet.',
+    'Tidak ada unit boros.': 'No overuse units.', 'Tidak ada.': 'None.', 'Tanpa meter': 'No meter', 'Meter HM': 'HM meter', 'Odometer': 'Odometer',
+    'Satuan HM? · tampak KM': 'HM unit? · looks like KM', 'Konsumsi unit ini tidak dinilai sampai meter diperbaiki': 'This unit’s consumption is not rated until the meter is fixed',
+
+    // --- Pesan WA (judul baris) ---
+    '*RINGKASAN BBM SITE*': '*SITE FUEL SUMMARY*', '*Konsumsi*': '*Consumption*', '*Top konsumsi*': '*Top consumption*', '*LAPORAN HARIAN BBM*': '*DAILY FUEL REPORT*',
+    '*LAPORAN MINGGUAN BBM*': '*WEEKLY FUEL REPORT*', '*LAPORAN BULANAN BBM*': '*MONTHLY FUEL REPORT*', '*Stok (Liter)*': '*Stock (Litres)*', '*Stok tangki (Liter)*': '*Tank stock (Litres)*',
+    '*Pemakaian per lokasi*': '*Usage by location*', 'Sisa stok': 'Stock left', 'Estimasi habis': 'Runs out in', 'Hari ini': 'Today', 'Masuk supplier': 'Supplier in', 'Stok awal': 'Opening stock',
+    'Stok akhir': 'Closing stock', 'Tanggal': 'Date', 'Lokasi': 'Location', 'Bulan': 'Month', 'Pemakaian': 'Usage', 'Penerimaan': 'Received', 'Total periode': 'Period total',
+
+    // --- Tambahan hasil pemindaian layar (putaran 1) ---
+    'Laporan Harian': 'Daily Report', 'Laporan Mingguan': 'Weekly Report', 'Laporan Bulanan': 'Monthly Report', 'Kirim WA': 'Send WA', 'STOK AWAL': 'OPENING STOCK',
+    'STOK AKHIR': 'CLOSING STOCK', 'Lokasi Kerja': 'Work Location', 'Jenis laporan': 'Report type', 'Tidak ada': 'None', 'PENERIMAAN SUPPLIER': 'SUPPLIER RECEIPTS',
+    'Cek Meter': 'Check Meter', 'KODE TIPE': 'TYPE CODE', 'LOKASI UTAMA': 'MAIN LOCATION', 'Periode sebelumnya': 'Previous period', 'Periode berikutnya': 'Next period',
+    'Halaman sebelumnya': 'Previous page', 'Halaman berikutnya': 'Next page', 'BULAN': 'MONTH', 'Modul Data': 'Data Modules', 'Pilih sub-menu untuk dikelola': 'Choose a sub-menu to manage',
+    'JAM TRANSAKSI': 'TRANSACTION TIME', 'Jenis Tx': 'Tx Type', 'Sub menu Master Data': 'Master Data sub-menu', 'Urutan data': 'Data order',
+    'Data yang paling akhir diinput di paling atas': 'Most recently entered data on top', 'Simpan Unit': 'Save Unit', 'Kode Tipe belum diisi': 'Type Code not set',
+    'Kode Unit tidak bisa diubah saat Edit': 'The Unit Code cannot be changed when editing', 'KODE UNIT TARGET': 'TARGET UNIT CODE', 'LOKASI PIT': 'PIT LOCATION', 'Simpan QR': 'Save QR',
+    'Database Stiker QR Unit': 'Unit QR Sticker Database', 'Lokasi Pit': 'Pit Location', 'Kapasitas Tangki': 'Tank Capacity', 'dari Kode Tipe': 'from Type Code', 'ID KARYAWAN': 'EMPLOYEE ID',
+    'Simpan Karyawan': 'Save Employee', 'Nama Operator / Driver': 'Operator / Driver Name', 'SATUAN STANDAR': 'STANDARD UNIT', 'Simpan Standar': 'Save Standard',
+    'Standar Konsumsi Dealer Pabrikan': 'Manufacturer Dealer Consumption Standard', 'Jenis Unit': 'Unit Type', 'JENIS UNIT': 'UNIT TYPE', 'Simpan Lokasi': 'Save Location', 'Pakai lokasi saya': 'Use my location',
+    'Daftar Lokasi Kerja Site': 'Site Work Location List', 'Klik peta untuk menentukan titik lokasi': 'Click the map to set the location point',
+    ') ke kolom Latitude. Lokasi': ') into the Latitude field. Locations', 'tidak muncul di pilihan lokasi baru maupun di peta, tetapi riwayat transaksinya tetap tersimpan.': 'do not appear in new location choices or on the map, but their transaction history is kept.',
+    'awal hari': 'start of day', 'akhir hari': 'end of day', 'Penerimaan Supplier': 'Supplier Received', 'Pemakaian (L)': 'Usage (L)', 'Rata-rata harian': 'Daily average',
+    'Kiriman supplier': 'Supplier deliveries', 'Rata-rata': 'Average', 'Daftar Master Unit Site': 'Site Master Unit List', 'Support mekanik': 'Mechanic support', 'Per hari': 'Per day', 'Per tanggal': 'Per date', 'titik = kiriman supplier': 'dot = supplier delivery', 'Seluruh unit dengan data pengisian & meter valid': 'All units with valid refuelling & meter data'
+  });
+
+  /* ===================== 2. POLA (kalimat berisi angka / nama) ===================== */
+  var P = [];
+  function pola(re, fn) { P.push([re, fn]); }
+  function T(s) { return trInti(s); }
+  pola(/^Menampilkan ([\d.,–-]+) dari ([\d.,]+) (transaksi|unit|karyawan|stiker|tipe|lokasi|baris|data|user)(.*)$/, function (m, a, b, c, d) {
+    var j = { transaksi: 'transactions', unit: 'units', karyawan: 'employees', stiker: 'stickers', tipe: 'types', lokasi: 'locations', baris: 'rows', data: 'records', user: 'users' };
+    return 'Showing ' + a + ' of ' + b + ' ' + j[c] + d; });
+  pola(/^([\d.,]+) \/ ([\d.,]+) lokasi$/, '$1 / $2 locations');
+  pola(/^Stok tangki (\S+)(.*) — klik untuk membuka Dashboard$/, function (m, a, b) {
+    return 'Tank stock ' + T(a) + b.replace(/cukup ±([\d.,]+) hari/, 'lasts ±$1 days') + ' — click to open the Dashboard'; });
+  pola(/^([\d.,]+)× kiriman( ·)?$/, '$1× deliveries$2'); pola(/^rata-rata (.+) L\/hari( ·)?$/, 'average $1 L/day$2');
+  pola(/^akhir (\d{1,2} \S+ \d{4})$/, 'end $1'); pola(/^mis\. (.+)$/, function (m, a) { return 'e.g. ' + T(a); });
+  pola(/^KARTU STOK BBM UNIT (.+)$/, 'UNIT FUEL STOCK CARD $1');
+  pola(/^Contoh: (.+)$/, function (m, a) { return 'Example: ' + T(a); }); pola(/^tertinggi (.+)$/, 'highest $1'); pola(/^(.+) vs standar (.+)$/, '$1 vs standard $2');
+  pola(/^berjalan, data s\/d (.+)$/, 'in progress, data to $1');
+  pola(/^Menampilkan ([\d.,]+) transaksi$/, 'Showing $1 transactions');
+  pola(/^Periode: (.+) s\/d (.+)$/, function (m, a, b) { return 'Period: ' + a + ' to ' + b; });
+  pola(/^(.+) s\/d (.+)$/, function (m, a, b) { return T(a) + ' to ' + T(b); });
+  pola(/^([\d.,]+) hari$/, '$1 days'); pola(/^cukup ±([\d.,]+) hari$/, 'lasts ±$1 days'); pola(/^([\d.,]+) kali$/, '$1 times');
+  pola(/^([\d.,]+) L\/hari$/, '$1 L/day'); pola(/^([\d.,]+)% dari 16[.,]000 L$/, '$1% of 16,000 L');
+  pola(/^Lihat Semua \(([\d.,]+)\)$/, 'View All ($1)'); pola(/^Tampilkan Unit \(([\d.,]+)\)$/, 'Show Units ($1)');
+  pola(/^Dev (.+)$/, 'Dev $1');
+  pola(/^(Masuk|Keluar) hari ini: (.+) · (stok awal \+ masuk|total keluar) (.+)$/, function (m, a, b, c, d) {
+    return (a === 'Masuk' ? 'In' : 'Out') + ' today: ' + b + ' · ' + (c === 'total keluar' ? 'total out' : 'opening stock + in') + ' ' + d; });
+  pola(/^Sisa di tangki: (.+)$/, 'Left in tank: $1');
+  pola(/^(.+) hari ini: (.+) · (.+)$/, function (m, a, b, c) { return T(a) + ' today: ' + b + ' · ' + T(c); });
+  pola(/^Tanpa (HM|KM) · (.+)$/, 'No $1 · $2'); pola(/^Belum ada (HM|KM) sejak (.+) · ([\d.,]+) pengisian$/, 'No $1 since $2 · $3 refuels');
+  pola(/^(Mundur|Lonjakan) · (.+)$/, function (m, a, b) { return (a === 'Mundur' ? 'Backwards' : 'Spike') + ' · ' + b; });
+  pola(/^(HM|KM) mundur (.+) \((.+)\) — mohon periksa angka di Database Master$/, '$1 went backwards $2 ($3) — please check the number in the Master Database');
+  pola(/^Lonjakan (HM|KM) (.+) \((.+)\) — mohon periksa angka di Database Master$/, '$1 spike $2 ($3) — please check the number in the Master Database');
+  pola(/^Deviasi ekstrem (.+) dari standar — cek meter \/ standar unit$/, 'Extreme deviation $1 from the standard — check the meter / unit standard');
+  pola(/^Angka meter tampak seperti odometer \((.+)\) — mohon ubah Satuan unit ini menjadi KM di Master Unit$/, 'The meter reading looks like an odometer ($1) — please change this unit’s Unit to KM in Master Unit');
+  pola(/^(Odometer|Meter HM) tidak andal$/, function (m, a) { return (a === 'Odometer' ? 'Odometer' : 'HM meter') + ' unreliable'; });
+  pola(/^(.+) — konsumsi unit ini tidak dinilai sampai meter diperbaiki$/, '$1 — this unit’s consumption is not rated until the meter is fixed');
+  pola(/^Standar: ([\d.,]+) (L\/HM|L\/KM)$/, 'Standard: $1 $2');
+  pola(/^Standar tipe ([\d.,]+) L per (HM|KM) — tidak dipakai \(unit memakai (.+)\)$/, 'Type standard $1 L per $2 — not used (the unit uses $3)');
+  pola(/^Aktual (.+) · Standar (.+)$/, 'Actual $1 · Standard $2'); pola(/^(.+) · std (.+)$/, '$1 · std $2');
+  pola(/^(.+) L · ([\d.,]+)% konsumsi periode$/, '$1 L · $2% of period consumption');
+  pola(/^STNK s\/d (.+) \(([\d.,]+) hari\)$/, 'Registration until $1 ($2 days)'); pola(/^STNK s\/d (.+)$/, 'Registration until $1'); pola(/^STNK habis (.+)$/, 'Registration expired $1');
+  pola(/^Ubah (Transaksi BBM|Master Unit|Lokasi|Stiker QR|Master Karyawan|Standar Dealer) \((.+)\)$/, function (m, a, b) {
+    var j = { 'Transaksi BBM': 'Fuel Transaction', 'Master Unit': 'Unit', 'Lokasi': 'Location', 'Stiker QR': 'QR Sticker', 'Master Karyawan': 'Employee', 'Standar Dealer': 'Dealer Standard' };
+    return 'Edit ' + j[a] + ' (' + b.replace(/^baris /, 'row ') + ')'; });
+  pola(/^Menu (.+) hanya untuk pengguna terdaftar\. Silakan login terlebih dahulu\.$/, function (m, a) { return 'The ' + T(a) + ' menu is only for registered users. Please sign in first.'; });
+  pola(/^Kode unit (.+) tidak terdaftar di Master Unit\.$/, 'Unit code $1 is not registered in Master Unit.'); pola(/^Mungkin maksud Anda: (.+)\?$/, 'Did you mean: $1?');
+  pola(/^Unit \x22(.+)\x22 tidak ditemukan$/, 'Unit "$1" not found');
+  pola(/^Pengisian \((.+)L\) melebihi kapasitas tangki unit \((.+)L\)!$/, 'The refuel ($1L) exceeds the unit tank capacity ($2L)!');
+  pola(/^(HM|KM) naik (.+) sejak pengisian terakhir \((.+)\)\. Mohon periksa kembali angkanya\.$/, '$1 rose $2 since the last refuel ($3). Please check the number again.');
+  pola(/^(HM|KM) (.+) lebih kecil dari pengisian terakhir \((.+)\)\. Mohon periksa kembali angkanya — bila meter memang diganti atau direset, boleh lanjut dan tulis alasannya di Keterangan\.$/,
+    '$1 $2 is lower than the last refuel ($3). Please check the number again — if the meter was replaced or reset, you may continue and write the reason in Notes.');
+  pola(/^(HM|KM) lebih kecil dari pengisian sebelumnya \((.+)\)\. Meter mundur atau diganti\?$/, '$1 is lower than the previous refuel ($2). Did the meter go backwards or get replaced?');
+  pola(/^(HM|KM) lebih besar dari pengisian sesudahnya \((.+)\)\.$/, '$1 is higher than the next refuel ($2).');
+  pola(/^(HM|KM) naik (.+) dalam (.+) hari sejak pengisian sebelumnya \((.+)\)\. Batas wajar (.+) per hari\.$/, '$1 rose $2 in $3 days since the previous refuel ($4). The normal limit is $5 per day.');
+  pola(/^Selisih dengan pengisian sesudahnya \((.+)\) terlalu besar: (.+)\.$/, 'The difference with the next refuel ($1) is too large: $2.');
+  pola(/^Unit ini berstatus (.+) di Master Unit\. Pastikan unit memang sudah beroperasi kembali\.$/, function (m, a) { return 'This unit has status ' + T(a) + ' in Master Unit. Make sure it is really operating again.'; });
+  pola(/^Unit ini berstatus (.+)$/, function (m, a) { return 'This unit has status ' + T(a); });
+  pola(/^Hapus lokasi \x22(.+)\x22\? Bila lokasi masih dipakai di riwayat transaksi, pertimbangkan menjadikannya Nonaktif saja\.$/, 'Delete location "$1"? If it is still used in the transaction history, consider making it Inactive instead.');
+  pola(/^Kode Tipe ini dipakai (.+) unit \((.+)\)\. Standar unit-unit tersebut akan hilang\.$/, 'This Type Code is used by $1 units ($2). Those units will lose their standard.');
+  pola(/^Unit ini masih dipakai (.+)\. Sebaiknya ubah Status menjadi Standby daripada dihapus\.$/, 'This unit is still used in $1. Better change its Status to Standby than delete it.');
+  pola(/^Semua (.+) unit sudah sesuai\. Tidak ada yang perlu diubah\.$/, 'All $1 units are already correct. Nothing needs to change.');
+  pola(/^Jam tidak valid: \x22(.*)\x22\. Gunakan format JJ:MM, contoh 08:30\.$/, 'Invalid time: "$1". Use the HH:MM format, e.g. 08:30.');
+  pola(/^Lokasi terkini terisi \(akurasi ± (.+)\)\.?$/, 'Current location filled in (accuracy ± $1).');
+  pola(/^Selamat datang kembali, (.+)!\s*Anda berhasil masuk ke sistem sebagai (.+)\.$/, function (m, a, b) { return 'Welcome back, ' + a + '! You are signed in as ' + T(b) + '.'; });
+  pola(/^Halo, (.+)\. Demi keamanan, silakan ganti kata sandi Anda terlebih dahulu\.\s*Akun ini memakai kata sandi sementara atau kata sandi yang terlalu umum\.$/, 'Hi, $1. For your security, please change your password first. This account uses a temporary or too-common password.');
+  pola(/^Apakah Anda yakin ingin me-reset password user \x27(.+)\x27\? Sistem akan membuat password sementara acak\.$/, "Are you sure you want to reset user '$1''s password? The system will create a random temporary password.");
+  pola(/^Apakah Anda yakin ingin MENGHAPUS PERMANEN akun \x27(.+)\x27\?$/, "Are you sure you want to PERMANENTLY DELETE the account '$1'?");
+  pola(/^Ubah status aktif\/nonaktif user \x27(.+)\x27\?$/, "Change the active/inactive status of user '$1'?"); pola(/^Status user \x27(.+)\x27 berhasil diubah\.$/, "User '$1' status changed.");
+  pola(/^User \x27(.+)\x27 berhasil dihapus\.$/, "User '$1' deleted."); pola(/^Keluarkan akun Anda dari \x22(.+)\x22\? Perangkat itu harus login ulang\.$/, 'Sign your account out of "$1"? That device will need to sign in again.');
+  pola(/^Password untuk \x27(.+)\x27 berhasil di-reset\. Password sementara: (.+)$/, "Password for '$1' was reset. Temporary password: $2");
+  pola(/^Kata sandi lama belum sesuai\. Sisa (.+) kali percobaan\.$/, 'The old password is not correct. $1 attempts left.');
+  pola(/^Demi keamanan, fitur ubah kata sandi dijeda sementara\. Silakan coba lagi dalam ± (.+) menit\.$/, 'For security, password change is paused. Please try again in ± $1 minutes.');
+  pola(/^(\d+) akun terdaftar$/, '$1 registered accounts'); pola(/^Sisa percobaan: (.+)$/, 'Attempts left: $1');
+  pola(/^([\d.,]+) unit perlu perhatian minggu ini \(Boros ([\d.,]+), Cek Meter ([\d.,]+)\) — lihat Laporan BBM › Mingguan$/, '$1 units need attention this week (Overuse $2, Check Meter $3) — see Fuel Reports › Weekly');
+  pola(/^Siap dikirim · (.+) KB · tekan Bagikan lalu pilih WhatsApp, email, atau Simpan ke File\.$/, 'Ready to send · $1 KB · press Share then choose WhatsApp, email or Save to Files.');
+  pola(/^PDF gagal: (.+)$/, 'PDF failed: $1'); pola(/^Gagal menyimpan transaksi: (.+)$/, 'Could not save the transaction: $1');
+  pola(/^Halaman (\d+) dari (\d+)$/, 'Page $1 of $2'); pola(/^Halaman (\d+)$/, 'Page $1');
+  pola(/^Unit (.+) — (.+) transaksi · (.+) unit$/, function (m, a, b, c) { return 'Unit ' + a + ' — ' + b + ' transactions · ' + c + ' units'; });
+  pola(/^(.+) — ([\d.,]+) transaksi · ([\d.,]+) unit$/, function (m, a, b, c) { return T(a) + ' — ' + b + ' transactions · ' + c + ' units'; });
+  pola(/^(.+): ([\d.,]+) L \(([\d.,]+) Unit\)$/, '$1: $2 L ($3 Units)');
+  pola(/^\.\.\. dan (.+) unit lain$|^… dan (.+) unit lain$/, function (m, a, b) { return '… and ' + (a || b) + ' more units'; });
+  pola(/^\*Unit BOROS \((.+)\)\*$/, '*OVERUSE units ($1)*'); pola(/^\*Perlu cek meter \((.+)\)\*$/, '*Meter check needed ($1)*'); pola(/^\*Stok tangki: (.+)\*$/, function (m, a) { return '*Tank stock: ' + T(a) + '*'; });
+  pola(/^\*Rincian \((.+) transaksi\)\*$/, '*Details ($1 transactions)*'); pola(/^Minggu ke-(\d+)$/, 'Week $1');
+  pola(/^Karena bulan ini belum selesai, perbandingan memakai rentang tanggal yang sama di bulan sebelumnya \((.+)\)\.?$/, 'Because this month is not over yet, the comparison uses the same date range last month ($1).');
+  pola(/^Rekap lokasi dan unit hanya memuat lokasi (.+)\.$/, 'The location and unit recap only includes location $1.'); pola(/^Rincian hanya memuat pengisian di lokasi (.+)\.$/, 'Details only include refuelling at location $1.');
+  pola(/^Konsumsi \(L\/(HM|KM)\)$/, 'Consumption (L/$1)'); pola(/^Meter \((HM|KM)\)$/, 'Meter ($1)'); pola(/^Selisih (HM|KM)$/, '$1 Difference');
+  pola(/^(.+) Sync Error:(.*)$/, '$1 sync error:$2'); pola(/^Gagal (.+): (.+)$/, function (m, a, b) { var k = 'Gagal ' + a + ':'; return (D[k] ? D[k] : 'Failed ' + a + ':') + ' ' + b; });
+  pola(/^(.+) \(([\d.,]+)\)$/, function (m, a, b) { return D[a] ? D[a] + ' (' + b + ')' : m; });
+
+  /* ===================== 3. ANGKA & TANGGAL ===================== */
+  // Angka gaya Indonesia → Inggris. Hanya pola yang PASTI Indonesia (ribuan .ddd, desimal ,d / ,dd) → aman dipanggil ulang.
+  var RE_ANGKA = /(^|[^\d.,\/:A-Za-z])(-?\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|-?\d+,\d{1,2})(?![\d])/g;
+  function angkaEN(s) { return s.replace(RE_ANGKA, function (m, a, n) { return a + n.replace(/\./g, '\u0001').replace(',', '.').replace(/\u0001/g, ','); }); }
+  var BL = { Januari: 'January', Februari: 'February', Maret: 'March', April: 'April', Mei: 'May', Juni: 'June', Juli: 'July', Agustus: 'August', September: 'September', Oktober: 'October', November: 'November', Desember: 'December' };
+  var BLS = { Jan: 'Jan', Feb: 'Feb', Mar: 'Mar', Apr: 'Apr', Mei: 'May', Jun: 'Jun', Jul: 'Jul', Agu: 'Aug', Sep: 'Sep', Okt: 'Oct', Nov: 'Nov', Des: 'Dec' };
+  var HR = { Minggu: 'Sunday', Senin: 'Monday', Selasa: 'Tuesday', Rabu: 'Wednesday', Kamis: 'Thursday', Jumat: 'Friday', Sabtu: 'Saturday' };
+  var HRS = { Min: 'Sun', Sen: 'Mon', Sel: 'Tue', Rab: 'Wed', Kam: 'Thu', Jum: 'Fri', Sab: 'Sat' };
+  var RB = '(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)';
+  var RBS = '(Jan|Feb|Mar|Apr|Mei|Jun|Jul|Agu|Sep|Okt|Nov|Des)';
+  var RE_TGL = [
+    [new RegExp('(\\d{1,2}) ' + RB + '\\b', 'g'), function (m, d, b) { return d + ' ' + BL[b]; }],
+    [new RegExp('\\b' + RB + ' (\\d{4})', 'g'), function (m, b, y) { return BL[b] + ' ' + y; }],
+    [new RegExp('(\\d{1,2}) ' + RBS + '\\b', 'g'), function (m, d, b) { return d + ' ' + BLS[b]; }],
+    [new RegExp('\\b' + RBS + ' (\\d{4})', 'g'), function (m, b, y) { return BLS[b] + ' ' + y; }],
+    [/\b(Minggu|Senin|Selasa|Rabu|Kamis|Jumat|Sabtu), (?=\d)/g, function (m, h) { return HR[h] + ', '; }],
+    [/\b(Minggu|Senin|Selasa|Rabu|Kamis|Jumat|Sabtu) (?=\d{1,2} )/g, function (m, h) { return HR[h] + ' '; }],
+    [/\b(Min|Sen|Sel|Rab|Kam|Jum|Sab), (?=\d)/g, function (m, h) { return HRS[h] + ', '; }],
+    [/^(Min|Sen|Sel|Rab|Kam|Jum|Sab) (?=\d{1,2}$)/, function (m, h) { return HRS[h] + ' '; }],
+    [/ s\/d /g, function () { return ' to '; }]
+  ];
+  function tglEN(s) { for (var i = 0; i < RE_TGL.length; i++) s = s.replace(RE_TGL[i][0], RE_TGL[i][1]); return s; }
+
+  /* ===================== 4. PENERJEMAH TEKS ===================== */
+  var CACHE = new Map();
+  function trInti(k) {
+    if (k in D) return D[k];
+    var n = tglEN(angkaEN(k));
+    if (n in D) return D[n];
+    for (var i = 0; i < P.length; i++) {
+      var re = P[i][0];
+      if (re.test(k)) { var r = k.replace(re, P[i][1]); return tglEN(angkaEN(r)); }
+    }
+    // "Label: nilai" / "Label:" / "a · b" / "a — b" / "(…)"
+    var m = /^([^:]{2,60}):\s*(.*)$/.exec(k);
+    if (m && (D[m[1]] || D[m[1] + ':'])) { var lab = D[m[1] + ':'] ? D[m[1] + ':'].replace(/:$/, '') : D[m[1]]; return lab + ':' + (m[2] ? ' ' + trInti(m[2]) : ''); }
+    var seps = [' · ', ' — ', ' | ', ' • '];
+    for (var s = 0; s < seps.length; s++) {
+      if (k.indexOf(seps[s]) > 0) {
+        var parts = k.split(seps[s]); var out = parts.map(trInti);
+        if (out.some(function (x, j) { return x !== parts[j]; })) return out.join(seps[s]);
+      }
+    }
+    var lead = /^([*\-•#\d.]+\s+|\*)(.+?)(\*?)$/.exec(k);
+    if (lead && lead[2] && (lead[2] in D)) return lead[1] + D[lead[2]] + lead[3];
+    return n;
+  }
+  function tr(s) {
+    if (LANG !== 'en' || s === null || s === undefined) return s;
+    s = String(s);
+    if (!/[A-Za-z0-9]/.test(s)) return s;
+    if (CACHE.has(s)) return CACHE.get(s);
+    var a = /^\s*/.exec(s)[0], b = /\s*$/.exec(s)[0];
+    var k = norm(s);
+    var out = a + trInti(k) + b;
+    if (CACHE.size > 5000) CACHE.clear();
+    CACHE.set(s, out);
+    return out;
+  }
+  function trAny(v) { return Array.isArray(v) ? v.map(trAny) : (typeof v === 'string' ? tr(v) : v); }
+
+  /* ===================== 5. HALAMAN (DOM) ===================== */
+  var ATTRS = ['placeholder', 'title', 'aria-label', 'data-label', 'alt'];
+  var TXT = new WeakMap(), ATR = new WeakMap();
+  var SKIP_SEL = 'script,style,textarea,noscript,[data-no-i18n]';
+  function teksNode(n) {
+    var cur = n.nodeValue, r = TXT.get(n);
+    if (LANG !== 'en' && !r) return;
+    var p = n.parentElement; if (!p || p.closest(SKIP_SEL)) return;
+    var src = (r && cur === r.out) ? r.src : cur;
+    var out = LANG === 'en' ? tr(src) : src;
+    if (!r || r.src !== src || r.out !== out) TXT.set(n, { src: src, out: out });
+    if (out !== cur) n.nodeValue = out;
+  }
+  function attrEl(el, name) {
+    if (!el.hasAttribute || !el.hasAttribute(name)) return;
+    var map = ATR.get(el), r = map && map[name];
+    if (LANG !== 'en' && !r) return;
+    if (el.closest(SKIP_SEL)) return;
+    var cur = el.getAttribute(name);
+    var src = (r && cur === r.out) ? r.src : cur;
+    var out = LANG === 'en' ? tr(src) : src;
+    if (!map) { map = {}; ATR.set(el, map); }
+    map[name] = { src: src, out: out };
+    if (out !== cur) el.setAttribute(name, out);
+  }
+  function walk(root) {
+    if (!root) return;
+    if (root.nodeType === 3) { teksNode(root); return; }
+    if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
+    if (root.nodeType === 1) { if (root.closest(SKIP_SEL)) return; ATTRS.forEach(function (a) { attrEl(root, a); }); }
+    if (root.querySelectorAll) {
+      var els = root.querySelectorAll('[placeholder],[title],[aria-label],[data-label],[alt]');
+      for (var i = 0; i < els.length; i++) for (var j = 0; j < ATTRS.length; j++) attrEl(els[i], ATTRS[j]);
+    }
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n;
+    while ((n = w.nextNode())) teksNode(n);
+  }
+  // Teks asli (Indonesia) suatu elemen — untuk kode yang membaca teks dari layar
+  function asli(el) {
+    if (!el) return '';
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, s = '';
+    while ((n = w.nextNode())) { var r = TXT.get(n); s += (r && n.nodeValue === r.out) ? r.src : n.nodeValue; }
+    return s;
+  }
+
+  /* ===================== 6. DOKUMEN CETAK & WA ===================== */
+  function dok(html) {
+    if (LANG !== 'en' || typeof html !== 'string' || typeof DOMParser === 'undefined') return html;
+    try {
+      var d = new DOMParser().parseFromString(html, 'text/html');
+      var w = d.createTreeWalker(d.documentElement, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode())) {
+        var p = n.parentNode && n.parentNode.nodeName;
+        if (p === 'SCRIPT') continue;
+        if (p === 'STYLE') { n.nodeValue = n.nodeValue.replace(/\x22Halaman \x22/g, '"Page "').replace(/\x22 dari \x22/g, '" of "'); continue; }
+        if (p === 'TITLE') { n.nodeValue = judulFile(n.nodeValue); continue; }
+        n.nodeValue = tr(n.nodeValue);
+      }
+      var els = d.querySelectorAll('[title],[alt],[aria-label]');
+      for (var i = 0; i < els.length; i++) ['title', 'alt', 'aria-label'].forEach(function (a) { if (els[i].hasAttribute(a)) els[i].setAttribute(a, tr(els[i].getAttribute(a))); });
+      d.documentElement.setAttribute('lang', 'en');
+      return '<!DOCTYPE html>\n' + d.documentElement.outerHTML;
+    } catch (e) { return html; }
+  }
+  var FILE = [['Laporan_Harian_BBM_', 'Daily_Fuel_Report_'], ['Laporan_Mingguan_BBM_', 'Weekly_Fuel_Report_'], ['Laporan_Bulanan_BBM_', 'Monthly_Fuel_Report_'],
+    ['Kartu_Stok_', 'Stock_Card_'], ['Audit_Kalibrasi_', 'Calibration_Audit_'], ['Semua_Lokasi', 'All_Locations'], ['Laporan_AB_Fuel', 'AB_Fuel_Report']];
+  function judulFile(s) { if (LANG !== 'en') return s; FILE.forEach(function (f) { s = s.split(f[0]).join(f[1]); }); return s; }
+  function wa(text) {
+    if (LANG !== 'en' || typeof text !== 'string') return text;
+    return text.split('\n').map(function (l) {
+      if (!l.trim()) return l;
+      var m = /^(\*)(.+)(\*)$/.exec(l);
+      if (m && !(l in D)) { var inner = tr(m[2]); if (inner !== m[2]) return '*' + inner + '*'; }
+      var b = /^(- |\d+\. )(.*)$/.exec(l);
+      if (b) return b[1] + tr(b[2]);
+      return tr(l);
+    }).join('\n');
+  }
+
+  /* ===================== 7. GRAFIK (Chart.js — teks di kanvas) ===================== */
+  function pasangGrafik() {
+    if (typeof Chart === 'undefined' || !Chart.register || pasangGrafik.ok) return;
+    pasangGrafik.ok = true;
+    function bungkus(obj, nama) {
+      if (!obj || typeof obj[nama] !== 'function' || obj[nama].__ab) return;
+      var f = obj[nama];
+      var g = function () { return trAny(f.apply(this, arguments)); };
+      g.__ab = true; obj[nama] = g;
+    }
+    Chart.register({
+      id: 'abBahasa',
+      beforeUpdate: function (chart) {
+        var data = chart.data || {};
+        if (data.labels) {
+          if (data.labels !== chart.$abLabOut) chart.$abLabSrc = data.labels;
+          var outL = (chart.$abLabSrc || []).map(function (x) { return typeof x === 'string' ? tr(x) : x; });
+          data.labels = outL; chart.$abLabOut = outL;
+        }
+        (data.datasets || []).forEach(function (ds) {
+          if (typeof ds.label !== 'string') return;
+          if (ds.label !== ds.$abOut) ds.$abSrc = ds.label;
+          ds.label = tr(ds.$abSrc); ds.$abOut = ds.label;
+        });
+        var o = chart.config && chart.config.options;
+        var cb = o && o.plugins && o.plugins.tooltip && o.plugins.tooltip.callbacks;
+        if (cb) ['title', 'label', 'footer', 'beforeLabel', 'afterLabel', 'afterBody'].forEach(function (k) { bungkus(cb, k); });
+        if (o && o.scales) Object.keys(o.scales).forEach(function (k) { var t = o.scales[k] && o.scales[k].ticks; if (t) bungkus(t, 'callback'); });
+      }
+    });
+  }
+  function segarkanGrafik() {
+    if (typeof Chart === 'undefined' || !Chart.instances) return;
+    Object.keys(Chart.instances).forEach(function (k) { try { Chart.instances[k].update('none'); } catch (e) {} });
+  }
+
+  /* ===================== 8. PILIHAN BAHASA ===================== */
+  function tandaiTombol() {
+    document.querySelectorAll('[data-bahasa]').forEach(function (b) {
+      var on = b.getAttribute('data-bahasa') === LANG;
+      b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  function setBahasa(l) {
+    l = l === 'en' ? 'en' : 'id';
+    if (l === LANG) { tandaiTombol(); return; }
+    LANG = l; CACHE.clear();
+    try { localStorage.setItem(KEY, l); } catch (e) {}
+    document.documentElement.setAttribute('lang', l);
+    walk(document.body);
+    tandaiTombol(); segarkanGrafik();
+    simpanBahasaEmail(l);
+    try { document.dispatchEvent(new CustomEvent('abfuel:bahasa', { detail: { lang: l } })); } catch (e) {}
+  }
+  // Email otomatis (Laporan Sore & Pengingat STNK) ikut bahasa pilihan terakhir Master Admin
+  function simpanBahasaEmail(l) {
+    try {
+      var s = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
+      if (!(s.role === 'ADMIN_MASTER' || s.role === 'Master Admin')) return;
+      if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+      google.script.run.withSuccessHandler(function () {}).withFailureHandler(function () {})
+        .setBahasaEmail(l, typeof getAuthToken === 'function' ? getAuthToken() : '');
+    } catch (e) { /* tidak mengganggu tampilan */ }
+  }
+  function mulai() {
+    document.documentElement.setAttribute('lang', LANG);
+    pasangGrafik();
+    // bungkus fungsi cetak & WA (didefinisikan di Javascript.html)
+    if (typeof window.openPrintWindow === 'function' && !window.openPrintWindow.__ab) {
+      var op = window.openPrintWindow;
+      window.openPrintWindow = function (html) { var a = Array.prototype.slice.call(arguments); a[0] = dok(html); return op.apply(this, a); };
+      window.openPrintWindow.__ab = true;
+    }
+    if (typeof window.shareToWhatsApp === 'function' && !window.shareToWhatsApp.__ab) {
+      var sw = window.shareToWhatsApp;
+      window.shareToWhatsApp = function (text) { var a = Array.prototype.slice.call(arguments); a[0] = wa(text); return sw.apply(this, a); };
+      window.shareToWhatsApp.__ab = true;
+    }
+    if (LANG === 'en') walk(document.body);
+    tandaiTombol();
+    new MutationObserver(function (list) {
+      for (var i = 0; i < list.length; i++) {
+        var m = list[i];
+        if (m.type === 'characterData') teksNode(m.target);
+        else if (m.type === 'attributes') attrEl(m.target, m.attributeName);
+        else for (var j = 0; j < m.addedNodes.length; j++) walk(m.addedNodes[j]);
+      }
+    }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mulai); else setTimeout(mulai, 0);
+
+  window.I18N = { tr: tr, wa: wa, dok: dok, asli: asli, judulFile: judulFile, setBahasa: setBahasa, bahasa: function () { return LANG; },
+    locale: function () { return LANG === 'en' ? 'en-US' : 'id-ID'; }, walk: walk, kamus: kamus, _angkaEN: angkaEN, _tglEN: tglEN };
+  window.setBahasa = setBahasa;
+})();
+</script>
+
+
     <!-- Template Javascript -->
     <script>
     /* =========================================================================
@@ -11820,7 +12548,7 @@ let LAST_DASHBOARD_DATA = null;
 function shareDashboardWA() {
   const d = LAST_DASHBOARD_DATA;
   if (!d) { if (typeof showToast === 'function') showToast('Data Dashboard belum termuat, coba sebentar lagi.', 'warning'); return; }
-  const txt = (id) => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+  const txt = (id) => { const el = document.getElementById(id); return el ? (window.I18N ? I18N.asli(el) : el.innerText).trim() : ''; }; // [Fase 50] teks asli (diterjemahkan saat kirim)
   const L = ['*RINGKASAN BBM SITE*', 'AB-Fuel · ' + waNowText() + ' WITA', ''];
   const status = txt('tankBadgeAlert') || '-';
   L.push('*Stok tangki: ' + status + '*');
@@ -12071,7 +12799,7 @@ function sharePrintAsPdf(html) {
         for (let i = 1; i <= total; i++) {
           pdf.setPage(i); pdf.setFontSize(7); pdf.setTextColor(68);
           pdf.text('AB-Fuel Management System · PT Arthalaut Bumijasa', 8, 290);
-          pdf.text('Halaman ' + i + ' dari ' + total, 202, 290, { align: 'right' });
+          pdf.text(I18N.tr('Halaman ' + i + ' dari ' + total), 202, 290, { align: 'right' }); // [Fase 50] ikut bahasa
         }
         return pdf.output('blob');
       }).then(function (blob) {
