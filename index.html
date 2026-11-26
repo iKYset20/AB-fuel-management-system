@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=628f94b23a"></script>
-    <script src="./pages-offline-ui.js?v=628f94b23a" defer></script>
-    <script src="./pages-install.js?v=628f94b23a" defer></script>
+    <script src="./gas-adapter.js?v=84fe3657e1"></script>
+    <script src="./pages-offline-ui.js?v=84fe3657e1" defer></script>
+    <script src="./pages-install.js?v=84fe3657e1" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3841,7 +3841,7 @@
         <!-- Spinner Loading -->
         <div id="spinner" class="show position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border v7-spinner" role="status">
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">Memuat…</span>
             </div>
         </div>
 
@@ -3944,7 +3944,7 @@
                             <span class="online-status" id="sidebarOnlineStatus"></span>
                         </div>
                         <div class="ms-3 text-truncate">
-                            <h6 class="mb-0 sidebar-user-name text-truncate" id="sidebarUserName">Guest Mode</h6>
+                            <h6 class="mb-0 sidebar-user-name text-truncate" id="sidebarUserName">Mode Tamu</h6>
                             <span class="sidebar-user-role" id="sidebarUserRole">Pengawas Site</span>
                         </div>
                     </div>
@@ -4026,7 +4026,7 @@
                             <a href="#" class="nav-link dropdown-toggle topbar-avatar" data-bs-toggle="dropdown" aria-expanded="false" title="Menu profil">
                                 <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" id="headerUserAvatar">
                                 <span class="topbar-avatar-text d-none d-lg-flex">
-                                    <span class="topbar-avatar-name" id="headerUserName">Guest Mode</span>
+                                    <span class="topbar-avatar-name" id="headerUserName">Mode Tamu</span>
                                     <span class="topbar-avatar-role" id="headerUserRole">Pengawas Site</span>
                                 </span>
                             </a>
@@ -4035,7 +4035,7 @@
                                 <div class="profile-menu-head">
                                     <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" class="profile-menu-avatar" id="dropdownUserAvatar">
                                     <div class="profile-menu-id">
-                                        <span class="profile-menu-name" id="dropdownUserName">Guest Mode</span>
+                                        <span class="profile-menu-name" id="dropdownUserName">Mode Tamu</span>
                                         <span class="profile-menu-role" id="dropdownUserRole">Pengawas Site</span>
                                         <span class="profile-menu-chips">
                                             <span class="badge bg-success badge-admin" id="headerProfileBadge" style="display: none;">ADMIN<span class="text-active"> ACTIVE</span></span>
@@ -4078,12 +4078,12 @@
             <div class="dash-hero-status">
                 <span class="live-chip">
                     <span class="pulse-dot-green"></span>
-                    <span class="dash-hero-eyebrow">Live · Sync 30s</span>
-                    <span id="syncTimeText" class="dash-hero-sync"><i class="fa fa-sync-alt fa-spin me-1"></i> Syncing...</span>
+                    <span class="dash-hero-eyebrow">Langsung · tiap 30 detik</span>
+                    <span id="syncTimeText" class="dash-hero-sync"><i class="fa fa-sync-alt fa-spin me-1"></i> Memperbarui…</span>
                 </span>
-                <span id="alertBadge" class="badge bg-danger glow-alert">ANOMALI DETECTED</span>
+                <span id="alertBadge" class="badge bg-danger glow-alert">ADA ANOMALI</span>
             </div>
-            <h2 class="dash-hero-title"><span id="dashGreetingText">Selamat Datang</span>, <span id="dashGreetingName" class="text-brand">Guest</span></h2>
+            <h2 class="dash-hero-title"><span id="dashGreetingText">Selamat Datang</span>, <span id="dashGreetingName" class="text-brand">Tamu</span></h2>
             <p class="dash-hero-sub mb-0"><span id="dashGreetingDate">Memuat waktu WITA...</span></p>
         </div>
         <div class="dash-hero-actions">
@@ -4288,7 +4288,7 @@
                 </div>
                 <div class="kpi-label">Sisa Stok Tangki</div>
                 <div class="kpi-value-white" id="kpiSisaStok">0 Liter</div>
-                <div class="kpi-stat-foot"><span class="kpi-subtext-red" id="stokWarningText">MONITORING</span></div>
+                <div class="kpi-stat-foot"><span class="kpi-subtext-red" id="stokWarningText">PANTAU</span></div>
             </div>
         </div>
     </div>
@@ -4310,7 +4310,7 @@
                             <tr><th>#</th><th>KODE UNIT</th><th class="text-end" title="Selisih rata-rata aktual terhadap standar unit">VS STANDAR</th></tr>
                         </thead>
                         <tbody id="tbodyTopIrit">
-                            <tr><td colspan="3" class="text-center text-muted small py-3">Loading data...</td></tr>
+                            <tr><td colspan="3" class="text-center text-muted small py-3">Memuat data…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -4332,7 +4332,7 @@
                             <tr><th>#</th><th>KODE UNIT</th><th class="text-end">TOTAL LITER</th></tr>
                         </thead>
                         <tbody id="tbodyTopKonsumsi">
-                            <tr><td colspan="3" class="text-center text-muted small py-3">Loading data...</td></tr>
+                            <tr><td colspan="3" class="text-center text-muted small py-3">Memuat data…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -4350,13 +4350,13 @@
                 </div>
                 <!-- [Fase 13] Ringkasan + daftar deviasi terbesar (selaras dengan tabel kartu tetangga) -->
                 <div class="dash-audit-body">
-                    <span class="audit-period" id="auditPeriodText" title="Periode & lokasi yang dipakai perhitungan audit"><i class="fa fa-calendar-alt me-1" aria-hidden="true"></i>—</span>
+                    <span class="audit-period" id="auditPeriodText" title="Periode & lokasi yang dipakai perhitungan audit"><i class="fa fa-calendar-alt me-1" aria-hidden="true"></i>–</span>
                     <div class="audit-summary">
                         <span class="audit-summary-value tabular-nums" id="totalDeviasiAnomaliCount">0</span>
                         <span class="audit-summary-label">unit di luar toleransi</span>
                     </div>
                     <ul class="audit-top-list" id="auditTopList" aria-label="Unit dengan deviasi terbesar">
-                        <li class="audit-top-empty text-muted">Loading data...</li>
+                        <li class="audit-top-empty text-muted">Memuat data…</li>
                     </ul>
                 </div>
             </div>
@@ -4377,7 +4377,7 @@
                             <tr><th>KODE UNIT</th><th class="text-end">KETERANGAN</th></tr>
                         </thead>
                         <tbody id="tbodyMeteranRusak">
-                            <tr><td colspan="2" class="text-center text-muted small py-3">Loading data...</td></tr>
+                            <tr><td colspan="2" class="text-center text-muted small py-3">Memuat data…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -4403,7 +4403,7 @@
                     <div class="chart-mini-stat"><span class="chart-mini-label">Stok Awal</span><span class="chart-mini-value" id="supplyStatAwal">0 L</span></div>
                     <div class="chart-mini-stat"><span class="chart-mini-label">+ BBM Masuk</span><span class="chart-mini-value" id="supplyStatMasuk">0 L</span></div>
                     <div class="chart-mini-stat"><span class="chart-mini-label">− BBM Keluar</span><span class="chart-mini-value" id="supplyStatKeluar">0 L</span></div>
-                    <div class="chart-mini-stat"><span class="chart-mini-label">= Stok Akhir</span><span class="chart-mini-value" id="supplyStatAkhir">0 L</span><span class="chart-mini-delta" id="supplyStatSelisih">—</span></div>
+                    <div class="chart-mini-stat"><span class="chart-mini-label">= Stok Akhir</span><span class="chart-mini-value" id="supplyStatAkhir">0 L</span><span class="chart-mini-delta" id="supplyStatSelisih">–</span></div>
                 </div>
             </div>
         </div>
@@ -4436,7 +4436,7 @@
                         <h6 class="dash-card-title"><i class="fa fa-map-marked-alt me-2"></i>Peta Lokasi Site</h6>
                         <span class="dash-card-sub">Sebaran lokasi site aktif · makin besar titik, makin tinggi konsumsi BBM pada periode terpilih</span>
                     </div>
-                    <span class="dash-map-count" id="dashMapCount">—</span>
+                    <span class="dash-map-count" id="dashMapCount">–</span>
                 </div>
                 <div class="dash-map-wrap">
                     <div id="dashMap" class="dash-map" role="region" aria-label="Peta lokasi site"></div>
@@ -4724,7 +4724,7 @@
                     </tr>
                 </thead>
                 <tbody id="tbodyKartuStok" class="text-center">
-                    <tr><td colspan="7" class="text-center text-muted py-4">Memuat data riwayat transaksi...</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Memuat data…</td></tr>
                 </tbody>
             </table>
         </div>
@@ -4952,10 +4952,11 @@
         }
 
         // 2. Update 4 Kartu KPI
-        setKartuStokKpi('kpiKartuStokTotal', data.totalBbmText || '0 Liter');
-        setKartuStokKpi('kpiKartuStokFrekuensi', data.frekuensiText || '0 Kali');
-        setKartuStokKpi('kpiKartuStokEfisiensi', typeof printDesimal === 'function' ? printDesimal(data.efisiensiText || '-') : (data.efisiensiText || '-')); // [Fase 48] desimal koma
-        setKartuStokKpi('kpiKartuStokAvgIsi', data.avgPerPengisianText || '0 Liter');
+        // [Fase 49] teks angka seragam (koma, L, L/HM, kali)
+        setKartuStokKpi('kpiKartuStokTotal', teksSeragam(data.totalBbmText || '0 L'));
+        setKartuStokKpi('kpiKartuStokFrekuensi', teksSeragam(data.frekuensiText || '0 kali'));
+        setKartuStokKpi('kpiKartuStokEfisiensi', teksSeragam(data.efisiensiText));
+        setKartuStokKpi('kpiKartuStokAvgIsi', teksSeragam(data.avgPerPengisianText || '0 L'));
 
         // 3. Update Title, Periode & Header Satuan
         if (document.getElementById('titleUnitCode')) document.getElementById('titleUnitCode').innerText = data.selectedUnit || '-';
@@ -4983,7 +4984,7 @@
         if (!tbody) return;
 
         if (!cachedKartuStokRows || cachedKartuStokRows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada riwayat transaksi pengisian solar pada periode ini.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada data untuk periode ini</td></tr>';
             if (countInfo) countInfo.innerText = 'Menampilkan 0 dari 0 transaksi';
             const nt0 = document.getElementById('ksDashNote'); if (nt0) nt0.classList.add('d-none');
             return;
@@ -5057,14 +5058,14 @@
                 const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(s || '')); return m ? m[3] + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0') : String(s || '').replace(/[\\/]/g, '-'); }).join('_'),
             subtitle: 'Riwayat pengisian & efisiensi konsumsi',
             meta: [['Kode Unit', d.selectedUnit], ['Periode', printTanggal(d.tglAwalStr) + ' s/d ' + printTanggal(d.tglAkhirStr)], ['Satuan Meter', sat]],
-            summary: [['Total Pengisian', d.totalBbmText || '0 Liter'], ['Frekuensi', d.frekuensiText || '0 Kali'],
-                      ['Rata-rata Efisiensi', printDesimal(d.efisiensiText || '-')], ['Rata-rata / Pengisian', d.avgPerPengisianText || '0 Liter']],
+            summary: [['Total Pengisian', teksSeragam(d.totalBbmText || '0 L')], ['Frekuensi', teksSeragam(d.frekuensiText || '0 kali')],
+                      ['Rata-rata Efisiensi', teksSeragam(d.efisiensiText)], ['Rata-rata / Pengisian', teksSeragam(d.avgPerPengisianText || '0 L')]],
             columns: ['Tanggal', 'Jam', 'Meter (' + sat + ')', 'Selisih ' + sat, 'Liter', 'Konsumsi (L/' + sat + ')', 'Lokasi'],
             align: ['l', 'c', 'r', 'r', 'r', 'r', 'c'],
             rows: rows.map(r => [printTanggal(r.tanggal, true), r.waktu || r.jam || '-', String(r.hmKm || '').replace(/\s*(HM|KM)$/, ''),
                 r.selisih > 0 ? fmt(r.selisih, 1) : '–', r.totalLiter, r.rate > 0 ? fmt(r.rate, sat === 'KM' ? 2 : 1) : '–', r.lokasi]),
             totalRow: [['Total', 4, 'l'], [totSelisih > 0 ? fmt(totSelisih, 1) + ' ' + sat : '–', 1, 'r'], [fmt(totLiter, 0) + ' L', 1, 'r'], ['', 2, 'c']],
-            emptyText: 'Tidak ada riwayat pengisian pada periode ini.',
+            emptyText: 'Belum ada data untuk periode ini.',
             // [Fase 48] catatan lembut per poin (tanpa simbol)
             note: [
                 'Riwayat diurutkan dari pengisian paling awal sampai paling akhir.',
@@ -5315,7 +5316,7 @@
           </tr>
         </thead>
         <tbody id="tbodyLaporanHarian" class="text-center">
-          <tr><td colspan="7" class="text-center text-muted py-4">Memuat data laporan...</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">Memuat data…</td></tr>
         </tbody>
       </table>
     </div>
@@ -5518,7 +5519,7 @@
     if (!tbody) return;
 
     if (!cachedLaporanRows || cachedLaporanRows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Tidak Ada Transaksi BBM pada Tanggal & Lokasi Ini</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada data untuk tanggal ini</td></tr>';
       if (countInfo) countInfo.innerText = "Menampilkan 0 dari 0 transaksi";
       return;
     }
@@ -5675,7 +5676,7 @@
     const totalUnit = Object.keys(rows.reduce((o, r) => { o[String(r.noUnit || '-').trim().toUpperCase()] = 1; return o; }, {})).length;
 
     let tb = '';
-    if (!rows.length) tb = '<tr><td colspan="6" class="c" style="padding:14px">Tidak ada transaksi pengisian pada tanggal &amp; lokasi ini.</td></tr>';
+    if (!rows.length) tb = '<tr><td colspan="6" class="c" style="padding:14px">Belum ada data untuk tanggal ini.</td></tr>';
     let no = 0;
     grup.forEach(g => {
       tb += `<tr class="grp"><td colspan="6">${e(g.lokasi)} — ${g.rows.length} transaksi · ${Object.keys(g.unit).length} unit</td></tr>`;
@@ -5960,7 +5961,7 @@
     const C = 'text-center';
     let ut = '<thead><tr><th class="text-start">NO</th><th class="text-start">UNIT</th><th class="text-start">KODE TIPE</th><th class="' + C + '">LOKASI UTAMA</th><th class="' + C + '">PENGISIAN</th><th class="' + C + '">LITER</th><th class="' + C + '">% TOTAL</th><th class="' + C + '">JAM / JARAK KERJA</th><th class="' + C + '">KONSUMSI</th><th class="' + C + '">STANDAR</th><th class="' + C + '">STATUS</th>' +
       (M ? '<th class="' + C + '">LITER VS ' + escapeHtml(lpBulanLalu(b).toUpperCase()) + '</th>' : '') + '</tr></thead><tbody>';
-    if (!us.length) ut += '<tr class="lp-empty-row"><td colspan="' + cols + '" class="text-center text-muted py-4">Tidak ada pengisian pada periode &amp; lokasi ini</td></tr>';
+    if (!us.length) ut += '<tr class="lp-empty-row"><td colspan="' + cols + '" class="text-center text-muted py-4">Belum ada data untuk periode ini</td></tr>';
     rows.forEach((x, i) => {
       const sat = lpSat(x), dk = sat === 'KM' ? 2 : 1;
       ut += '<tr>' +
@@ -6325,17 +6326,17 @@
         <thead>
           <tr class="text-center">
             <th class="text-center">Kode Unit</th>
-            <th class="text-center">Tipe Unit</th>
+            <th class="text-center">Kode Tipe</th>
             <th class="text-center">Total Liter</th>
-            <th class="text-center">Delta HM/KM</th>
-            <th class="text-center">Aktual Rate</th>
-            <th class="text-center">Std Benchmark</th>
-            <th class="text-center">Deviasi (%)</th>
-            <th class="text-center">Status Meteran</th>
+            <th class="text-center">Jam / Jarak Kerja</th>
+            <th class="text-center">Konsumsi Aktual</th>
+            <th class="text-center">Standar</th>
+            <th class="text-center">Selisih</th>
+            <th class="text-center">Status</th>
           </tr>
         </thead>
         <tbody id="tbodyKalibrasi" class="text-center">
-          <tr><td colspan="8" class="text-center text-muted py-4">Memuat data audit kalibrasi...</td></tr>
+          <tr><td colspan="8" class="text-center text-muted py-4">Memuat data…</td></tr>
         </tbody>
       </table>
     </div>
@@ -6371,7 +6372,7 @@
     const v = (id, def) => { const el = document.getElementById(id); return el && el.value ? el.value : def; };
     const awal = v('filterKalAwal', '-'), akhir = v('filterKalAkhir', '-'), lokasi = v('filterKalLokasi', 'Semua Lokasi');
     const total = parseFloat(d.totalAudited) || 0;
-    const pct = (n) => total > 0 ? ' (' + ((parseFloat(n) || 0) / total * 100).toFixed(1).replace('.', ',') + '%)' : '';
+    const pct = (n) => total > 0 ? ' (' + fmtAngka((parseFloat(n) || 0) / total * 100, 1) + '%)' : '';
     // [Fase 48] istilah Indonesia, desimal koma, tanggal Indonesia, satuan ringkas (L/HM · L/KM)
     const sat = (s) => (String(s || '').indexOf('KM') !== -1 ? 'KM' : 'HM');
     openPrintableReport({
@@ -6387,7 +6388,7 @@
         printDesimal(r.deltaHM || '0') + ' ' + sat(r.satuan),
         printDesimal(r.aktualRate || '0') + ' L/' + sat(r.satuan), r.stdRate === '-' ? '–' : printDesimal(r.stdRate || '0') + ' L/' + sat(r.satuan),
         (!r.deviasiText || r.deviasiText === '-') ? '–' : printDesimal(r.deviasiText), (r.statusText || '-') + (r.meterTidakAndal ? ' (meter ditandai)' : '')]),
-      emptyText: 'Tidak ada data unit pada periode & lokasi ini.',
+      emptyText: 'Belum ada data untuk periode ini.',
       // [Fase 48] arti status per poin, bahasa lembut tanpa simbol
       noteTitle: 'Arti status:',
       note: [
@@ -6437,8 +6438,11 @@
     const bar = document.getElementById(barId);
     const txt = document.getElementById(pctId);
     if (bar) bar.style.setProperty('--tier-pct', p.toFixed(1) + '%');
-    if (txt) txt.innerText = p.toFixed(1) + '%';
+    if (txt) txt.innerText = fmtAngka(p, 1) + '%';
   }
+
+  // [Fase 49] satuan tampilan seragam: "Liter/HM" (data) → "L/HM"
+  function kalSatuan(s) { return String(s || '').replace(/^Liter\//, 'L/'); }
 
   function renderKalibrasi(data) {
     if (!data) return;
@@ -6466,7 +6470,7 @@
     if (!tbody) return;
 
     if (!cachedKalibrasiRows || cachedKalibrasiRows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Tidak Ada Data Unit Terdeteksi</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Belum ada data untuk periode ini</td></tr>`;
       if (countInfo) countInfo.innerText = "Menampilkan 0 dari 0 unit";
       return;
     }
@@ -6495,10 +6499,10 @@
           <td class="text-center fw-bold text-white">${escapeHtml(r.unit || '-')}</td>
           <td class="text-center text-muted">${escapeHtml(r.jenis || '-')}</td>
           <td class="text-center fw-bold tabular-nums">${escapeHtml(r.totalLiter ? r.totalLiter + ' L' : '0 L')}</td>
-          <td class="text-center text-muted tabular-nums">${escapeHtml(r.deltaHM || '0')}</td>
-          <td class="text-center text-brand fw-bold tabular-nums">${escapeHtml(r.aktualRate || '0')} ${escapeHtml(r.satuan || '')}</td>
-          <td class="text-center text-muted tabular-nums">${r.stdRate === '-' ? '—' : escapeHtml(r.stdRate || '0') + ' ' + escapeHtml(r.satuan || '')}</td>
-          <td class="text-center fw-bold tabular-nums ${devClass}">${escapeHtml(r.deviasiText || '0%')}</td>
+          <td class="text-center text-muted tabular-nums">${escapeHtml(printDesimal(r.deltaHM || '0'))}</td>
+          <td class="text-center text-brand fw-bold tabular-nums">${escapeHtml(printDesimal(r.aktualRate || '0'))} ${escapeHtml(kalSatuan(r.satuan))}</td>
+          <td class="text-center text-muted tabular-nums">${r.stdRate === '-' ? '–' : escapeHtml(printDesimal(r.stdRate || '0')) + ' ' + escapeHtml(kalSatuan(r.satuan))}</td>
+          <td class="text-center fw-bold tabular-nums ${devClass}">${(!r.deviasiText || r.deviasiText === '-') ? '–' : escapeHtml(printDesimal(r.deviasiText))}</td>
           <td class="text-center"><span class="badge ${badge} px-2 py-1"${r.meterTidakAndal ? ' title="' + escapeHtml(r.meterTidakAndal) + '"' : ''}>${escapeHtml(r.statusText || '-')}${r.meterTidakAndal ? ' <i class="fa fa-flag ms-1" aria-hidden="true"></i>' : ''}</span></td>
         </tr>
       `;
@@ -6564,7 +6568,7 @@
          semua sub-tab kini memakai satu transisi ringan (.submaster-enter) -->
     <section class="glass-card no-lift v7-form-card" id="formMasterDbWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="formMasterTitle"><i class="fa fa-edit text-brand me-2"></i>INPUT TRANSAKSI BBM BARU</h6>
+        <h6 class="dash-card-title mb-0" id="formMasterTitle"><i class="fa fa-edit text-brand me-2"></i>Input Transaksi BBM Baru</h6>
       </div>
 
       <input type="hidden" id="adminRowIndex" value="0">
@@ -6712,7 +6716,7 @@
   <div id="subViewMasterUnit" class="submaster-view v7-stack d-none">
     <section class="glass-card no-lift v7-form-card" id="formUnitWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="titleFormUnit"><i class="fa fa-plus-circle text-brand me-2"></i>INPUT DATA UNIT BARU</h6>
+        <h6 class="dash-card-title mb-0" id="titleFormUnit"><i class="fa fa-plus-circle text-brand me-2"></i>Input Data Unit Baru</h6>
       </div>
       <input type="hidden" id="unitRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
@@ -6896,7 +6900,7 @@
   <div id="subViewMasterQR" class="submaster-view v7-stack d-none">
     <section class="glass-card no-lift v7-form-card" id="formQRWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="titleFormQR"><i class="fa fa-qrcode text-brand me-2"></i>INPUT DATA STIKER QR BARU</h6>
+        <h6 class="dash-card-title mb-0" id="titleFormQR"><i class="fa fa-qrcode text-brand me-2"></i>Input Data Stiker QR Baru</h6>
       </div>
       <input type="hidden" id="qrRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
@@ -6993,7 +6997,7 @@
   <div id="subViewMasterKaryawan" class="submaster-view v7-stack d-none">
     <section class="glass-card no-lift v7-form-card" id="formKaryawanWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="titleFormKaryawan"><i class="fa fa-user-plus text-brand me-2"></i>INPUT DATA KARYAWAN / OPERATOR BARU</h6>
+        <h6 class="dash-card-title mb-0" id="titleFormKaryawan"><i class="fa fa-user-plus text-brand me-2"></i>Input Data Karyawan / Operator Baru</h6>
       </div>
       <input type="hidden" id="karyawanRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
@@ -7090,7 +7094,7 @@
   <div id="subViewMasterDealer" class="submaster-view v7-stack d-none">
     <section class="glass-card no-lift v7-form-card" id="formDealerWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="titleFormDealer"><i class="fa fa-cogs text-brand me-2"></i>INPUT DATA STANDAR DEALER BARU</h6>
+        <h6 class="dash-card-title mb-0" id="titleFormDealer"><i class="fa fa-cogs text-brand me-2"></i>Input Data Standar Dealer Baru</h6>
       </div>
       <input type="hidden" id="dealerRowIndex" value="0">
 
@@ -7151,7 +7155,7 @@
         <div class="col-6 col-md-2 mt-2">
           <label class="field-label" for="dealerRata2" title="Acuan rata-rata — dihitung otomatis dari 3 beban">ACUAN (OTOMATIS)</label>
           <!-- [Fase 18] dihitung dari rata-rata beban; di sheet disimpan sebagai rumus =AVERAGE(E:G) -->
-          <input type="number" step="0.01" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="—" readonly tabindex="-1">
+          <input type="number" step="0.01" id="dealerRata2" class="form-control form-control-sm input-accent fw-bold tabular-nums" placeholder="–" readonly tabindex="-1">
         </div>
         <div class="col-12 col-md-4 mt-2 d-flex align-items-end gap-2">
           <button onclick="resetDealerForm()" class="btn btn-sm btn-ghost px-3" title="Reset Form"><i class="fa fa-undo"></i></button>
@@ -7223,7 +7227,7 @@
   <div id="subViewMasterLokasi" class="submaster-view v7-stack d-none">
     <section class="glass-card no-lift v7-form-card" id="formLokasiWrapper">
       <div class="v7-form-head">
-        <h6 class="dash-card-title mb-0" id="titleFormLokasi"><i class="fa fa-plus-circle text-brand me-2"></i>INPUT LOKASI BARU</h6>
+        <h6 class="dash-card-title mb-0" id="titleFormLokasi"><i class="fa fa-plus-circle text-brand me-2"></i>Input Lokasi Baru</h6>
       </div>
       <input type="hidden" id="lokasiRowIndex" value="0">
       <div class="row g-2 v7-form-grid">
@@ -7405,7 +7409,7 @@
         roleNotice.innerText = "Akses: Sub Admin (Read-Only)";
       } else {
         roleNotice.className = "badge role-notice role-notice--guest";
-        roleNotice.innerText = "Akses: Guest Mode (Terkunci)";
+        roleNotice.innerText = "Akses: Mode Tamu (Terkunci)";
       }
     }
 
@@ -7492,6 +7496,14 @@
              String(r.keterangan || '').toLowerCase().includes(keyword);
     });
     return sortDbMasterRows(rows);
+  }
+
+  // [Fase 49] angka tabel Database Master gaya Indonesia (9.730,5); teks (mis. "RUSAK") tampil apa adanya
+  function dbMasterAngka(v) {
+    if (v === '' || v === null || v === undefined) return '0';
+    const s = String(v).trim();
+    if (typeof v !== 'number' && !/^-?\d+(\.\d+)?$/.test(s)) return s;
+    return Number(s).toLocaleString('id-ID', { maximumFractionDigits: 2 });
   }
 
   /* [Fase 47] Urutan tabel Database Master (pilihan diingat di perangkat):
@@ -7659,7 +7671,7 @@
     DB_MASTER_VIEW = dataToRender || [];
 
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Database Master Kosong / Data Tidak Ditemukan</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>`;
       renderDbMasterPager(0, 0);
       return;
     }
@@ -7687,17 +7699,17 @@
       html += `
         <tr class="text-center align-middle${baru ? ' db-row-baru' : ''}">
           <td class="tabular-nums text-muted">${escapeHtml(r.noBaris || '-')}${baru ? '<span class="db-baru-tag">BARU</span>' : ''}</td>
-          <td class="tabular-nums">${escapeHtml(r.tanggal || '-')}</td>
+          <td class="tabular-nums">${escapeHtml(tglAngka(r.tanggal))}</td>
           <td class="tabular-nums fw-bold text-muted">${escapeHtml(r.jam || '-')}</td>
           <td><span class="badge ${isSupplier ? 'bg-success' : 'bg-warning'}">${escapeHtml(r.jenisTx || '-')}</span></td>
           <td class="fw-bold text-white">${escapeHtml(r.noUnit || '-')}</td>
           <td><span class="badge badge-location">${escapeHtml(r.lokasi || 'Site')}</span></td>
-          <td class="text-muted tabular-nums">${escapeHtml(r.hmKm || 0)}</td>
-          <td class="fw-bold tabular-nums ${isSupplier ? 'text-success' : 'text-warning'}">${escapeHtml(r.liter || 0)} L</td>
+          <td class="text-muted tabular-nums">${escapeHtml(dbMasterAngka(r.hmKm))}</td>
+          <td class="fw-bold tabular-nums ${isSupplier ? 'text-success' : 'text-warning'}">${escapeHtml(dbMasterAngka(r.liter || 0))} L</td>
           <td class="text-brand">${escapeHtml(r.noSuratJalan || '-')}</td>
           <td class="text-muted">${escapeHtml(r.keterangan || '-')}</td>
           <td>
-            <button onclick="editAdminRow(${Number(r.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+            <button onclick="editAdminRow(${Number(r.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
             ${deleteButtonHtml}
           </td>
         </tr>
@@ -7776,7 +7788,7 @@
     
     toggleSuratJalanField();
     hideAdminMeterWarning();
-    document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT TRANSAKSI BBM (BARIS ${escapeHtml(item.noBaris || rowIndex)})`;
+    document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Transaksi BBM (baris ${escapeHtml(item.noBaris || rowIndex)})`;
   }
 
   function resetAdminForm() {
@@ -7799,7 +7811,7 @@
     document.getElementById('adminJenisTx').value = 'PENGELUARAN UNIT';
     toggleSuratJalanField();
     hideAdminMeterWarning();
-    document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>INPUT TRANSAKSI BBM BARU`;
+    document.getElementById('formMasterTitle').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Input Transaksi BBM Baru`;
   }
 
   /* [Fase 17 — poin E di Database Master] Peringatan meter. Acuan = pembacaan sah SEBELUM & SESUDAH
@@ -8121,13 +8133,13 @@
     if (!d) { hint.textContent = 'Standar: — (pilih Kode Tipe)'; return; }
     if (!(d.acuan > 0)) { hint.textContent = 'Standar: — (belum diisi di Standar Dealer)'; hint.classList.add('is-warn'); return; }
     const satTipe = d.satuan === 'KM' ? 'KM' : 'HM';
-    const angka = d.acuan < 1 ? d.acuan.toFixed(2) : d.acuan.toFixed(1);
+    const angka = fmtAngka(d.acuan, d.acuan < 1 ? 2 : 1);
     if (satTipe !== satUnit) {
       hint.textContent = `Standar tipe ${angka} L per ${satTipe} — tidak dipakai (unit memakai ${satUnit})`;
       hint.classList.add('is-warn');
       return;
     }
-    hint.textContent = `Standar: ${angka} ${satTipe === 'KM' ? 'L/KM' : 'L/Jam'}`;
+    hint.textContent = `Standar: ${angka} ${satTipe === 'KM' ? 'L/KM' : 'L/HM'}`;
   }
 
   function onUnitKodeTipeChange() {
@@ -8190,7 +8202,7 @@
     if (up.indexOf('TANPA') !== -1) return 'Tanpa Meter';
     if (up.indexOf('KM') !== -1) return 'KM';
     if (up.indexOf('HM') !== -1 || up.indexOf('JAM') !== -1) return 'HM';
-    return up ? s : '—';
+    return up ? s : '–';
   }
 
   function renderMasterUnitTable(dataToRender) {
@@ -8202,7 +8214,7 @@
 
     const pageRows = masterPageRows('UNIT', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Data Unit Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>';
       return;
     }
 
@@ -8215,16 +8227,16 @@
       html += `
         <tr>
           <td class="fw-bold text-white">${escapeHtml(u.kodeUnit)}${(u.noLambung || u.ket) ? `<span class="dash-cell-sub unit-ket">${u.noLambung ? escapeHtml(u.noLambung) : ''}${u.noLambung && u.ket ? ' · ' : ''}${u.ket ? escapeHtml(u.ket) : ''}</span>` : ''}</td>
-          <td class="text-muted">${escapeHtml(u.kodeTipe || '—')}</td>
-          <td>${u.jenisUnit ? escapeHtml(u.jenisUnit) : '<span class="text-muted">—</span>'}</td>
-          <td>${escapeHtml(u.kategori || '—')}</td>
+          <td class="text-muted">${escapeHtml(u.kodeTipe || '–')}</td>
+          <td>${u.jenisUnit ? escapeHtml(u.jenisUnit) : '<span class="text-muted">–</span>'}</td>
+          <td>${escapeHtml(u.kategori || '–')}</td>
           <td><span class="badge badge-location">${escapeHtml(unitSatuanLabel(u.satuanMeter))}</span></td>
-          <td><span class="unit-status unit-status--${escapeHtml(String(u.status || '').toLowerCase() || 'none')}">${escapeHtml(u.status || '—')}</span>${(() => { const s = stnkExpInfo(u.expStnk); return s ? `<span class="dash-cell-sub unit-stnk ${s.cls}">${escapeHtml(s.text)}</span>` : ''; })()}</td>
-          <td class="unit-serial">${u.serialNo ? escapeHtml(u.serialNo) : '<span class="text-muted">—</span>'}${(u.noMesin || u.stnk) ? `<span class="dash-cell-sub">${u.noMesin ? 'Mesin ' + escapeHtml(u.noMesin) : ''}${u.noMesin && u.stnk ? ' · ' : ''}${u.stnk ? 'STNK ' + escapeHtml(u.stnk) : ''}</span>` : ''}</td>
-          <td class="tabular-nums">${u.thnUnit ? escapeHtml(u.thnUnit) : '<span class="text-muted">—</span>'}</td>
-          <td class="fw-bold text-brand tabular-nums">${escapeHtml(u.stdText || '—')}${u.stdNote ? `<span class="dash-cell-sub">${escapeHtml(u.stdNote)}</span>` : ''}</td>
+          <td><span class="unit-status unit-status--${escapeHtml(String(u.status || '').toLowerCase() || 'none')}">${escapeHtml(u.status || '–')}</span>${(() => { const s = stnkExpInfo(u.expStnk); return s ? `<span class="dash-cell-sub unit-stnk ${s.cls}">${escapeHtml(s.text)}</span>` : ''; })()}</td>
+          <td class="unit-serial">${u.serialNo ? escapeHtml(u.serialNo) : '<span class="text-muted">–</span>'}${(u.noMesin || u.stnk) ? `<span class="dash-cell-sub">${u.noMesin ? 'Mesin ' + escapeHtml(u.noMesin) : ''}${u.noMesin && u.stnk ? ' · ' : ''}${u.stnk ? 'STNK ' + escapeHtml(u.stnk) : ''}</span>` : ''}</td>
+          <td class="tabular-nums">${u.thnUnit ? escapeHtml(u.thnUnit) : '<span class="text-muted">–</span>'}</td>
+          <td class="fw-bold text-brand tabular-nums">${escapeHtml(teksSeragam(u.stdText))}${u.stdNote ? `<span class="dash-cell-sub">${escapeHtml(u.stdNote)}</span>` : ''}</td>
           <td>
-            <button onclick="editUnitRow(${Number(u.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+            <button onclick="editUnitRow(${Number(u.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
             ${deleteBtn}
           </td>
         </tr>
@@ -8264,7 +8276,7 @@
     document.getElementById('unitKet').value = item.ket || '';
     toggleUnitDtFields();
     updateUnitStdHint();
-    document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT MASTER UNIT (${escapeHtml(item.kodeUnit)})`;
+    document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Master Unit (${escapeHtml(item.kodeUnit)})`;
   }
 
   function resetUnitForm() {
@@ -8286,7 +8298,7 @@
     toggleUnitDtFields();
     fillUnitKodeTipeOptions('');
     updateUnitStdHint();
-    document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT DATA UNIT BARU`;
+    document.getElementById('titleFormUnit').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>Input Data Unit Baru`;
   }
 
   function saveUnitForm() {
@@ -8402,7 +8414,7 @@
         if (res.statusDiperbaiki) teks += ` Status yang tidak sah (mis. berisi angka) diisi <b>Active</b> — periksa kembali di sheet bila seharusnya Standby/Breakdown.`;
         if (tanpa.length) teks += `<br><span class="text-warning">Belum dikenali (isi manual lewat Edit): ${escapeHtml(tanpa.join(', '))}</span>`;
         sum.innerHTML = teks;
-        const arrow = (a, b) => a === b ? escapeHtml(b || '—') : `<span class="text-muted">${escapeHtml(a || '—')}</span> → <b>${escapeHtml(b || '—')}</b>`;
+        const arrow = (a, b) => a === b ? escapeHtml(b || '–') : `<span class="text-muted">${escapeHtml(a || '–')}</span> → <b>${escapeHtml(b || '–')}</b>`;
         tbody.innerHTML = items.map(it => `
           <tr>
             <td class="fw-bold">${escapeHtml(it.kodeUnit)}</td>
@@ -8470,7 +8482,7 @@
     const activeSession = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     const isMasterAdmin = (activeSession.role === 'ADMIN_MASTER' || activeSession.role === 'Master Admin');
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Data Lokasi Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>';
       return;
     }
     tbody.innerHTML = dataToRender.map(l => {
@@ -8479,12 +8491,12 @@
         ? '<span class="status-pill status-pill--ok"><span class="status-dot"></span>Aktif</span>'
         : '<span class="status-pill status-pill--off"><span class="status-dot"></span>Nonaktif</span>';
       const actions = isMasterAdmin
-        ? `<button onclick="editLokasiRow(${idx})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+        ? `<button onclick="editLokasiRow(${idx})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
            <button onclick="deleteLokasiRow(${idx})" class="btn btn-xs btn-delete"><i class="fa fa-trash-alt me-1"></i>Hapus</button>`
         : `<button disabled class="btn btn-xs btn-ghost" title="Hanya Master Admin"><i class="fa fa-lock me-1"></i>Terkunci</button>`;
       const coord = (typeof l.lat === 'number' && typeof l.lng === 'number')
         ? `<span class="tabular-nums small">${l.lat.toFixed(5)}, ${l.lng.toFixed(5)}</span>`
-        : '<span class="text-muted small">—</span>';
+        : '<span class="text-muted small">–</span>';
       return `<tr>
           <td class="fw-bold text-white text-start ps-3">${escapeHtml(l.nama)}</td>
           <td>${statusPill}</td>
@@ -8504,7 +8516,7 @@
     document.getElementById('lokasiLat').value = typeof item.lat === 'number' ? item.lat : '';
     document.getElementById('lokasiLng').value = typeof item.lng === 'number' ? item.lng : '';
     syncLokasiPickerMarker(true);
-    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT LOKASI (${escapeHtml(item.nama)})`;
+    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Lokasi (${escapeHtml(item.nama)})`;
     const f = document.getElementById('formLokasiWrapper');
     if (f && f.scrollIntoView) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -8515,7 +8527,7 @@
     document.getElementById('lokasiNama').value = '';
     document.getElementById('lokasiStatus').value = 'Aktif';
     clearLokasiCoords();
-    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>INPUT LOKASI BARU`;
+    document.getElementById('titleFormLokasi').innerHTML = `<i class="fa fa-plus-circle text-brand me-2"></i>Input Lokasi Baru`;
   }
 
   /* ---------- [Fase 12] Koordinat lokasi: tempel "lat, lng", GPS, peta pemilih ---------- */
@@ -8684,7 +8696,7 @@
 
     const pageRows = masterPageRows('QR', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Data QR Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>';
       return;
     }
 
@@ -8700,10 +8712,10 @@
           <td class="fw-bold text-white">${escapeHtml(q.kodeUnit)}</td>
           <td>${escapeHtml(q.lokasi)}</td>
           <td class="tabular-nums">${q.kapasitas > 0 ? escapeHtml(q.kapasitas) + ' L'
-            : (q.kapasitasTipe > 0 ? escapeHtml(q.kapasitasTipe) + ' L<span class="dash-cell-sub">dari Kode Tipe</span>' : '<span class="text-muted">—</span><span class="dash-cell-sub">cek kapasitas nonaktif</span>')}</td>
+            : (q.kapasitasTipe > 0 ? escapeHtml(q.kapasitasTipe) + ' L<span class="dash-cell-sub">dari Kode Tipe</span>' : '<span class="text-muted">–</span><span class="dash-cell-sub">cek kapasitas nonaktif</span>')}</td>
           <td><span class="badge ${q.status === 'Aktif' ? 'bg-success' : 'badge-location'}">${escapeHtml(q.status)}</span></td>
           <td>
-            <button onclick="editQRRow(${Number(q.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+            <button onclick="editQRRow(${Number(q.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
             ${deleteBtn}
           </td>
         </tr>
@@ -8724,7 +8736,7 @@
     else document.getElementById('qrLokasi').value = item.lokasi || '';
     document.getElementById('qrKapasitas').value = item.kapasitas > 0 ? item.kapasitas : '';
     document.getElementById('qrStatus').value = item.status;
-    document.getElementById('titleFormQR').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT STIKER QR (${escapeHtml(item.qrId)})`;
+    document.getElementById('titleFormQR').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Stiker QR (${escapeHtml(item.qrId)})`;
   }
 
   function resetQRForm() {
@@ -8733,7 +8745,7 @@
     document.getElementById('qrCodeId').value = '';
     document.getElementById('qrKodeUnit').value = '';
     document.getElementById('qrKapasitas').value = '';
-    document.getElementById('titleFormQR').innerHTML = `<i class="fa fa-qrcode text-brand me-2"></i>INPUT DATA STIKER QR BARU`;
+    document.getElementById('titleFormQR').innerHTML = `<i class="fa fa-qrcode text-brand me-2"></i>Input Data Stiker QR Baru`;
   }
 
   function saveQRForm() {
@@ -8880,7 +8892,7 @@
 
     const pageRows = masterPageRows('KARYAWAN', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Data Karyawan Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>';
       return;
     }
 
@@ -8898,7 +8910,7 @@
           <td>${escapeHtml(k.departemen)}</td>
           <td><span class="badge ${k.status === 'Aktif' ? 'bg-success' : 'badge-location'}">${escapeHtml(k.status)}</span></td>
           <td>
-            <button onclick="editKaryawanRow(${Number(k.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+            <button onclick="editKaryawanRow(${Number(k.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
             ${deleteBtn}
           </td>
         </tr>
@@ -8915,7 +8927,7 @@
     document.getElementById('karyawanNik').value = item.nik;
     document.getElementById('karyawanNama').value = item.nama;
     fillKaryawanDropdowns(item); // [Fase 27] Jabatan / Departemen / Status = dropdown
-    document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT MASTER KARYAWAN (${escapeHtml(item.nama)})`;
+    document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Master Karyawan (${escapeHtml(item.nama)})`;
   }
 
   function resetKaryawanForm() {
@@ -8924,7 +8936,7 @@
     document.getElementById('karyawanNik').value = '';
     document.getElementById('karyawanNama').value = '';
     fillKaryawanDropdowns(null); // [Fase 27]
-    document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-user-plus text-brand me-2"></i>INPUT DATA KARYAWAN / OPERATOR BARU`;
+    document.getElementById('titleFormKaryawan').innerHTML = `<i class="fa fa-user-plus text-brand me-2"></i>Input Data Karyawan / Operator Baru`;
   }
 
   function saveKaryawanForm(allowDupNama) {
@@ -9031,14 +9043,14 @@
 
     const pageRows = masterPageRows('DEALER', dataToRender);
     if (!dataToRender || dataToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Data Standar Dealer Kosong / Tidak Ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data yang cocok</td></tr>';
       return;
     }
 
-    // Helper untuk membatasi maksimal 2 angka di belakang koma
+    // Helper untuk membatasi maksimal 2 angka di belakang koma — [Fase 49] desimal koma (12,5)
     const formatDesimal = (val) => {
       const num = parseFloat(val);
-      return isNaN(num) ? "0" : (Math.round(num * 100) / 100).toString();
+      return isNaN(num) ? "0" : (Math.round(num * 100) / 100).toLocaleString('id-ID', { maximumFractionDigits: 2 });
     };
 
     let html = '';
@@ -9057,10 +9069,10 @@
           <td class="fw-bold tabular-nums">${formatDesimal(d.bebanSedang)}</td>
           <td class="tabular-nums">${formatDesimal(d.bebanBerat)}</td>
           <td class="fw-bold text-brand tabular-nums">${formatDesimal(d.acuanRata2)}</td>
-          <td class="tabular-nums">${escapeHtml(d.kapasitas)} L</td>
+          <td class="tabular-nums">${(d.kapasitas === '' || d.kapasitas === null || d.kapasitas === undefined || isNaN(parseFloat(d.kapasitas))) ? '–' : escapeHtml(fmtAngka(d.kapasitas)) + ' L'}</td>
           <td class="tabular-nums">${escapeHtml(d.toleransi)}%</td>
           <td>
-            <button onclick="editDealerRow(${Number(d.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Edit</button>
+            <button onclick="editDealerRow(${Number(d.rowIndex) || 0})" class="btn btn-xs btn-ghost me-1"><i class="fa fa-pen me-1"></i>Ubah</button>
             ${deleteBtn}
           </td>
         </tr>
@@ -9089,7 +9101,7 @@
     document.getElementById('dealerKapasitas').value = item.kapasitas;
     document.getElementById('dealerToleransi').value = item.toleransi;
     updateDealerAcuan();
-    document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>EDIT STANDAR DEALER (${escapeHtml(item.kodeTipe)})`;
+    document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-edit text-brand me-2"></i>Ubah Standar Dealer (${escapeHtml(item.kodeTipe)})`;
   }
 
   function resetDealerForm() {
@@ -9104,7 +9116,7 @@
     document.getElementById('dealerRata2').value = '';
     document.getElementById('dealerKapasitas').value = '';
     document.getElementById('dealerToleransi').value = '';
-    document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-cogs text-brand me-2"></i>INPUT DATA STANDAR DEALER BARU`;
+    document.getElementById('titleFormDealer').innerHTML = `<i class="fa fa-cogs text-brand me-2"></i>Input Data Standar Dealer Baru`;
   }
 
   // [Fase 18] Acuan Rata-rata = rata-rata beban yang terisi (sama dengan rumus =AVERAGE di sheet)
@@ -11814,7 +11826,7 @@ function shareDashboardWA() {
   L.push('*Stok tangki: ' + status + '*');
   L.push('Sisa stok: ' + (d.numTankVal != null ? Math.round(d.numTankVal).toLocaleString('id-ID') + ' L' : (d.kpiSisaStok || '-')) +
     (d.tankPercentage != null ? ' (' + Number(d.tankPercentage).toFixed(1).replace('.', ',') + '%)' : ''));
-  L.push('Estimasi habis: ' + (d.daysLeftText || '-') + ' · rata-rata ' + (d.avg7DaysConsText || '-'));
+  L.push('Estimasi habis: ' + teksSeragam(d.daysLeftText) + ' · rata-rata ' + teksSeragam(d.avg7DaysConsText));
   L.push('', '*Konsumsi*');
   L.push('Hari ini: ' + (d.kpiTodayCons || '0 L'));
   const periode = txt('auditPeriodText');
@@ -11823,7 +11835,7 @@ function shareDashboardWA() {
   const top = (d.top5Cons || []).slice(0, 5);
   if (top.length) { L.push('', '*Top konsumsi*'); top.forEach((x, i) => L.push((i + 1) + '. ' + x.unit + ' — ' + x.totalLiterText + (x.pctText ? ' (' + x.pctText + ')' : ''))); }
   const boros = d.auditDeviasi || [];
-  if (boros.length) { L.push('', '*Unit BOROS (' + boros.length + ')*'); boros.slice(0, 10).forEach(x => L.push('- ' + x.unit + ' ' + (x.deviasiText || ''))); if (boros.length > 10) L.push('… dan ' + (boros.length - 10) + ' unit lain'); }
+  if (boros.length) { L.push('', '*Unit BOROS (' + boros.length + ')*'); boros.slice(0, 10).forEach(x => L.push('- ' + x.unit + ' ' + printDesimal(x.deviasiText || ''))); if (boros.length > 10) L.push('… dan ' + (boros.length - 10) + ' unit lain'); }
   const cek = d.meteranRusakList || [];
   if (cek.length) { L.push('', '*Perlu cek meter (' + cek.length + ')*'); cek.slice(0, 10).forEach(x => L.push('- ' + x.unit + ': ' + (x.kondisiSingkat || x.kondisi || ''))); if (cek.length > 10) L.push('… dan ' + (cek.length - 10) + ' unit lain'); }
   L.push('', '◉ Report : ' + WA_REPORT_URL);
@@ -11849,6 +11861,29 @@ function printTanggal(v, withDay) {
 }
 // Desimal titik dari server ("24.89", "+2.1%", "60.0") → koma; ribuan "1.200" (3 angka) tidak tersentuh
 function printDesimal(v) { return String(v === undefined || v === null ? '' : v).replace(/(\d)\.(\d{1,2})(?!\d)/g, '$1,$2'); }
+/* [Fase 49] Format angka tampilan seragam (gaya Indonesia): ribuan titik, desimal koma; dg = jumlah desimal tetap.
+   Nilai bukan angka → "–" (tanda kosong seragam). Sama dengan fmtAngkaId_ di server. */
+function fmtAngka(n, dg) {
+  const v = (typeof n === 'number') ? n : parseFloat(n);
+  if (n === null || n === undefined || n === '' || !isFinite(v)) return '–';
+  dg = dg || 0;
+  return v.toLocaleString('id-ID', { minimumFractionDigits: dg, maximumFractionDigits: dg });
+}
+// [Fase 49] Teks angka dari server versi lama / cache offline → gaya seragam (koma, L, L/HM, kali, hari, "–")
+function teksSeragam(v) {
+  const s = String(v === undefined || v === null ? '' : v).trim();
+  if (!s || s === '-' || s === '—' || s === 'N/A') return '–';
+  return printDesimal(s).replace(/ Liter\b/g, ' L').replace(/L\/Jam\b/g, 'L/HM').replace(/ Kali\b/g, ' kali')
+    .replace(/ Hari\b/g, ' hari').replace(/L\/Hari\b/g, 'L/hari');
+}
+// [Fase 49] Tanggal tabel seragam "25/11/2026" dari "11/25/2026" (format server) atau "2026-11-25"
+function tglAngka(v) {
+  const s = String(v === undefined || v === null ? '' : v).trim();
+  let m;
+  if ((m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s))) return m[3] + '/' + m[2] + '/' + m[1];
+  if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s))) return String(m[2]).padStart(2, '0') + '/' + String(m[1]).padStart(2, '0') + '/' + m[3];
+  return s || '–';
+}
 // [Fase 48] Catatan di cetakan: judul kecil + poin-poin pendek (teks polos, di-escape; poin kosong dilewati)
 function printCatatanHtml(judul, items) {
   const e = (v) => escapeHtml(String(v === undefined || v === null ? '' : v));
@@ -12082,7 +12117,7 @@ function openPrintableReport(opts) {
   const rows = opts.rows || [];
   const body = rows.length
     ? rows.map((r, i) => '<tr><td class="c">' + (i + 1) + '</td>' + r.map((c, j) => `<td class="${al[j] || 'c'}">${e(c)}</td>`).join('') + '</tr>').join('')
-    : `<tr><td colspan="${cols.length + 1}" class="c" style="padding:14px">${e(opts.emptyText || 'Tidak ada data.')}</td></tr>`;
+    : `<tr><td colspan="${cols.length + 1}" class="c" style="padding:14px">${e(opts.emptyText || 'Belum ada data untuk periode ini.')}</td></tr>`;
   const foot = rows.length && opts.totalRow
     ? '<tfoot><tr>' + opts.totalRow.map(c => `<td class="${c[2] || 'c'}"${c[1] > 1 ? ' colspan="' + c[1] + '"' : ''}>${e(c[0])}</td>`).join('') + '</tr></tfoot>' : '';
   const bodyHtml = (sum ? `<div class="sum">${sum}</div>` : '') +
@@ -12274,7 +12309,7 @@ function resetDashboardFilter() {
 
 function loadLiveDashboardData() {
   var syncText = document.getElementById('syncTimeText');
-  if (syncText) syncText.innerHTML = '<i class="fa fa-sync-alt fa-spin me-1"></i> Syncing...';
+  if (syncText) syncText.innerHTML = '<i class="fa fa-sync-alt fa-spin me-1"></i> Memperbarui…';
 
   // Mengambil Variabel Status Mutlak isCustomFilter dari parameter global
   var filterObj = {
@@ -12323,10 +12358,12 @@ function renderDashboardUI(data) {
 
   // 1. KPI DATA
   const todayCons = data.kpiTodayCons || (data.kpi && data.kpi.todayCons) || '0 L';
-  const totalCons = data.kpiTotalCons || (data.kpi && data.kpi.totalCons) || '23.300 L';
-  const efisiensi = data.kpiEfisiensi || (data.kpi && data.kpi.efisiensi) || '16.2 L/Jam';
-  const efisiensiKM = data.kpiEfisiensiKM || (data.kpi && data.kpi.efisiensiKM) || '358.4 L/KM';
-  const sisaStok = data.kpiSisaStok || (data.kpi && data.kpi.sisaStok) || '8,227.1 Liter';
+  // [Fase 49] angka seragam: desimal koma, satuan L/HM; printDesimal menjaga data lama (cache offline) bertitik
+  const totalCons = data.kpiTotalCons || (data.kpi && data.kpi.totalCons) || '0 L';
+  const efisiensi = printDesimal(data.kpiEfisiensi || (data.kpi && data.kpi.efisiensi) || '0,0 L/HM').replace('L/Jam', 'L/HM');
+  const efisiensiKM = printDesimal(data.kpiEfisiensiKM || (data.kpi && data.kpi.efisiensiKM) || '0,00 L/KM');
+  const sisaStok = (typeof data.numTankVal === 'number') ? fmtAngka(Math.round(data.numTankVal)) + ' L'
+    : (data.kpiSisaStok || (data.kpi && data.kpi.sisaStok) || '0 L');
   // [Fase 13] Supplier masuk periode: cukup liter (tanpa jumlah kedatangan "· Nx")
   const supplier = (typeof data.kpiSupplierLiter === 'number')
     ? Math.round(data.kpiSupplierLiter).toLocaleString('id-ID') + ' L'
@@ -12341,25 +12378,25 @@ function renderDashboardUI(data) {
   setKpiValue('kpiSupplier', supplier);
 
   if (data.lastSync) {
-    document.getElementById('syncTimeText').innerText = "Last Sync: " + data.lastSync;
+    document.getElementById('syncTimeText').innerText = "Diperbarui: " + String(data.lastSync).replace('(Cached)', '(tersimpan)');
   }
 
   // 2. STORAGE TANK DATA & LIVE FORECAST
   const perc = (data.tankPercentage !== undefined) ? parseFloat(data.tankPercentage) : ((data.tank && data.tank.percentage) ? parseFloat(data.tank.percentage) : 51.4);
-  const tankVol = data.numTankVal ? (data.numTankVal.toLocaleString("id-ID") + " L") : ((data.tank && data.tank.volume) || "8.227,1 L");
+  const tankVol = data.numTankVal ? (fmtAngka(Math.round(data.numTankVal)) + " L") : ((data.tank && data.tank.volume) || "0 L");
 
   // Radial Semi-Circle Tank Gauge V7 (animasi 0% -> stok aktual)
   if (typeof animateTankRadialGauge === 'function') {
     animateTankRadialGauge(perc);
   } else {
-    document.getElementById('tankPercentage').innerText = perc.toFixed(1) + "%";
+    document.getElementById('tankPercentage').innerText = fmtAngka(perc, 1) + "%";
     document.getElementById('tankFluid').style.height = perc + "%";
   }
   setKpiValue('tankVolumeText', tankVol);
 
   const daysLeftNum = data.daysLeftNum !== undefined ? data.daysLeftNum : 0;
-  const daysLeftText = data.daysLeftText || "0.0 Hari";
-  const avgConsText = data.avg7DaysConsText || "0 L/Hari";
+  const daysLeftText = (!data.daysLeftText || data.daysLeftText === 'N/A') ? '–' : printDesimal(data.daysLeftText).replace(' Hari', ' hari');
+  const avgConsText = (data.avg7DaysConsText || "0 L/Hari").replace('L/Hari', 'L/hari');
 
   if (document.getElementById('tankDaysLeftText')) document.getElementById('tankDaysLeftText').innerText = daysLeftText;
   if (document.getElementById('tankAvgConsText')) document.getElementById('tankAvgConsText').innerText = avgConsText;
@@ -12399,11 +12436,11 @@ function renderDashboardUI(data) {
   const cardMeteran = document.getElementById('cardMeteranRusak');
 
   if (hasAnomaly || meteranList.length > 0) {
-    if (alertBadge) { alertBadge.className = 'badge bg-danger glow-alert'; alertBadge.innerText = 'ANOMALI DETECTED'; }
+    if (alertBadge) { alertBadge.className = 'badge bg-danger glow-alert'; alertBadge.innerText = 'ADA ANOMALI'; }
     if (cardMeteran) cardMeteran.classList.add('card-anomali-active');
     playWebAudioAlert('meter_anomaly');
   } else {
-    if (alertBadge) { alertBadge.className = 'badge bg-success'; alertBadge.innerText = 'SYSTEM NORMAL'; }
+    if (alertBadge) { alertBadge.className = 'badge bg-success'; alertBadge.innerText = 'SISTEM NORMAL'; }
     if (cardMeteran) cardMeteran.classList.remove('card-anomali-active');
   }
 
@@ -12451,7 +12488,7 @@ function renderTableTopIrit(items) {
   if (!tbody) return;
   tbody.innerHTML = '';
   if (!globalTopIritData || globalTopIritData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted small py-3">Tidak Ada Data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted small py-3">Belum ada data untuk periode ini</td></tr>';
     return;
   }
 
@@ -12460,9 +12497,9 @@ function renderTableTopIrit(items) {
   top5.forEach((item, idx) => {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
-    const val = item.rateText || item.val || '-';
+    const val = teksSeragam(item.rateText || item.val);
     // [Fase 16] nilai = deviasi terhadap standar unit; aktual & standar di tooltip
-    const tip = item.aktualText ? `Aktual ${item.aktualText} · Standar ${item.stdText || '-'}` : '';
+    const tip = item.aktualText ? `Aktual ${teksSeragam(item.aktualText)} · Standar ${teksSeragam(item.stdText)}` : '';
     const tone = (typeof item.deviasi === 'number' && item.deviasi < 0) ? 'text-success' : '';
     tbody.innerHTML += `<tr><th>${escapeHtml(rank)}</th><td class="fw-bold text-white">${escapeHtml(unit)}</td><td class="text-end fw-bold tabular-nums ${tone}" title="${escapeHtml(tip)}">${escapeHtml(val)}</td></tr>`;
   });
@@ -12493,8 +12530,8 @@ function renderModalTableTopIrit(dataList) {
   dataList.forEach((item, idx) => {
     const rank = item.rank || (idx + 1);
     const unit = item.unit || item.kodeUnit || '-';
-    const val = item.rateText || item.val || '-';
-    const sub = item.aktualText ? `${item.aktualText} · std ${item.stdText || '-'}` : '';
+    const val = teksSeragam(item.rateText || item.val);
+    const sub = item.aktualText ? `${teksSeragam(item.aktualText)} · std ${teksSeragam(item.stdText)}` : '';
     html += `<tr>
               <td>${escapeHtml(rank)}</td>
               <td class="fw-bold text-success">${escapeHtml(unit)}</td>
@@ -12533,7 +12570,7 @@ function renderTableTopKonsumsi(items) {
   if (!tbody) return;
   tbody.innerHTML = '';
   if (!globalTopKonsumsiData || globalTopKonsumsiData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted small py-3">Tidak Ada Data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted small py-3">Belum ada data untuk periode ini</td></tr>';
     return;
   }
 
@@ -12597,7 +12634,8 @@ function filterModalTopKonsumsi() {
 // --- RENDER & MODAL HANDLER: STATUS AUDIT DEVIASI FLEET ---
 // [Fase 14] Angka deviasi dari teks "+23.4%" & urutan dari deviasi terbesar (kartu & pop-up sama)
 function devNum(it) {
-  const n = parseFloat(String((it && it.deviasiText) || '').replace(',', '.').replace(/[^0-9.+-]/g, ''));
+  const raw = String((it && it.deviasiText) || ''); // [Fase 49] "+1.234,5%" (baru) atau "+6.9%" (lama)
+  const n = parseFloat((raw.indexOf(',') !== -1 ? raw.replace(/\./g, '').replace(',', '.') : raw).replace(/[^0-9.+-]/g, ''));
   return isFinite(n) ? n : 0;
 }
 function sortDeviasiDesc(list) {
@@ -12663,7 +12701,7 @@ function renderTableAuditDeviasi(items) {
         <span class="audit-top-rank tabular-nums">${i + 1}</span>
         <span class="audit-top-main">
           <span class="audit-top-row"><span class="audit-top-unit">${escapeHtml(it.unit || it.kodeUnit || '-')}</span>
-            <span class="audit-top-chip ${tone} tabular-nums" title="${escapeHtml(it.statusText || '')}">${escapeHtml(it.deviasiText || '-')}</span></span>
+            <span class="audit-top-chip ${tone} tabular-nums" title="${escapeHtml(it.statusText || '')}">${escapeHtml(teksSeragam(it.deviasiText))}</span></span>
           <span class="audit-top-bar ${tone}" aria-hidden="true"><span style="width:${w}%"></span></span>
         </span>
       </li>`;
@@ -12694,7 +12732,7 @@ function renderModalTableDeviasi(dataList) {
   let html = '';
   dataList.forEach((item, idx) => {
     const unit = item.unit || item.kodeUnit || '-';
-    const deviasi = item.deviasiText || '-';
+    const deviasi = teksSeragam(item.deviasiText);
     html += `<tr>
               <td>${idx + 1}</td>
               <td class="fw-bold text-danger">${escapeHtml(unit)}</td>
@@ -13468,7 +13506,7 @@ function animateTankRadialGauge(percent) {
     }
   }
   const pctEl = document.getElementById('tankPercentage');
-  if (pctEl) animateCountUp(pctEl, p.toFixed(1) + '%');
+  if (pctEl) animateCountUp(pctEl, fmtAngka(p, 1) + '%');
 
   // Jarum gauge (video V7): -90° = 0%, +90° = 100%; transisi 900ms via CSS
   const needle = document.getElementById('tankGaugeNeedle');
@@ -13523,7 +13561,7 @@ function updateDashboardGreeting() {
   else if (h >= 11 && h < 15) greet = 'Selamat Siang';
   else if (h >= 15 && h < 18) greet = 'Selamat Sore';
 
-  let name = 'Guest';
+  let name = 'Tamu';
   try {
     const s = JSON.parse(localStorage.getItem('darkpan_user_session') || '{}');
     if (s && (s.fullName || s.username)) name = s.fullName || s.username;
@@ -13845,7 +13883,7 @@ function renderDashMapMarkers(fit) {
     const pct = total > 0 ? (liter / total * 100) : 0;
     const m = L.circleMarker([p.lat, p.lng], { radius: r, color: '#FFFFFF', weight: 2, fillColor: liter > 0 ? brand : '#9DB3A8', fillOpacity: 0.85 })
       .bindPopup(`<div class="dash-map-pop"><strong>${escapeHtml(p.nama)}</strong>
-        <span>${Math.round(liter).toLocaleString('id-ID')} L · ${pct.toFixed(1)}% konsumsi periode</span>
+        <span>${fmtAngka(Math.round(liter))} L · ${fmtAngka(pct, 1)}% konsumsi periode</span>
         <small>${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}</small></div>`)
       .bindTooltip(escapeHtml(p.nama), { direction: 'top', offset: [0, -r], className: 'dash-map-tip' });
     m.addTo(DASH_MAP_LAYER);
@@ -14174,14 +14212,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (mobileMasterBadge) mobileMasterBadge.style.display = 'none';
 
                 if (dropdownAuthBtn) {
-                    dropdownAuthBtn.innerHTML = '<i class="fa fa-sign-out-alt text-danger me-2"></i>Logout ke Guest';
+                    dropdownAuthBtn.innerHTML = '<i class="fa fa-sign-out-alt text-danger me-2"></i>Keluar ke Mode Tamu';
                     dropdownAuthBtn.setAttribute('onclick', 'logoutToGuest(); return false;');
                 }
                 resetInactivityTimer();
             } else {
-                if (sidebarName) sidebarName.innerText = 'Guest Mode';
+                if (sidebarName) sidebarName.innerText = 'Mode Tamu';
                 if (sidebarRole) sidebarRole.innerText = 'Pengawas Site';
-                if (headerName) headerName.innerText = 'Guest Mode';
+                if (headerName) headerName.innerText = 'Mode Tamu';
 
                 if (sidebarAvatar) sidebarAvatar.src = guestAvatarSrc;
                 if (headerAvatar) headerAvatar.src = guestAvatarSrc;
@@ -14287,7 +14325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             inactivityTimer = setTimeout(() => {
                 if (currentAuthMode === 'ADMIN') {
                     logoutToGuest();
-                    showAlertModal("Sesi Admin telah berakhir karena tidak ada aktivitas selama 15 menit. Anda telah dikembalikan ke Guest Mode.", "Sesi Berakhir", "info");
+                    showAlertModal("Sesi Admin telah berakhir karena tidak ada aktivitas selama 15 menit. Anda telah dikembalikan ke Mode Tamu.", "Sesi Berakhir", "info");
                 }
             }, INACTIVITY_LIMIT_MS);
         }
