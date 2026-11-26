@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=c086682784"></script>
-    <script src="./pages-offline-ui.js?v=c086682784" defer></script>
-    <script src="./pages-install.js?v=c086682784" defer></script>
+    <script src="./gas-adapter.js?v=1faa163089"></script>
+    <script src="./pages-offline-ui.js?v=1faa163089" defer></script>
+    <script src="./pages-install.js?v=1faa163089" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3723,10 +3723,6 @@
         #sidebarTankCard[data-level="critical"], #sidebarTankCard[data-level="critical"] .sidebar-tank-dot { animation: none; }
     }
 
-    /* [Fase 48] Kartu Stok: baris total di bawah tabel */
-    #tfootKartuStok tr.ks-total > td { background: var(--bg-inset) !important; border-top: 1px solid var(--border-subtle); padding-top: 10px; padding-bottom: 10px; }
-    #tfootKartuStok tr.ks-total > td.dash-card-sub { white-space: normal; font-size: 0.68rem; }
-
     /* [Fase 47] Database Master: pilihan urutan + tanda baris "BARU" (diinput di sesi ini) */
     .db-sort-switch { flex: none; flex-wrap: nowrap; }
     .db-sort-switch > .btn { padding: 5px 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
@@ -4715,16 +4711,15 @@
                         <th class="text-center">Tanggal</th>
                         <th class="text-center">Jam</th>
                         <th id="thMeterLabel" class="text-center">HM</th>
-                        <th class="text-center" id="thKsSelisih">Selisih HM</th>
+                        <th class="text-center" id="thKsSelisih" title="Angka meter pengisian ini dikurangi angka meter pengisian sebelumnya = jam kerja (HM) / jarak (KM) yang ditempuh">Selisih HM</th>
                         <th class="text-center">Liter</th>
-                        <th class="text-center" id="thKsRate">L/HM (selang)</th>
+                        <th class="text-center" id="thKsRate" title="Liter pengisian sebelumnya ÷ selisih meter = konsumsi selama selang itu (cara hitung sama dengan Rata-rata Efisiensi)">L/HM (selang)</th>
                         <th class="text-center">Lokasi</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyKartuStok" class="text-center">
                     <tr><td colspan="7" class="text-center text-muted py-4">Memuat data riwayat transaksi...</td></tr>
                 </tbody>
-                <tfoot id="tfootKartuStok"></tfoot>
             </table>
         </div>
 
@@ -4977,11 +4972,9 @@
         const countInfo = document.getElementById('countKartuStokInfo');
         if (!tbody) return;
 
-        const tfoot = document.getElementById('tfootKartuStok');
         if (!cachedKartuStokRows || cachedKartuStokRows.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada riwayat transaksi pengisian solar pada periode ini.</td></tr>';
             if (countInfo) countInfo.innerText = 'Menampilkan 0 dari 0 transaksi';
-            if (tfoot) tfoot.innerHTML = '';
             return;
         }
 
@@ -5019,13 +5012,8 @@
             </tr>`;
         });
         tbody.innerHTML = rowHtml;
-        if (tfoot) {
-            let totSel = 0, totL = 0;
-            cachedKartuStokRows.forEach(r => { totL += num(r.totalLiter); if (r.selisih > 0) totSel += r.selisih; });
-            tfoot.innerHTML = `<tr class="ks-total"><td colspan="3" class="text-start fw-bold">Total ${cachedKartuStokRows.length} pengisian</td>` +
-                `<td class="text-center tabular-nums fw-bold">${totSel > 0 ? fmt(totSel, 1) + ' ' + sat : '–'}</td>` +
-                `<td class="text-center tabular-nums fw-bold">${fmt(totL, 0)} L</td><td colspan="2" class="text-start dash-card-sub">"–" = pengisian pertama / meter tak terbaca / tidak bertambah</td></tr>`;
-        }
+        // (baris total di layar dihapus atas masukan pengguna — totalnya sudah ada di 4 kartu ringkasan di atas)
+        if (countInfo) countInfo.innerText += ' · "–" = pengisian pertama / meter tak terbaca / tidak bertambah';
     }
 
     /* [Fase 41] Cetak / PDF Kartu Stok — dokumen bersih A4 (semua baris, bukan hanya yang tampil) */
