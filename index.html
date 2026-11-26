@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=8fecb5d979"></script>
-    <script src="./pages-offline-ui.js?v=8fecb5d979" defer></script>
-    <script src="./pages-install.js?v=8fecb5d979" defer></script>
+    <script src="./gas-adapter.js?v=c086682784"></script>
+    <script src="./pages-offline-ui.js?v=c086682784" defer></script>
+    <script src="./pages-install.js?v=c086682784" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3723,6 +3723,10 @@
         #sidebarTankCard[data-level="critical"], #sidebarTankCard[data-level="critical"] .sidebar-tank-dot { animation: none; }
     }
 
+    /* [Fase 48] Kartu Stok: baris total di bawah tabel */
+    #tfootKartuStok tr.ks-total > td { background: var(--bg-inset) !important; border-top: 1px solid var(--border-subtle); padding-top: 10px; padding-bottom: 10px; }
+    #tfootKartuStok tr.ks-total > td.dash-card-sub { white-space: normal; font-size: 0.68rem; }
+
     /* [Fase 47] Database Master: pilihan urutan + tanda baris "BARU" (diinput di sesi ini) */
     .db-sort-switch { flex: none; flex-wrap: nowrap; }
     .db-sort-switch > .btn { padding: 5px 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
@@ -4706,18 +4710,21 @@
         <div class="table-responsive v7-table-scroll">
             <table class="table table-clean table-hover align-middle mb-0">
                 <thead>
+                    <!-- [Fase 48] sama dengan cetakan: tanggal Indonesia, selisih meter & L/HM per selang, total; kolom Kode Unit (selalu sama) dihapus — kode unit ada di judul -->
                     <tr class="text-center">
                         <th class="text-center">Tanggal</th>
-                        <th class="text-center">Waktu</th>
-                        <th class="text-center">Kode Unit</th>
+                        <th class="text-center">Jam</th>
                         <th id="thMeterLabel" class="text-center">HM</th>
-                        <th class="text-center">Total Liter</th>
-                        <th class="text-center">Lokasi Pit</th>
+                        <th class="text-center" id="thKsSelisih">Selisih HM</th>
+                        <th class="text-center">Liter</th>
+                        <th class="text-center" id="thKsRate">L/HM (selang)</th>
+                        <th class="text-center">Lokasi</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyKartuStok" class="text-center">
-                    <tr><td colspan="6" class="text-center text-muted py-4">Memuat data riwayat transaksi...</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Memuat data riwayat transaksi...</td></tr>
                 </tbody>
+                <tfoot id="tfootKartuStok"></tfoot>
             </table>
         </div>
 
@@ -4944,13 +4951,17 @@
         // 2. Update 4 Kartu KPI
         setKartuStokKpi('kpiKartuStokTotal', data.totalBbmText || '0 Liter');
         setKartuStokKpi('kpiKartuStokFrekuensi', data.frekuensiText || '0 Kali');
-        setKartuStokKpi('kpiKartuStokEfisiensi', data.efisiensiText || '-');
+        setKartuStokKpi('kpiKartuStokEfisiensi', typeof printDesimal === 'function' ? printDesimal(data.efisiensiText || '-') : (data.efisiensiText || '-')); // [Fase 48] desimal koma
         setKartuStokKpi('kpiKartuStokAvgIsi', data.avgPerPengisianText || '0 Liter');
 
         // 3. Update Title, Periode & Header Satuan
         if (document.getElementById('titleUnitCode')) document.getElementById('titleUnitCode').innerText = data.selectedUnit || '-';
-        if (document.getElementById('periodeKartuStokText')) document.getElementById('periodeKartuStokText').innerText = 'Periode: ' + (data.tglAwalStr || '') + ' s/d ' + (data.tglAkhirStr || '');
-        if (document.getElementById('thMeterLabel')) document.getElementById('thMeterLabel').innerText = data.unitSatuan || 'HM';
+        const tglID = (s) => (typeof printTanggal === 'function' ? printTanggal(s) : (s || ''));
+        if (document.getElementById('periodeKartuStokText')) document.getElementById('periodeKartuStokText').innerText = 'Periode: ' + tglID(data.tglAwalStr) + ' s/d ' + tglID(data.tglAkhirStr);
+        const sat = data.unitSatuan || 'HM';
+        if (document.getElementById('thMeterLabel')) document.getElementById('thMeterLabel').innerText = 'Meter (' + sat + ')';
+        if (document.getElementById('thKsSelisih')) document.getElementById('thKsSelisih').innerText = 'Selisih ' + sat;
+        if (document.getElementById('thKsRate')) document.getElementById('thKsRate').innerText = 'L/' + sat + ' (selang)';
 
         // 4. Cache Data Rows & Render Tabel Sesuai Limit
         cachedKartuStokRows = data.rows || [];
@@ -4966,9 +4977,11 @@
         const countInfo = document.getElementById('countKartuStokInfo');
         if (!tbody) return;
 
+        const tfoot = document.getElementById('tfootKartuStok');
         if (!cachedKartuStokRows || cachedKartuStokRows.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada riwayat transaksi pengisian solar pada periode ini.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada riwayat transaksi pengisian solar pada periode ini.</td></tr>';
             if (countInfo) countInfo.innerText = 'Menampilkan 0 dari 0 transaksi';
+            if (tfoot) tfoot.innerHTML = '';
             return;
         }
 
@@ -4984,19 +4997,35 @@
             countInfo.innerText = `Menampilkan ${displayRows.length} dari ${cachedKartuStokRows.length} transaksi`;
         }
 
+        // [Fase 48] sama dengan cetakan: tanggal Indonesia ringkas, meter tanpa satuan (ada di judul kolom),
+        // selisih & L/HM per selang (dari server), baris total untuk SEMUA baris periode
+        const sat = (LAST_KARTU_STOK_DATA && LAST_KARTU_STOK_DATA.unitSatuan) || 'HM';
+        const fmt = (n, dg) => Number(n).toLocaleString('id-ID', { minimumFractionDigits: dg, maximumFractionDigits: dg });
+        const num = (s) => parseFloat(String(s || '0').replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+        const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'], BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const tgl = (s) => { const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(s || '')); if (!m) return String(s || '-');
+            const d = new Date(+m[3], +m[1] - 1, +m[2]); return HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear(); };
         let rowHtml = '';
         displayRows.forEach(r => {
             var waktuDisplay = r.waktu || r.jam || '-';
             rowHtml += `<tr class="text-center">
-                <td class="text-center tabular-nums">${escapeHtml(r.tanggal)}</td>
+                <td class="text-center tabular-nums text-nowrap">${escapeHtml(tgl(r.tanggal))}</td>
                 <td class="text-center tabular-nums text-muted">${escapeHtml(waktuDisplay)}</td>
-                <td class="text-center fw-bold text-white">${escapeHtml(r.noUnit)}</td>
-                <td class="text-center tabular-nums">${escapeHtml(r.hmKm)}</td>
+                <td class="text-center tabular-nums">${escapeHtml(String(r.hmKm || '').replace(/\s*(HM|KM)$/, ''))}</td>
+                <td class="text-center tabular-nums">${r.selisih > 0 ? fmt(r.selisih, 1) : '<span class="text-muted">–</span>'}</td>
                 <td class="text-center fw-bold text-brand tabular-nums">${escapeHtml(r.totalLiter)}</td>
+                <td class="text-center tabular-nums fw-bold">${r.rate > 0 ? fmt(r.rate, sat === 'KM' ? 2 : 1) : '<span class="text-muted fw-normal">–</span>'}</td>
                 <td class="text-center"><span class="badge badge-location">${escapeHtml(r.lokasi)}</span></td>
             </tr>`;
         });
         tbody.innerHTML = rowHtml;
+        if (tfoot) {
+            let totSel = 0, totL = 0;
+            cachedKartuStokRows.forEach(r => { totL += num(r.totalLiter); if (r.selisih > 0) totSel += r.selisih; });
+            tfoot.innerHTML = `<tr class="ks-total"><td colspan="3" class="text-start fw-bold">Total ${cachedKartuStokRows.length} pengisian</td>` +
+                `<td class="text-center tabular-nums fw-bold">${totSel > 0 ? fmt(totSel, 1) + ' ' + sat : '–'}</td>` +
+                `<td class="text-center tabular-nums fw-bold">${fmt(totL, 0)} L</td><td colspan="2" class="text-start dash-card-sub">"–" = pengisian pertama / meter tak terbaca / tidak bertambah</td></tr>`;
+        }
     }
 
     /* [Fase 41] Cetak / PDF Kartu Stok — dokumen bersih A4 (semua baris, bukan hanya yang tampil) */
@@ -7656,6 +7685,7 @@
   /* [Fase 27] Pengaman kode unit Database Master (hanya PENGELUARAN UNIT). Saat Edit, kode unit lama yang
      tidak diubah tetap boleh (data lama dari unit yang sudah dihapus). → true bila boleh disimpan. */
   let ADMIN_EDIT_ORIG_UNIT = '';
+  let ADMIN_STATUS_CONFIRMED = ''; // [Fase 48b] kode unit non-Active yang sudah dikonfirmasi lewat SIMPAN kedua
   function checkAdminUnitCode(onSave) {
     const el = document.getElementById('adminNoUnit');
     const hint = document.getElementById('adminUnitHint');
@@ -7667,6 +7697,22 @@
     const ru = resolveUnitCode(val);
     if (ru.ok) {
       if (ru.kode && ru.kode !== val) el.value = ru.kode;
+      // [Fase 48b] unit berstatus selain Active (Standby / Breakdown / dll.) → keterangan + konfirmasi saat SIMPAN
+      const st = ru.unit && ru.unit.status ? String(ru.unit.status).trim() : '';
+      if (st && st.toUpperCase() !== 'ACTIVE') {
+        const kode = ru.kode || val.toUpperCase();
+        const sudah = ADMIN_STATUS_CONFIRMED === kode;
+        hint.innerHTML = `<i class="fa fa-exclamation-triangle me-1"></i>Unit <b>${escapeHtml(kode)}</b> berstatus <b>${escapeHtml(st.toUpperCase())}</b> di Master Unit — biasanya tidak diisi BBM. Pastikan kode unit sudah benar.` +
+          (onSave && !sudah ? ' Bila memang benar, tekan <b>SIMPAN DATA</b> sekali lagi.' : '');
+        hint.classList.remove('d-none');
+        if (onSave && !sudah) {
+          ADMIN_STATUS_CONFIRMED = kode; // tekan SIMPAN kedua (kode sama) → tetap disimpan
+          // (tanpa toast & tanpa memindah kursor: keterangan di bawah kolom sudah menjelaskan; toast / daftar saran
+          //  kode unit yang terbuka saat kolom difokuskan bisa menutupi tombol SIMPAN sehingga tekan kedua tidak sampai)
+          return false;
+        }
+        return true;
+      }
       hint.classList.add('d-none');
       return true;
     }
@@ -7680,6 +7726,7 @@
     const item = ADMIN_CACHE_ROWS.find(r => r.rowIndex == rowIndex);
     if (!item) return;
     ADMIN_EDIT_ORIG_UNIT = String(item.noUnit || '').trim(); // [Fase 27]
+    ADMIN_STATUS_CONFIRMED = ''; // [Fase 48b]
     document.getElementById('adminUnitHint').classList.add('d-none');
     document.getElementById('adminRowIndex').value = item.rowIndex;
     EDIT_ROW_KEYS.admin = item.rowKey || '';
@@ -7712,6 +7759,7 @@
     document.getElementById('adminRowIndex').value = 0;
     EDIT_ROW_KEYS.admin = '';
     ADMIN_EDIT_ORIG_UNIT = ''; // [Fase 27]
+    ADMIN_STATUS_CONFIRMED = ''; // [Fase 48b]
     document.getElementById('adminUnitHint').classList.add('d-none');
     document.getElementById('adminJam').value = '';
     document.getElementById('adminJam').classList.remove('is-invalid');
@@ -11450,8 +11498,10 @@
         const spike = isError ? null : getMeterSpikeInfo();
         const back = isError ? null : getMeterBackInfo();
         // [Fase 18] Unit berstatus Breakdown di Master Unit → peringatan saja
-        const breakdownNote = String(currentUnitMasterMeta.unitStatus || '').toUpperCase() === 'BREAKDOWN'
-            ? 'Unit ini berstatus Breakdown di Master Unit. Pastikan unit memang sudah beroperasi kembali.' : '';
+        // [Fase 48b] juga Standby & status lain selain Active (sebelumnya Standby lolos tanpa peringatan)
+        const stUnit = String(currentUnitMasterMeta.unitStatus || '').trim();
+        const breakdownNote = stUnit && stUnit.toUpperCase() !== 'ACTIVE'
+            ? 'Unit ini berstatus ' + stUnit.toUpperCase() + ' di Master Unit. Pastikan unit memang sudah beroperasi kembali.' : ''; // di-escape saat ditampilkan
 
         if (isError) {
             warningBox.removeClass('d-none');
