@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=67fa0ba86a"></script>
-    <script src="./pages-offline-ui.js?v=67fa0ba86a" defer></script>
-    <script src="./pages-install.js?v=67fa0ba86a" defer></script>
+    <script src="./gas-adapter.js?v=456526183b"></script>
+    <script src="./pages-offline-ui.js?v=456526183b" defer></script>
+    <script src="./pages-install.js?v=456526183b" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3841,6 +3841,12 @@
     .bahasa-btn:hover { color: var(--brand-primary); }
     .bahasa-btn.active { background: var(--brand-primary); color: var(--on-brand-primary); }
     .bahasa-btn:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+    /* menu profil (topbar): baris Bahasa + tombol ID | EN mini */
+    .v7-menu-icon--lang { background: var(--tone-rose-bg); color: var(--tone-rose); }
+    .v7-menu-item--lang { cursor: default; }
+    .v7-menu-item--lang:active { background: transparent; }
+    .bahasa-seg--mini { flex-shrink: 0; padding: 2px; gap: 2px; }
+    .bahasa-seg--mini .bahasa-btn { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; padding: 3px 9px; }
 </style>
 
 
@@ -4068,6 +4074,15 @@
                                     <span class="v7-menu-text"><span class="v7-menu-label">Audio Sirene</span><span class="v7-menu-sub">Peringatan stok &amp; anomali</span></span>
                                     <span class="v7-menu-state" id="dropdownSirenState">ON</span>
                                 </a>
+                                <!-- [Fase 50] Bahasa (Indonesia / English) — klik tidak menutup menu -->
+                                <div class="dropdown-item v7-menu-item v7-menu-item--lang" id="dropdownBahasaRow" onclick="event.stopPropagation();">
+                                    <span class="v7-menu-icon v7-menu-icon--lang"><i class="fa fa-globe"></i></span>
+                                    <span class="v7-menu-text"><span class="v7-menu-label">Bahasa</span><span class="v7-menu-sub">Indonesia / English</span></span>
+                                    <span class="bahasa-seg bahasa-seg--mini" role="group" aria-label="Bahasa">
+                                        <button type="button" class="bahasa-btn" data-bahasa="id" title="Bahasa Indonesia" onclick="event.stopPropagation(); setBahasa('id');">ID</button>
+                                        <button type="button" class="bahasa-btn" data-bahasa="en" title="English" onclick="event.stopPropagation(); setBahasa('en');">EN</button>
+                                    </span>
+                                </div>
 
                                 <a href="#" class="dropdown-item v7-menu-auth" id="dropdownAuthBtn" onclick="switchTab('PROFIL'); return false;">
                                     <i class="fa fa-key me-2"></i>Login Admin
@@ -11055,7 +11070,7 @@
     'Terkunci': 'Locked', 'Pesan Toast': 'Notification', 'Masukkan 4-Digit PIN otentikasi': 'Enter the 4-digit authentication PIN', 'PIN Salah!': 'Wrong PIN!',
     'Peringatan Browser': 'Browser Warning', 'Sync Error!': 'Sync error!', 'Akses Ditolak: Anda belum login!': 'Access denied: you are not signed in!',
     'Bahasa': 'Language', 'Bahasa tampilan aplikasi, cetakan, dan pesan WA': 'Language for the app, printouts and WhatsApp messages',
-    'Berlaku di perangkat ini': 'Applies on this device',
+    'Berlaku di perangkat ini': 'Applies on this device', 'Bahasa Indonesia': 'Indonesian',
     'Berlaku di perangkat ini. Email otomatis (Laporan Sore & Pengingat STNK) mengikuti pilihan terakhir Master Admin.': 'Applies on this device. Automatic emails (Evening Report & Vehicle Registration Reminder) follow the Master Admin’s latest choice.',
 
     // --- Scan to Fill ---
