@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <!-- [Fase 8] Versi GitHub Pages: adaptor google.script.run → API Apps Script /exec -->
     <script>window.AB_FUEL_API_URL = "https://script.google.com/macros/s/AKfycby8CA01xy7WNR1mBk8DDeHZVkokSHg0293wS74LH_5ZUG9panRtLetD4vbjUQkBdSl2/exec";</script>
-    <script src="./gas-adapter.js?v=456526183b"></script>
-    <script src="./pages-offline-ui.js?v=456526183b" defer></script>
-    <script src="./pages-install.js?v=456526183b" defer></script>
+    <script src="./gas-adapter.js?v=d351fc076d"></script>
+    <script src="./pages-offline-ui.js?v=d351fc076d" defer></script>
+    <script src="./pages-install.js?v=d351fc076d" defer></script>
     <title>AB - Fuel Management System</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
@@ -3841,6 +3841,14 @@
     .bahasa-btn:hover { color: var(--brand-primary); }
     .bahasa-btn.active { background: var(--brand-primary); color: var(--on-brand-primary); }
     .bahasa-btn:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+    /* Profil (2 kolom berdampingan): bawah kedua kolom rata — kartu terakhir tiap kolom mengisi sisa tinggi,
+       catatan kecilnya turun ke dasar kartu (masukan pengguna "tidak presisi") */
+    @media (min-width: 992px) {
+        @container profrow (min-width: 800px) {
+            .profil-main-row > .profil-col > .profil-card:last-child { flex: 1 1 auto; display: flex; flex-direction: column; }
+            .profil-main-row > .profil-col > .profil-card:last-child > .profil-note:last-child { margin-top: auto !important; padding-top: 10px; }
+        }
+    }
     /* menu profil (topbar): baris Bahasa + tombol ID | EN mini */
     .v7-menu-icon--lang { background: var(--tone-rose-bg); color: var(--tone-rose); }
     .v7-menu-item--lang { cursor: default; }
@@ -9405,22 +9413,6 @@
                     </div>
                 </div>
 
-                <!-- [Fase 50] Bahasa tampilan (Indonesia / English) — berlaku di perangkat ini -->
-                <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 2;" id="cardBahasa">
-                    <div class="profil-card-head">
-                        <span class="profil-card-icon"><i class="fa fa-globe" aria-hidden="true"></i></span>
-                        <div>
-                            <h6 class="dash-card-title mb-0">Bahasa</h6>
-                            <span class="dash-card-sub">Bahasa tampilan aplikasi, cetakan, dan pesan WA</span>
-                        </div>
-                    </div>
-                    <div class="bahasa-seg bahasa-seg--full" role="group" aria-label="Bahasa">
-                        <button type="button" class="bahasa-btn" data-bahasa="id" onclick="setBahasa('id')">Indonesia</button>
-                        <button type="button" class="bahasa-btn" data-bahasa="en" onclick="setBahasa('en')">English</button>
-                    </div>
-                    <p class="profil-note mb-0 mt-2">Berlaku di perangkat ini. Email otomatis (Laporan Sore &amp; Pengingat STNK) mengikuti pilihan terakhir Master Admin.</p>
-                </div>
-
                 <!-- [Fase 28] Keluar: satu tempat untuk kedua cara keluar (HP: paling bawah) -->
                 <div class="glass-card no-lift profil-card profil-card--keluar stagger-item" style="--stagger-idx: 2;">
                     <div class="profil-card-head">
@@ -9521,6 +9513,22 @@
                             <span class="profil-live"><span class="profil-live-dot"></span>Aktif</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- [Fase 50] Bahasa tampilan (Indonesia / English) — berlaku di perangkat ini -->
+                <div class="glass-card no-lift profil-card stagger-item" style="--stagger-idx: 2;" id="cardBahasa">
+                    <div class="profil-card-head">
+                        <span class="profil-card-icon"><i class="fa fa-globe" aria-hidden="true"></i></span>
+                        <div>
+                            <h6 class="dash-card-title mb-0">Bahasa</h6>
+                            <span class="dash-card-sub">Bahasa tampilan aplikasi, cetakan, dan pesan WA</span>
+                        </div>
+                    </div>
+                    <div class="bahasa-seg bahasa-seg--full" role="group" aria-label="Bahasa">
+                        <button type="button" class="bahasa-btn" data-bahasa="id" onclick="setBahasa('id')">Indonesia</button>
+                        <button type="button" class="bahasa-btn" data-bahasa="en" onclick="setBahasa('en')">English</button>
+                    </div>
+                    <p class="profil-note mb-0 mt-2">Berlaku di perangkat ini. Email otomatis (Laporan Sore &amp; Pengingat STNK) mengikuti pilihan terakhir Master Admin.</p>
                 </div>
             </div>
         </div>
@@ -10779,6 +10787,7 @@
         evaluatePasswordRules();
     });
 </script>
+
                     </div>
                 </div>
             </div>
@@ -11090,7 +11099,7 @@
 
     // --- Dashboard ---
     'Selamat Datang': 'Welcome', 'Selamat Pagi': 'Good Morning', 'Selamat Siang': 'Good Afternoon', 'Selamat Sore': 'Good Afternoon', 'Selamat Malam': 'Good Evening',
-    'Langsung · tiap 30 detik': 'Live · every 30 seconds', 'Memuat waktu WITA...': 'Loading WITA time...', 'ADA ANOMALI': 'ANOMALY FOUND', 'SISTEM NORMAL': 'SYSTEM NORMAL',
+    'Langsung · tiap 30 detik': 'Live · every 30 seconds', 'Memuat waktu WITA...': 'Loading WITA time...', 'ADA ANOMALI': 'ANOMALY DETECTED', 'SISTEM NORMAL': 'SYSTEM NORMAL',
     'Diperbarui:': 'Updated:', 'Tren Konsumsi BBM Site': 'Site Fuel Consumption Trend',
     'Liter per periode filter · area hijau = total site, garis = tiap kelompok unit': 'Litres per filter period · green area = site total, lines = each unit group',
     'Pilih seri grafik': 'Choose chart series', 'Total Site': 'Site Total', 'Alat Berat': 'Heavy Equipment', 'Dump Truck': 'Dump Truck', 'Dumptruck': 'Dump Truck',
@@ -11286,7 +11295,7 @@
     'Minimal 8 karakter': 'At least 8 characters', 'Mengandung huruf dan angka': 'Contains letters and numbers', 'Konfirmasi sama persis': 'Confirmation matches exactly',
     'Hindari kata sandi umum, tanggal lahir, atau username.': 'Avoid common passwords, birth dates or your username.', 'Simpan Kata Sandi Baru': 'Save New Password',
     'Lemah': 'Weak', 'Cukup': 'Fair', 'Kuat': 'Strong', 'Sangat kuat': 'Very strong', 'Sesi & Perangkat': 'Sessions & Devices', 'Kendalikan di mana akun Anda sedang masuk': 'Control where your account is signed in',
-    'Memuat perangkat…': 'Loading devices…', 'Muat ulang daftar perangkat': 'Reload device list', 'Perangkat ini': 'This device', 'Perangkat': 'Device', 'perangkat sedang masuk': 'devices signed in',
+    'Memuat perangkat…': 'Loading devices…', 'Muat ulang daftar perangkat': 'Reload device list', 'Perangkat ini': 'This device', 'Perangkat': 'Device', 'perangkat sedang masuk': 'device(s) signed in',
     'Daftar perangkat tidak tersedia': 'Device list not available', 'Daftar perangkat tidak tersedia (offline)': 'Device list not available (offline)', 'Sesi berlaku': 'Session valid', '(Aplikasi)': '(App)',
     'Keluar dari Semua Perangkat': 'Sign Out of All Devices', 'Akhiri sesi akun Anda di SEMUA perangkat, termasuk perangkat ini? Anda perlu login kembali.': 'End your account session on ALL devices, including this one? You will need to sign in again.',
     'Semua sesi telah diakhiri. Silakan login kembali.': 'All sessions have ended. Please sign in again.', 'Panel Kelola User': 'User Management Panel', 'Khusus Master Admin': 'Master Admin only',
@@ -11406,6 +11415,8 @@
   pola(/^([\d.,]+) L\/hari$/, '$1 L/day'); pola(/^([\d.,]+)% dari 16[.,]000 L$/, '$1% of 16,000 L');
   pola(/^Lihat Semua \(([\d.,]+)\)$/, 'View All ($1)'); pola(/^Tampilkan Unit \(([\d.,]+)\)$/, 'Show Units ($1)');
   pola(/^Dev (.+)$/, 'Dev $1');
+  pola(/^(.+) \(tersimpan\)$/, function (m, a) { return T(a) + ' (cached)'; }); pola(/^(.+) \(Aplikasi\)$/, '$1 (App)'); pola(/^Masuk (\d[^·]*)$/, 'Signed in $1');
+  pola(/^Berakhir (\d.+)$/, 'Ends $1'); pola(/^aktif (\d+) mnt lalu$/, 'active $1 min ago'); pola(/^aktif (\d+) jam lalu$/, 'active $1 hr ago'); pola(/^Terakhir aktif (.+)$/, function (m, a) { return 'Last active ' + T(a); });
   pola(/^(Masuk|Keluar) hari ini: (.+) · (stok awal \+ masuk|total keluar) (.+)$/, function (m, a, b, c, d) {
     return (a === 'Masuk' ? 'In' : 'Out') + ' today: ' + b + ' · ' + (c === 'total keluar' ? 'total out' : 'opening stock + in') + ' ' + d; });
   pola(/^Sisa di tangki: (.+)$/, 'Left in tank: $1');
